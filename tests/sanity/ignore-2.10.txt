@@ -1,0 +1,16 @@
+plugins/modules/cloudscale_floating_ip.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloudscale_floating_ip.py validate-modules:doc-missing-type
+plugins/modules/cloudscale_floating_ip.py validate-modules:doc-required-mismatch
+plugins/modules/cloudscale_server.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloudscale_server.py validate-modules:doc-missing-type
+plugins/modules/cloudscale_server.py validate-modules:doc-required-mismatch
+plugins/modules/cloudscale_server.py validate-modules:parameter-list-no-elements
+plugins/modules/cloudscale_server_group.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloudscale_server_group.py validate-modules:doc-missing-type
+plugins/modules/cloudscale_server_group.py validate-modules:doc-required-mismatch
+plugins/modules/cloudscale_volume.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloudscale_volume.py validate-modules:doc-missing-type
+plugins/modules/cloudscale_volume.py validate-modules:doc-required-mismatch
+plugins/modules/cloudscale_volume.py validate-modules:parameter-list-no-elements
+plugins/doc_fragments/cloudscale.py future-import-boilerplate
+plugins/doc_fragments/cloudscale.py metaclass-boilerplate

@@ -183,6 +183,7 @@ from ansible_collections.cloudscale_ch.cloud.plugins.module_utils.cloudscale imp
     cloudscale_argument_spec,
 )
 
+
 class AnsibleCloudscaleFloatingIP(AnsibleCloudscaleBase):
 
     def __init__(self, module):

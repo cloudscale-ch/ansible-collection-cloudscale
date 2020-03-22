@@ -15,9 +15,7 @@ jobs:
         runner-os:
         - ubuntu-latest
         ansible-version:
-        - git+https://github.com/ansible/ansible.git@devel
-        # - git+https://github.com/ansible/ansible.git@stable-2.9
-        # - ansible
+        - git+https://github.com/ansible/ansible.git@temp-2.10-devel
         runner-python-version:
         - 3.8
     steps:
@@ -26,22 +24,162 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.runner-python-version }}
+    - name: Set up pip cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ github.ref }}
     - name: Install Ansible ${{ matrix.ansible-version }}
-      run: |
-        python -m pip install --upgrade pip
-        pip install ${{ matrix.ansible-version }}
-        pip install -r test-requirements.txt
+      run: >-
+        python -m
+        pip
+        install
+        --user
+        ${{ matrix.ansible-version }}
     - name: Build a collection tarball
-      run: |
-        ansible-galaxy collection build .
-        ansible-galaxy collection install *.gz
-    - name: Add service account file
+      run: >-
+        ~/.local/bin/ansible-galaxy
+        collection
+        build
+        --output-path
+        "${GITHUB_WORKSPACE}/.cache/collection-tarballs"
+    - name: Store migrated collection artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: >-
+          collection
+        path: .cache/collection-tarballs
+
+  sanity-test-collection-via-containers:
+    name: Sanity in container via Python ${{ matrix.python-version }}
+    needs:
+    - build-collection-artifact
+    runs-on: ${{ matrix.runner-os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner-os:
+        - ubuntu-latest
+        runner-python-version:
+        - 3.8
+        ansible-version:
+        - git+https://github.com/ansible/ansible.git@temp-2.10-devel
+        python-version:
+        # - 3.8 pylint in test container does not seem to support python3.8 yet
+        - 3.7
+        - 3.6
+        - 2.7
+    steps:
+    - name: Set up Python ${{ matrix.runner-python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.runner-python-version }}
+    - name: Set up pip cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ github.ref }}-sanity-containers
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install Ansible ${{ matrix.ansible-version }}
+      run: >-
+        python -m
+        pip
+        install
+        --user
+        ${{ matrix.ansible-version }}
+    - name: Download migrated collection artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: >-
+          collection
+        path: .cache/collection-tarballs
+    - name: Install the collection tarball
+      run: >-
+        ~/.local/bin/ansible-galaxy
+        collection
+        install
+        .cache/collection-tarballs/*.tar.gz
+    - name: Run collection sanity tests
+      run: >-
+        ~/.local/bin/ansible-test
+        sanity
+        --color
+        --requirements
+        --docker
+        --python
+        "${{ matrix.python-version }}"
+        -vvv
+      working-directory: >-
+        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
+
+  integration-test:
+    name: Integration test using Python ${{ matrix.python-version }}
+    needs:
+    - build-collection-artifact
+    - sanity-test-collection-via-containers
+    runs-on: ${{ matrix.runner-os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner-os:
+        - ubuntu-latest
+        runner-python-version:
+        - 3.8
+        ansible-version:
+        - git+https://github.com/ansible/ansible.git@devel
+        python-version:
+        - 3.8
+        - 2.7
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up pip cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ github.ref }}
+    - name: Install Ansible ${{ matrix.ansible-version }}
+      run: >-
+        python -m
+        pip
+        install
+        --user
+        ${{ matrix.ansible-version }}
+    - name: Install requirements
+      run: >-
+        python -m
+        pip
+        install
+        --user
+        -r test-requirements.txt
+    - name: Download migrated collection artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: >-
+          collection
+        path: .cache/collection-tarballs
+    - name: Install collection tarball
+      run: >-
+        ~/.local/bin/ansible-galaxy
+        collection
+        install
+        ${GITHUB_WORKSPACE}/.cache/collection-tarballs/*.gz
+    - name: Add config file
       env:
         CONFIG_FILE: ${{ secrets.CONFIG_FILE }}
       run: |
-        pushd ~/.ansible/collections/ansible_collections/cloudscale_ch/cloud
         echo "$CONFIG_FILE" > tests/integration/cloud-config-cloudscale.ini
+      working-directory: >-
+        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
     - name: Run the tests
-      run: |
-        pushd ~/.ansible/collections/ansible_collections/cloudscale_ch/cloud
-        ansible-test integration -v --allow-unsupported --continue-on-error cloud/cloudscale/
+      run: >-
+        ~/.local/bin/ansible-test
+        integration
+        -v
+        --color
+        --allow-unsupported
+        --continue-on-error
+        cloud/cloudscale/
+      working-directory: >-
+        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
