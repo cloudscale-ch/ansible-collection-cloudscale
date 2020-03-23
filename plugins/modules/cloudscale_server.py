@@ -76,6 +76,7 @@ options:
        - List of SSH public keys.
        - Use the full content of your .pub file here.
     type: list
+    elements: str
   password:
     description:
        - Password for the server.
@@ -107,6 +108,7 @@ options:
       - List of UUID or names of server groups.
       - Mutually exclusive with I(anti_affinity_with).
     type: list
+    elements: str
     version_added: '2.8'
   user_data:
     description:
@@ -530,13 +532,13 @@ def main():
         zone=dict(),
         volume_size_gb=dict(type='int', default=10),
         bulk_volume_size_gb=dict(type='int'),
-        ssh_keys=dict(type='list'),
+        ssh_keys=dict(type='list', elements='str'),
         password=dict(no_log=True),
         use_public_network=dict(type='bool', default=True),
         use_private_network=dict(type='bool', default=False),
         use_ipv6=dict(type='bool', default=True),
         anti_affinity_with=dict(removed_in_version='2.11'),
-        server_groups=dict(type='list'),
+        server_groups=dict(type='list', elements='str'),
         user_data=dict(),
         force=dict(type='bool', default=False),
         tags=dict(type='dict'),

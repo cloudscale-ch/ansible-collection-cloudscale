@@ -69,6 +69,7 @@ options:
         single server.
     aliases: [ server_uuid ]
     type: list
+    elements: str
   tags:
     description:
       - Tags associated with the volume. Set this to C({}) to clear any tags.
@@ -281,7 +282,7 @@ def main():
         zone=dict(),
         size_gb=dict(type='int'),
         type=dict(choices=('ssd', 'bulk')),
-        server_uuids=dict(type='list', aliases=['server_uuid']),
+        server_uuids=dict(type='list', elements='str', aliases=['server_uuid']),
         tags=dict(type='dict'),
     ))
 
