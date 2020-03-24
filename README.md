@@ -21,7 +21,7 @@ ansible-galaxy collection install cloudscale_ch.cloud
 To upgrade to the latest version of the collection:
 
 ```bash
-ansible-galaxy collection install al cloudscale_ch.cloud --force
+ansible-galaxy collection install cloudscale_ch.cloud --force
 ```
 
 ## Usage
