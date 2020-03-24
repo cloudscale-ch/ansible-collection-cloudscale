@@ -2,7 +2,7 @@ name: Collection integration
 
 on:
   push:
-  pull_request:
+  # pull_request:
   # schedule:
   # - cron: 3 0 * * *  # Run daily at 0:03 UTC
 
@@ -15,7 +15,7 @@ jobs:
         runner-os:
         - ubuntu-latest
         ansible-version:
-        - git+https://github.com/ansible/ansible.git@temp-2.10-devel
+        - git+https://github.com/ansible/ansible.git@devel
         runner-python-version:
         - 3.8
     steps:
@@ -61,14 +61,9 @@ jobs:
         runner-os:
         - ubuntu-latest
         runner-python-version:
-        - 3.8
-        ansible-version:
-        - git+https://github.com/ansible/ansible.git@temp-2.10-devel
-        python-version:
-        # - 3.8 pylint in test container does not seem to support python3.8 yet
-        - 3.7
         - 3.6
-        - 2.7
+        ansible-version:
+        - git+https://github.com/ansible/ansible.git@devel
     steps:
     - name: Set up Python ${{ matrix.runner-python-version }}
       uses: actions/setup-python@v1
@@ -108,8 +103,6 @@ jobs:
         --color
         --requirements
         --docker
-        --python
-        "${{ matrix.python-version }}"
         -vvv
       working-directory: >-
         /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
@@ -130,7 +123,7 @@ jobs:
         ansible-version:
         - git+https://github.com/ansible/ansible.git@devel
         python-version:
-        - 3.8
+        - 3.6
         - 2.7
     steps:
     - uses: actions/checkout@v1
@@ -177,6 +170,7 @@ jobs:
         ~/.local/bin/ansible-test
         integration
         -v
+        --diff
         --color
         --allow-unsupported
         --continue-on-error

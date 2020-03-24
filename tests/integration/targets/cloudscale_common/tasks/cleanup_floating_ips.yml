@@ -9,7 +9,9 @@
 
 - name: Remove all floating IPs created by this test run
   cloudscale_ch.cloud.cloudscale_floating_ip:
-    ip: '{{ item.network | ipaddr("address") }}'
+    # TODO: fix
+    # ip: '{{ item.network | ipaddr("address") }}'
+    ip:  '{{ item.network.split("/")[0] }}'
     state: 'absent'
   when: cloudscale_resource_prefix in (item.reverse_ptr | string )
   with_items: '{{ floating_ip_list.json }}'
