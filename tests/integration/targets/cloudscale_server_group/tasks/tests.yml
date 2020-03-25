@@ -1,6 +1,6 @@
 ---
 - name: Create server group in check mode
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-grp'
     tags:
       project: ansible-test
@@ -16,7 +16,7 @@
       - not grp.uuid
 
 - name: Create server group
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-grp'
     zone: '{{ cloudscale_test_zone }}'
     tags:
@@ -41,7 +41,7 @@
     server_group_uuid: '{{ grp.uuid }}'
 
 - name: Create server group idempotence
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-grp'
     zone: '{{ cloudscale_test_zone }}'
     tags:
@@ -61,7 +61,7 @@
       - grp.tags.sla == '24-7'
 
 - name: Update server group in check mode
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     uuid: '{{ server_group_uuid }}'
     name: '{{ cloudscale_resource_prefix }}-grp2'
     tags:
@@ -82,7 +82,7 @@
       - grp.tags.sla == '24-7'
 
 - name: Update server group
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     uuid: '{{ server_group_uuid }}'
     name: '{{ cloudscale_resource_prefix }}-grp2'
     tags:
@@ -102,7 +102,7 @@
       - grp.tags.sla == '8-5'
 
 - name: Update server group idempotence
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     uuid: '{{ server_group_uuid }}'
     name: '{{ cloudscale_resource_prefix }}-grp2'
     tags:
@@ -122,7 +122,7 @@
       - grp.tags.sla == '8-5'
 
 - name: Delete server group in check mode
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-grp2'
     state: absent
   register: grp
@@ -135,7 +135,7 @@
       - grp.uuid == server_group_uuid
 
 - name: Delete server group
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-grp2'
     state: absent
   register: grp
@@ -147,7 +147,7 @@
       - grp.uuid == server_group_uuid
 
 - name: Delete server group idempotence
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-grp2'
     state: absent
   register: grp

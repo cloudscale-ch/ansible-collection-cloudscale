@@ -107,7 +107,7 @@ jobs:
         --docker
         -vvv
       working-directory: >-
-        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
+        /home/runner/.ansible/collections/ansible_collections/ngine_io/cloudscale
 
   integration-test:
     name: Integration test using Python ${{ matrix.python-version }}
@@ -166,7 +166,7 @@ jobs:
       run: |
         echo "$CONFIG_FILE" > tests/integration/cloud-config-cloudscale.ini
       working-directory: >-
-        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
+        /home/runner/.ansible/collections/ansible_collections/ngine_io/cloudscale
     - name: Run the tests
       run: >-
         ~/.local/bin/ansible-test
@@ -178,4 +178,4 @@ jobs:
         --continue-on-error
         cloud/cloudscale/
       working-directory: >-
-        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
+        /home/runner/.ansible/collections/ansible_collections/ngine_io/cloudscale

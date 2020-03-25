@@ -1,5 +1,5 @@
 ---
 - name: Remove test server
-  cloudscale_ch.cloud.cloudscale_server:
+  ngine_io.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     state: 'absent'

@@ -8,7 +8,7 @@
   register: volume_list
 
 - name: Remove all volumes created by this test run
-  cloudscale_ch.cloud.cloudscale_volume:
+  ngine_io.cloudscale.cloudscale_volume:
     uuid: '{{ item.uuid }}'
     state: 'absent'
   when: cloudscale_resource_prefix in item.name

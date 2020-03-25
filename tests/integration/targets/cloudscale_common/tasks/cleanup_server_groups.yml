@@ -8,7 +8,7 @@
   register: server_group_list
 
 - name: Remove all server groups created by this test run
-  cloudscale_ch.cloud.cloudscale_server_group:
+  ngine_io.cloudscale.cloudscale_server_group:
     uuid: '{{ item.uuid }}'
     state: absent
   when: cloudscale_resource_prefix in item.name

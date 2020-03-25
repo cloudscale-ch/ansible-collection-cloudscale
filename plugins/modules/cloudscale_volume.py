@@ -75,7 +75,7 @@ options:
       - Tags associated with the volume. Set this to C({}) to clear any tags.
     type: dict
     version_added: '2.9'
-extends_documentation_fragment: cloudscale_ch.cloud.cloudscale
+extends_documentation_fragment: ngine_io.cloudscale.cloudscale
 '''
 
 EXAMPLES = '''
@@ -172,7 +172,7 @@ tags:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.cloudscale_ch.cloud.plugins.module_utils.cloudscale import (
+from ansible_collections.ngine_io.cloudscale.plugins.module_utils.cloudscale import (
     AnsibleCloudscaleBase,
     cloudscale_argument_spec,
 )

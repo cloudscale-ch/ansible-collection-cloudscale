@@ -15,13 +15,13 @@ This collection provides a series of Ansible modules and plugins for interacting
 To install the collection hosted in Galaxy:
 
 ```bash
-ansible-galaxy collection install cloudscale_ch.cloud
+ansible-galaxy collection install ngine_io.cloudscale
 ```
 
 To upgrade to the latest version of the collection:
 
 ```bash
-ansible-galaxy collection install cloudscale_ch.cloud --force
+ansible-galaxy collection install ngine_io.cloudscale --force
 ```
 
 ## Usage
@@ -35,7 +35,7 @@ To use a module from cloudscale.ch collection, please reference the full namespa
 - name: Using cloudscale.ch collection
   hosts: localhost
   tasks:
-    - cloudscale_ch.cloud.cloudscale_server:
+    - ngine_io.cloudscale.cloudscale_server:
         name: web1
         image: debian-10
         flavor: flex-2
@@ -52,7 +52,7 @@ Or you can add full namepsace and collecton name in the `collections` element:
 - name: Using cloudscale.ch collection
   hosts: localhost
   collections:
-    - cloudscale_ch.cloud
+    - ngine_io.cloudscale
   tasks:
     - cloudscale_server:
         name: web1
@@ -73,7 +73,7 @@ For existing Ansible roles, please also reference the full namespace, collection
 To use a pluign, please reference the full namespace, collection name, and plugins name that you want to use:
 
 ```yaml
-plugin: cloudscale_ch.cloud.cloudscale
+plugin: ngine_io.cloudscale.cloudscale
 ````
 
 ## Contributing

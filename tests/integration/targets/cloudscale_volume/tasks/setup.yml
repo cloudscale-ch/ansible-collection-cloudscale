@@ -1,6 +1,6 @@
 ---
 - name: Create test instance
-  cloudscale_ch.cloud.cloudscale_server:
+  ngine_io.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-server'
     flavor: '{{ cloudscale_test_flavor }}'
     zone: '{{ cloudscale_test_zone }}'

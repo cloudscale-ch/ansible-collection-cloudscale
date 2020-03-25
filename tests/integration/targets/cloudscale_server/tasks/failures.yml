@@ -1,6 +1,6 @@
 ---
 - name: Fail missing params
-  cloudscale_ch.cloud.cloudscale_server:
+  ngine_io.cloudscale.cloudscale_server:
   register: srv
   ignore_errors: True
 - name: 'VERIFY: Fail name and UUID'
@@ -9,7 +9,7 @@
       - srv is failed
 
 - name: Fail unexisting server group
-  cloudscale_ch.cloud.cloudscale_server:
+  ngine_io.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-group'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -38,7 +38,7 @@
   with_sequence: count=2
 
 - name: Try to use server groups with identical name
-  cloudscale_ch.cloud.cloudscale_server:
+  ngine_io.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-group'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
