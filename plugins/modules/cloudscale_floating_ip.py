@@ -25,7 +25,6 @@ notes:
   - It's not possible to request a floating IP without associating it with a server at the same time.
   - This module requires the ipaddress python library. This library is included in Python since version 3.3. It is available as a
     module on PyPI for earlier versions.
-version_added: "2.5"
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Denis Krienbühl (@href)
@@ -58,14 +57,12 @@ options:
     choices: [ regional, global ]
     type: str
     default: regional
-    version_added: '2.10'
   region:
     description:
       - Region in which the floating IP resides (e.g. C(lgp) or C(rma)).
         If omitted, the region of the project default zone is used.
         This parameter must be omitted if I(type) is set to C(global).
     type: str
-    version_added: '2.10'
   prefix_length:
     description:
       - Only valid if I(ip_version) is 6.
@@ -159,7 +156,6 @@ region:
   returned: success when state == present
   type: dict
   sample: {'slug': 'lpg'}
-  version_added: '2.10'
 state:
   description: The current status of the floating IP.
   returned: success

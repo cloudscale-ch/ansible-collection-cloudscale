@@ -24,7 +24,6 @@ notes:
   - To create a new volume at least the I(name) and I(size_gb) options
     are required.
   - A volume can be created and attached to a server in the same task.
-version_added: '2.8'
 author:
   - Gaudenz Steinlin (@gaudenz)
   - René Moser (@resmo)
@@ -61,7 +60,6 @@ options:
       - Zone in which the volume resides (e.g. C(lgp1) or C(rma1)). Cannot be
         changed after creating the volume. Defaults to the project default zone.
     type: str
-    version_added: '2.10'
   server_uuids:
     description:
       - UUIDs of the servers this volume is attached to. Set this to C([]) to
@@ -74,7 +72,6 @@ options:
     description:
       - Tags associated with the volume. Set this to C({}) to clear any tags.
     type: dict
-    version_added: '2.9'
 extends_documentation_fragment: ngine_io.cloudscale.cloudscale
 '''
 
@@ -152,7 +149,6 @@ zone:
   returned: state == present
   type: dict
   sample: {'slug': 'lpg1'}
-  version_added: '2.10'
 server_uuids:
   description: The UUIDs of the servers this volume is attached to.
   returned: state == present
@@ -168,7 +164,6 @@ tags:
   returned: state == present
   type: dict
   sample: { 'project': 'my project' }
-  version_added: '2.9'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

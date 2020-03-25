@@ -26,7 +26,6 @@ notes:
   - If no I(uuid) option is provided, I(name) is used for server selection. If more than one server with this name exists, execution is aborted.
   - Only the I(name) and I(flavor) are evaluated for the update.
   - The option I(force=true) must be given to allow the reboot of existing running servers for applying the changes.
-version_added: '2.3'
 author:
   - Gaudenz Steinlin (@gaudenz)
   - René Moser (@resmo)
@@ -60,7 +59,6 @@ options:
     description:
       - Zone in which the server resides (e.g. C(lgp1) or C(rma1)).
     type: str
-    version_added: '2.10'
   volume_size_gb:
     description:
       - Size of the root volume in GB.
@@ -81,7 +79,6 @@ options:
     description:
        - Password for the server.
     type: str
-    version_added: '2.8'
   use_public_network:
     description:
       - Attach a public network interface to the server.
@@ -109,24 +106,19 @@ options:
       - Mutually exclusive with I(anti_affinity_with).
     type: list
     elements: str
-    version_added: '2.8'
   user_data:
     description:
       - Cloud-init configuration (cloud-config) data to use for the server.
     type: str
-  api_timeout:
-    version_added: '2.5'
   force:
     description:
       - Allow to stop the running server for updating if necessary.
     default: no
     type: bool
-    version_added: '2.8'
   tags:
     description:
       - Tags assosiated with the servers. Set this to C({}) to clear any tags.
     type: dict
-    version_added: '2.9'
 extends_documentation_fragment: ngine_io.cloudscale.cloudscale
 '''
 
@@ -232,7 +224,6 @@ zone:
   returned: success when not state == absent
   type: dict
   sample: { 'slug': 'lpg1' }
-  version_added: '2.10'
 volumes:
   description: List of volumes attached to the server
   returned: success when not state == absent
@@ -265,13 +256,11 @@ server_groups:
   returned: success when not state == absent
   type: list
   sample: [ {"href": "https://api.cloudscale.ch/v1/server-groups/...", "uuid": "...", "name": "db-group"} ]
-  version_added: '2.8'
 tags:
   description: Tags assosiated with the volume.
   returned: success
   type: dict
   sample: { 'project': 'my project' }
-  version_added: '2.9'
 '''
 
 from datetime import datetime, timedelta

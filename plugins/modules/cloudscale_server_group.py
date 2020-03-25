@@ -22,7 +22,6 @@ description:
 author:
   - René Moser (@resmo)
   - Denis Krienbühl (@href)
-version_added: '2.8'
 options:
   name:
     description:
@@ -43,7 +42,6 @@ options:
     description:
       - Zone slug of the server group (e.g. C(lgp1) or C(rma1)).
     type: str
-    version_added: '2.10'
   state:
     description:
       - State of the server group.
@@ -54,7 +52,6 @@ options:
     description:
       - Tags assosiated with the server groups. Set this to C({}) to clear any tags.
     type: dict
-    version_added: '2.9'
 extends_documentation_fragment: ngine_io.cloudscale.cloudscale
 '''
 
@@ -107,7 +104,6 @@ zone:
   returned: success
   type: dict
   sample: { 'slug': 'rma1' }
-  version_added: '2.10'
 servers:
   description: A list of servers that are part of the server group.
   returned: if available
@@ -123,7 +119,6 @@ tags:
   returned: success
   type: dict
   sample: { 'project': 'my project' }
-  version_added: '2.9'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

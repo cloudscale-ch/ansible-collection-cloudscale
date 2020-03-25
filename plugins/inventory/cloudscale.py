@@ -16,7 +16,6 @@ short_description: cloudscale.ch inventory source
 description:
     - Get inventory hosts from cloudscale.ch API
     - Uses an YAML configuration file ending with either I(cloudscale.yml) or I(cloudscale.yaml) to set parameter values (also see examples).
-version_added: '2.8'
 extends_documentation_fragment:
   - constructed
 options:
