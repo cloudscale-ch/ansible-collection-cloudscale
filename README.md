@@ -1,7 +1,6 @@
 ![Collection integration](https://github.com/ngine-io/ansible-collection-cloudscale/workflows/Collection%20integration/badge.svg)
 [![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](LICENSE)
 
-
 # Ansible Collection for cloudscale.ch Cloud
 
 This collection provides a series of Ansible modules and plugins for interacting with the [cloudscale.ch](https://www.cloudscale.ch) Cloud.
@@ -74,7 +73,7 @@ To use a pluign, please reference the full namespace, collection name, and plugi
 
 ```yaml
 plugin: ngine_io.cloudscale.cloudscale
-````
+```
 
 ## Contributing
 
