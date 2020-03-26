@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: cloudscale_server
@@ -21,7 +16,6 @@ short_description: Manages servers on the cloudscale.ch IaaS service
 description:
   - Create, update, start, stop and delete servers on the cloudscale.ch IaaS service.
 notes:
-  - Since version 2.8, I(uuid) and I(name) or not mutually exclusive anymore.
   - If I(uuid) option is provided, it takes precedence over I(name) for server selection. This allows to update the server's name.
   - If no I(uuid) option is provided, I(name) is used for server selection. If more than one server with this name exists, execution is aborted.
   - Only the I(name) and I(flavor) are evaluated for the update.
@@ -30,6 +24,7 @@ author:
   - Gaudenz Steinlin (@gaudenz)
   - René Moser (@resmo)
   - Denis Krienbühl (@href)
+version_added: "1.0"
 options:
   state:
     description:
@@ -94,16 +89,9 @@ options:
       - Enable IPv6 on the public network interface.
     default: yes
     type: bool
-  anti_affinity_with:
-    description:
-      - UUID of another server to create an anti-affinity group with.
-      - Mutually exclusive with I(server_groups).
-      - Deprecated, removed in version 2.11.
-    type: str
   server_groups:
     description:
       - List of UUID or names of server groups.
-      - Mutually exclusive with I(anti_affinity_with).
     type: list
     elements: str
   user_data:
@@ -244,13 +232,6 @@ ssh_host_keys:
   returned: success when not state == absent
   type: list
   sample: ["ecdsa-sha2-nistp256 XXXXX", ... ]
-anti_affinity_with:
-  description:
-  - List of servers in the same anti-affinity group
-  - Deprecated, removed in version 2.11.
-  returned: success when not state == absent
-  type: list
-  sample: []
 server_groups:
   description: List of server groups
   returned: success when not state == absent
@@ -526,7 +507,6 @@ def main():
         use_public_network=dict(type='bool', default=True),
         use_private_network=dict(type='bool', default=False),
         use_ipv6=dict(type='bool', default=True),
-        anti_affinity_with=dict(removed_in_version='2.11'),
         server_groups=dict(type='list', elements='str'),
         user_data=dict(),
         force=dict(type='bool', default=False),
@@ -536,7 +516,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_one_of=(('name', 'uuid'),),
-        mutually_exclusive=(('anti_affinity_with', 'server_groups'),),
         supports_check_mode=True,
     )
 

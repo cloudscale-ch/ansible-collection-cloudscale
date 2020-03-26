@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: cloudscale_floating_ip
@@ -28,6 +23,7 @@ notes:
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Denis Krienbühl (@href)
+version_added: "1.0"
 options:
   state:
     description:

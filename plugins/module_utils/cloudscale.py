@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (c) 2017, Gaudenz Steinlin <gaudenz.steinlin@cloudscale.ch>
+# Copyright (c) 2017, Gaudenz Steinlin <gaudenz.steinlin@cloudscale.ch>
 # Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
 
 from __future__ import absolute_import, division, print_function
