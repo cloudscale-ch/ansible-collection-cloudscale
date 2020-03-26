@@ -174,7 +174,7 @@ except ImportError:
     HAS_IPADDRESS = False
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
-from ansible_collections.ngine_io.cloudscale.plugins.module_utils.cloudscale import (
+from ..module_utils.cloudscale import (
     AnsibleCloudscaleBase,
     cloudscale_argument_spec,
 )
