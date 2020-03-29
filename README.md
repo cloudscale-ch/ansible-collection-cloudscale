@@ -1,4 +1,5 @@
 ![Collection integration](https://github.com/ngine-io/ansible-collection-cloudscale/workflows/Collection%20integration/badge.svg)
+ [![Codecov](https://img.shields.io/codecov/c/github/ngine-io/ansible-collection-cloudscale)](https://codecov.io/gh/ngine-io/ansible-collection-cloudscale)
 [![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](LICENSE)
 
 # Ansible Collection for cloudscale.ch Cloud

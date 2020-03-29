@@ -3,7 +3,7 @@ name: Collection integration
 on:
   push:
     branches:
-      - master
+    - master
   pull_request:
   # schedule:
   # - cron: 3 0 * * *  # Run daily at 0:03 UTC
@@ -121,14 +121,17 @@ jobs:
         runner-os:
         - ubuntu-latest
         runner-python-version:
-        - 3.8
+        - 3.6
         ansible-version:
         - git+https://github.com/ansible/ansible.git@devel
         python-version:
         - 3.6
         - 2.7
     steps:
-    - uses: actions/checkout@v1
+    - name: Check out code
+      uses: actions/checkout@v1
+      with:
+        path: ansible_collections/ngine_io/cloudscale
     - name: Set up pip cache
       uses: actions/cache@v1
       with:
@@ -147,7 +150,7 @@ jobs:
         pip
         install
         --user
-        -r test-requirements.txt
+        -r tests/requirements.txt
     - name: Download migrated collection artifacts
       uses: actions/download-artifact@v1
       with:
@@ -165,17 +168,26 @@ jobs:
         CONFIG_FILE: ${{ secrets.CONFIG_FILE }}
       run: |
         echo "$CONFIG_FILE" > tests/integration/cloud-config-cloudscale.ini
-      working-directory: >-
-        /home/runner/.ansible/collections/ansible_collections/ngine_io/cloudscale
     - name: Run the tests
       run: >-
         ~/.local/bin/ansible-test
         integration
+        --docker
         -v
         --diff
         --color
         --allow-unsupported
         --continue-on-error
+        --coverage
         cloud/cloudscale/
-      working-directory: >-
-        /home/runner/.ansible/collections/ansible_collections/ngine_io/cloudscale
+    - name: Generate coverage report.
+      run: >-
+        ~/.local/bin/ansible-test
+        coverage xml
+        -v
+        --requirements
+        --group-by command
+        --group-by version
+    - uses: codecov/codecov-action@v1
+      with:
+        fail_ci_if_error: false
