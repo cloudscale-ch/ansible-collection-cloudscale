@@ -1,7 +1,7 @@
 - name: Cloudscale floating IP tests
   block:
     - name: Create a server
-      ngine_io.cloudscale.cloudscale_server:
+      cloudscale_ch.cloudscale.cloudscale_server:
         name: '{{ cloudscale_resource_prefix }}-test01'
         flavor: '{{ cloudscale_test_flavor }}'
         image: '{{ cloudscale_test_image }}'
@@ -10,7 +10,7 @@
       register: test01
 
     - name: Create a second server
-      ngine_io.cloudscale.cloudscale_server:
+      cloudscale_ch.cloudscale.cloudscale_server:
         name: '{{ cloudscale_resource_prefix }}-test02'
         flavor: '{{ cloudscale_test_flavor }}'
         image: '{{ cloudscale_test_image }}'

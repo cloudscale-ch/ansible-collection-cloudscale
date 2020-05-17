@@ -1,6 +1,6 @@
 ---
 - name: Fail missing params
-  ngine_io.cloudscale.cloudscale_server_group:
+  cloudscale_ch.cloudscale.cloudscale_server_group:
   register: grp
   ignore_errors: True
 - name: 'VERIFY: Fail name and UUID'
@@ -23,7 +23,7 @@
   with_sequence: count=2
 
 - name: Try access to duplicate name
-  ngine_io.cloudscale.cloudscale_server_group:
+  cloudscale_ch.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-duplicate'
   register: grp
   ignore_errors: True
@@ -34,7 +34,7 @@
     - grp.msg.startswith('More than one server group with name exists')
 
 - name: Fail server group creation with UUID
-  ngine_io.cloudscale.cloudscale_server_group:
+  cloudscale_ch.cloudscale.cloudscale_server_group:
     uuid: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
   register: grp
   ignore_errors: True

@@ -71,7 +71,7 @@ options:
       - Reverse PTR entry for this address.
       - You cannot set a reverse PTR entry for IPv6 floating networks. Reverse PTR entries are only allowed for single addresses.
     type: str
-extends_documentation_fragment: ngine_io.cloudscale.cloudscale
+extends_documentation_fragment: cloudscale_ch.cloudscale.cloudscale
 '''
 
 EXAMPLES = '''

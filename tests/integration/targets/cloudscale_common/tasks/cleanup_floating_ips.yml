@@ -8,7 +8,7 @@
   register: floating_ip_list
 
 - name: Remove all floating IPs created by this test run
-  ngine_io.cloudscale.cloudscale_floating_ip:
+  cloudscale_ch.cloudscale.cloudscale_floating_ip:
     # TODO: fix
     # ip: '{{ item.network | ipaddr("address") }}'
     ip:  '{{ item.network.split("/")[0] }}'

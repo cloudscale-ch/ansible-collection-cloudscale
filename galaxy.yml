@@ -16,5 +16,5 @@ repository: 'https://github.com/cloudscale-ch/ansible-collection-cloudscale'
 tags:
   - cloud
   - cloudscale
-  - ngine_io
+  - cloudscale_ch
 version: 1.0.2

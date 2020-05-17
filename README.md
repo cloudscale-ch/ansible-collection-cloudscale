@@ -1,5 +1,5 @@
-![Collection integration](https://github.com/ngine-io/ansible-collection-cloudscale/workflows/Collection%20integration/badge.svg)
-[![Codecov](https://codecov.io/gh/ngine-io/ansible-collection-cloudscale/branch/master/graph/badge.svg)](https://codecov.io/gh/ngine-io/ansible-collection-cloudscale)
+![Collection integration](https://github.com/cloudscale_ch/ansible-collection-cloudscale/workflows/Collection%20integration/badge.svg)
+[![Codecov](https://codecov.io/gh/cloudscale_ch/ansible-collection-cloudscale/branch/master/graph/badge.svg)](https://codecov.io/gh/cloudscale_ch/ansible-collection-cloudscale)
 [![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](LICENSE)
 
 # Ansible Collection for cloudscale.ch Cloud
@@ -15,13 +15,13 @@ This collection provides a series of Ansible modules and plugins for interacting
 To install the collection hosted in Galaxy:
 
 ```bash
-ansible-galaxy collection install ngine_io.cloudscale
+ansible-galaxy collection install cloudscale_ch.cloudscale
 ```
 
 To upgrade to the latest version of the collection:
 
 ```bash
-ansible-galaxy collection install ngine_io.cloudscale --force
+ansible-galaxy collection install cloudscale_ch.cloudscale --force
 ```
 
 ## Usage
@@ -35,7 +35,7 @@ To use a module from cloudscale.ch collection, please reference the full namespa
 - name: Using cloudscale.ch collection
   hosts: localhost
   tasks:
-    - ngine_io.cloudscale.cloudscale_server:
+    - cloudscale_ch.cloudscale.cloudscale_server:
         name: web1
         image: debian-10
         flavor: flex-2
@@ -52,7 +52,7 @@ Or you can add full namepsace and collecton name in the `collections` element:
 - name: Using cloudscale.ch collection
   hosts: localhost
   collections:
-    - ngine_io.cloudscale
+    - cloudscale_ch.cloudscale
   tasks:
     - cloudscale_server:
         name: web1
@@ -73,7 +73,7 @@ For existing Ansible roles, please also reference the full namespace, collection
 To use a pluign, please reference the full namespace, collection name, and plugins name that you want to use:
 
 ```yaml
-plugin: ngine_io.cloudscale.cloudscale
+plugin: cloudscale_ch.cloudscale.cloudscale
 ```
 
 ## Contributing
