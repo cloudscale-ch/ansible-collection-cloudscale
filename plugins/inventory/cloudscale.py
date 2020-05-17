@@ -87,7 +87,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.urls import open_url
 from ansible.inventory.group import to_safe_group_name
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ansible_collections.ngine_io.cloudscale.plugins.module_utils.cloudscale import API_URL
+from ansible_collections.cloudscale_ch.cloudscale.plugins.module_utils.cloudscale import API_URL
 
 iface_type_map = {
     'public_v4': ('public', 4),

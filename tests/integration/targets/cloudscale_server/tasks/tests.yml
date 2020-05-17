@@ -1,13 +1,13 @@
 ---
 - name: Setup server groups
-  ngine_io.cloudscale.cloudscale_server_group:
+  cloudscale_ch.cloudscale.cloudscale_server_group:
     name: '{{ cloudscale_resource_prefix }}-group-{{ item }}'
     type: anti-affinity
     zone: '{{ cloudscale_test_zone }}'
   with_sequence: count=2
 
 - name: Test create a running server in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -27,7 +27,7 @@
       - server.state == 'absent'
 
 - name: Test create a running server
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -51,7 +51,7 @@
       - server.tags.sla == '24-7'
 
 - name: Test create a running server idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -75,7 +75,7 @@
       - server.tags.sla == '24-7'
 
 - name: Test update tags in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -98,7 +98,7 @@
       - server.tags.sla == '24-7'
 
 - name: Test update tags
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -120,7 +120,7 @@
       - server.tags.sla == '8-5'
 
 - name: Test update tags idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -142,7 +142,7 @@
       - server.tags.sla == '8-5'
 
 - name: Test omit tags idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -160,7 +160,7 @@
       - server.tags.sla == '8-5'
 
 - name: Test delete tags
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -177,7 +177,7 @@
       - not server.tags
 
 - name: Test delete tags idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -194,7 +194,7 @@
       - not server.tags
 
 - name: Test update flavor of a running server without force in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
@@ -211,7 +211,7 @@
       - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
 
 - name: Test update flavor of a running server without force
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
@@ -227,7 +227,7 @@
       - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
 
 - name: Test update flavor of a running server without force idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
@@ -243,7 +243,7 @@
       - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
 
 - name: Test update flavor and name of a running server without force in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
@@ -261,7 +261,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test'
 
 - name: Test update flavor and name of a running server without force
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
@@ -278,7 +278,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
 
 - name: Test update flavor and name of a running server without force idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
@@ -295,7 +295,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
 
 - name: Test update flavor of a running server with force in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
@@ -312,7 +312,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
 
 - name: Test update flavor of a running server with force
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
@@ -328,7 +328,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
 
 - name: Test update a running server with force idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
@@ -348,7 +348,7 @@
     running_server_uuid: '{{ server.uuid }}'
 
 - name: Test create server stopped in anti affinity and private network only in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -367,7 +367,7 @@
       - server_stopped.state == 'absent'
 
 - name: Test create server stopped in anti affinity and private network only
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -389,7 +389,7 @@
       - server_stopped.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
 
 - name: Test create server stopped in anti affinity and private network only idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -411,7 +411,7 @@
       - server_stopped.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
 
 - name: Test change server group not changed
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -432,7 +432,7 @@
       - server_stopped.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
 
 - name: Test create server with password in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-password'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -448,7 +448,7 @@
       - server_password.diff.after.password != cloudscale_test_password
 
 - name: Test create server with password
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-password'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -463,7 +463,7 @@
       - server_password.diff.after.password != cloudscale_test_password
 
 - name: Test create server with password idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-password'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -476,7 +476,7 @@
       - server_password.state == 'running'
 
 - name: Test create server failure without required parameters
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-failed'
   register: server_failed
   ignore_errors: yes
@@ -488,7 +488,7 @@
       - "'This field is required.' in server_failed.fetch_url_info.body"
 
 - name: Test stop running server in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     state: stopped
   check_mode: yes
@@ -500,7 +500,7 @@
       - server.state == 'running'
 
 - name: Test stop running server
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     state: stopped
   register: server
@@ -511,7 +511,7 @@
       - server.state == 'stopped'
 
 - name: Test stop running server idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     state: 'stopped'
   register: server
@@ -522,7 +522,7 @@
       - server.state == 'stopped'
 
 - name: Test update a stopped server in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
@@ -540,7 +540,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
 
 - name: Test update a stopped server without force
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
@@ -557,7 +557,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test'
 
 - name: Test update a stopped server idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
@@ -574,7 +574,7 @@
       - server.name == '{{ cloudscale_resource_prefix }}-test'
 
 - name: Test server running in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     state: running
   register: server
@@ -586,7 +586,7 @@
       - server.state == 'stopped'
 
 - name: Test server running
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     state: running
   register: server
@@ -597,7 +597,7 @@
       - server.state == 'running'
 
 - name: Test server running idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     state: running
   register: server
@@ -608,7 +608,7 @@
       - server.state == 'running'
 
 - name: Test running server deletion by name in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     state: absent
   register: server
@@ -620,7 +620,7 @@
       - server.state == 'running'
 
 - name: Test running server deletion by name
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     state: absent
   register: server
@@ -631,7 +631,7 @@
       - server.state == 'absent'
 
 - name: Test running server deletion by name idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-test'
     state: absent
   register: server
@@ -642,7 +642,7 @@
       - server.state == 'absent'
 
 - name: Test stopped server deletion by uuid in check mode
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server_stopped.uuid }}'
     state: absent
   register: server_stopped
@@ -654,7 +654,7 @@
       - server_stopped.state == 'stopped'
 
 - name: Test stopped server deletion by uuid
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server_stopped.uuid }}'
     state: absent
   register: server_stopped
@@ -665,7 +665,7 @@
       - server_stopped.state == 'absent'
 
 - name: Test stopped server deletion by uuid idempotence
-  ngine_io.cloudscale.cloudscale_server:
+  cloudscale_ch.cloudscale.cloudscale_server:
     uuid: '{{ server_stopped.uuid }}'
     state: absent
   register: server_stopped

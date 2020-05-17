@@ -1,6 +1,6 @@
 ---
 - name: Create volume in check mode
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
     zone: '{{ cloudscale_test_zone }}'
     size_gb: 50
@@ -18,7 +18,7 @@
       - vol.state == 'absent'
 
 - name: Create volume
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
     zone: '{{ cloudscale_test_zone }}'
     size_gb: 50
@@ -40,7 +40,7 @@
       - vol.tags.sla == '24-7'
 
 - name: Create volume idempotence
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
     zone: '{{ cloudscale_test_zone }}'
     size_gb: 50
@@ -62,7 +62,7 @@
       - vol.tags.sla == '24-7'
 
 - name: Attach existing volume by name to server in check mode
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
     server_uuids:
       - '{{ server.uuid }}'
@@ -76,7 +76,7 @@
       - server.uuid not in vol.server_uuids
 
 - name: Attach existing volume by name to server
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
     server_uuids:
       - '{{ server.uuid }}'
@@ -89,7 +89,7 @@
       - server.uuid in vol.server_uuids
 
 - name: Attach existing volume by name to server idempotence
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
     server_uuids:
       - '{{ server.uuid }}'
@@ -102,7 +102,7 @@
       - server.uuid in vol.server_uuids
 
 - name: Resize attached volume by UUID in check mode
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ vol.uuid }}'
     size_gb: 100
   check_mode: yes
@@ -115,7 +115,7 @@
       - vol.size_gb == 50
 
 - name: Resize attached volume by UUID
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ vol.uuid }}'
     size_gb: 100
   register: vol
@@ -127,7 +127,7 @@
       - vol.size_gb == 100
 
 - name: Resize attached volume by UUID idempotence
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ vol.uuid }}'
     size_gb: 100
   register: vol
@@ -139,7 +139,7 @@
       - vol.size_gb == 100
 
 - name: Delete attached volume by UUID in check mode
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ vol.uuid }}'
     state: 'absent'
   check_mode: yes
@@ -154,7 +154,7 @@
       - deleted.name == '{{ cloudscale_resource_prefix }}-vol'
 
 - name: Delete attached volume by UUID
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ vol.uuid }}'
     state: 'absent'
   register: deleted
@@ -168,7 +168,7 @@
       - deleted.name == '{{ cloudscale_resource_prefix }}-vol'
 
 - name: Delete attached volume by UUID idempotence
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ vol.uuid }}'
     state: 'absent'
   register: deleted
@@ -182,7 +182,7 @@
       - not deleted.name
 
 - name: Create bulk volume and attach
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ cloudscale_resource_prefix }}-bulk'
     type: bulk
     zone: '{{ cloudscale_test_zone }}'
@@ -199,7 +199,7 @@
       - server.uuid in bulk.server_uuids
 
 - name: Detach volume by UUID
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     uuid: '{{ bulk.uuid }}'
     server_uuids: []
   register: bulk
@@ -211,7 +211,7 @@
       - bulk.server_uuids == []
 
 - name: Resize detached volume by name
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ bulk.name }}'
     size_gb: 200
   register: bulk
@@ -223,7 +223,7 @@
       - bulk.size_gb == 200
 
 - name: Delete volume by name in check mode
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ bulk.name }}'
     state: 'absent'
   check_mode: yes
@@ -236,7 +236,7 @@
       - bulk.state == 'present'
 
 - name: Delete volume by name
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ bulk.name }}'
     state: 'absent'
   register: bulk
@@ -248,7 +248,7 @@
       - bulk.state == 'absent'
 
 - name: Delete volume by name idempotence
-  ngine_io.cloudscale.cloudscale_volume:
+  cloudscale_ch.cloudscale.cloudscale_volume:
     name: '{{ bulk.name }}'
     state: 'absent'
   register: bulk

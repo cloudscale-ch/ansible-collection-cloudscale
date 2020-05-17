@@ -48,7 +48,7 @@ options:
     description:
       - Tags assosiated with the server groups. Set this to C({}) to clear any tags.
     type: dict
-extends_documentation_fragment: ngine_io.cloudscale.cloudscale
+extends_documentation_fragment: cloudscale_ch.cloudscale.cloudscale
 '''
 
 EXAMPLES = '''
