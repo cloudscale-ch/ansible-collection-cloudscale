@@ -107,7 +107,7 @@ jobs:
         --docker
         -vvv
       working-directory: >-
-        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloudscale
+        /home/runner/.ansible/collections/ansible_collections/cloudscale_ch/cloud
 
   integration-test:
     name: Integration test using Python ${{ matrix.python-version }}
@@ -131,7 +131,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
       with:
-        path: ansible_collections/cloudscale_ch/cloudscale
+        path: ansible_collections/cloudscale_ch/cloud
     - name: Set up pip cache
       uses: actions/cache@v1
       with:
