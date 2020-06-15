@@ -9,7 +9,7 @@ documentation: ''
 homepage: 'https://github.com/cloudscale-ch/ansible-collection-cloudscale'
 issues: 'https://github.com/cloudscale-ch/ansible-collection-cloudscale/issues'
 license: GPL-3.0-or-later
-name: cloudscale
+name: cloud
 namespace: cloudscale_ch
 readme: README.md
 repository: 'https://github.com/cloudscale-ch/ansible-collection-cloudscale'

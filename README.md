@@ -35,7 +35,7 @@ To use a module from cloudscale.ch collection, please reference the full namespa
 - name: Using cloudscale.ch collection
   hosts: localhost
   tasks:
-    - cloudscale_ch.cloudscale.cloudscale_server:
+    - cloudscale_ch.cloud.server:
         name: web1
         image: debian-10
         flavor: flex-2
@@ -73,7 +73,7 @@ For existing Ansible roles, please also reference the full namespace, collection
 To use a pluign, please reference the full namespace, collection name, and plugins name that you want to use:
 
 ```yaml
-plugin: cloudscale_ch.cloudscale.cloudscale
+plugin: cloudscale_ch.cloud.cloudscale
 ```
 
 ## Contributing
