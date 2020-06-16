@@ -1,4 +1,4 @@
-name: Upload release to Galaxy
+name: Upload release to Ansible Galaxy
 
 on:
   release:

@@ -1,4 +1,4 @@
-name: Collection integration
+name: CI tests
 
 on:
   push:
