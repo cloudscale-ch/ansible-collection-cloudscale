@@ -15,13 +15,13 @@ This collection provides a series of Ansible modules and plugins for interacting
 To install the collection hosted in Galaxy:
 
 ```bash
-ansible-galaxy collection install cloudscale_ch.cloudscale
+ansible-galaxy collection install cloudscale_ch.cloud
 ```
 
 To upgrade to the latest version of the collection:
 
 ```bash
-ansible-galaxy collection install cloudscale_ch.cloudscale --force
+ansible-galaxy collection install cloudscale_ch.cloud --force
 ```
 
 ## Usage
@@ -73,7 +73,7 @@ For existing Ansible roles, please also reference the full namespace, collection
 To use a pluign, please reference the full namespace, collection name, and plugins name that you want to use:
 
 ```yaml
-plugin: cloudscale_ch.cloud.cloudscale
+plugin: cloudscale_ch.cloud.<myplugin>
 ```
 
 ## Contributing

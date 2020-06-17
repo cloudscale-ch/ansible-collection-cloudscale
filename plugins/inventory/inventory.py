@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-name: cloudscale
+name: inventory
 plugin_type: inventory
 author:
   - Gaudenz Steinlin (@gaudenz)
@@ -18,6 +18,7 @@ description:
     - Uses an YAML configuration file ending with either I(cloudscale.yml) or I(cloudscale.yaml) to set parameter values (also see examples).
 extends_documentation_fragment:
   - constructed
+  - cloudscale_ch.cloud.api_parameters
 options:
     plugin:
         description: |
@@ -50,31 +51,22 @@ options:
             - private
             - none
         default: public_v4
-    api_token:
-        description: cloudscale.ch API token
-        env:
-          - name: CLOUDSCALE_API_TOKEN
-        type: str
-    api_timeout:
-        description: Timeout in seconds for calls to the cloudscale.ch API.
-        default: 30
-        type: int
 '''
 
 EXAMPLES = r'''
 # cloudscale.yml name ending file in YAML format
 # Example command line: ansible-inventory --list -i inventory_cloudscale.yml
 
-plugin: cloudscale
+plugin: cloudscale_ch.cloud.inventory
 
 # Example grouping by tag key "project"
-plugin: cloudscale
+plugin: cloudscale_ch.cloud.inventory
 keyed_groups:
   - prefix: project
     key: cloudscale.tags.project
 
 # Example grouping by key "operating_system" lowercased and prefixed with "os"
-plugin: cloudscale
+plugin: cloudscale_ch.cloud.inventory
 keyed_groups:
   - prefix: os
     key: cloudscale.image.operating_system | lower
@@ -87,7 +79,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.urls import open_url
 from ansible.inventory.group import to_safe_group_name
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ansible_collections.cloudscale_ch.cloud.plugins.module_utils.cloudscale import API_URL
+from ..module_utils.api import API_URL
 
 iface_type_map = {
     'public_v4': ('public', 4),
