@@ -1,12 +1,12 @@
-name: Collection integration
+name: CI tests
 
 on:
   push:
     branches:
     - master
   pull_request:
-  # schedule:
-  # - cron: 3 0 * * *  # Run daily at 0:03 UTC
+  schedule:
+    - cron: '0 5 * * *'  # Run daily at 5:00 UTC
 
 jobs:
   build-collection-artifact:

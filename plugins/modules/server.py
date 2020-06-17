@@ -107,7 +107,7 @@ options:
     description:
       - Tags assosiated with the servers. Set this to C({}) to clear any tags.
     type: dict
-extends_documentation_fragment: cloudscale_ch.cloud.cloudscale
+extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
@@ -249,7 +249,7 @@ from time import sleep
 from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.cloudscale import (
+from ..module_utils.api import (
     AnsibleCloudscaleBase,
     cloudscale_argument_spec,
 )

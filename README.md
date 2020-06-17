@@ -1,4 +1,4 @@
-![Collection integration](https://github.com/cloudscale_ch/ansible-collection-cloudscale/workflows/Collection%20integration/badge.svg)
+![Collection integration](https://github.com/cloudscale_ch/ansible-collection-cloudscale/workflows/CI%20tests/badge.svg)
 [![Codecov](https://codecov.io/gh/cloudscale_ch/ansible-collection-cloudscale/branch/master/graph/badge.svg)](https://codecov.io/gh/cloudscale_ch/ansible-collection-cloudscale)
 [![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](LICENSE)
 
@@ -15,13 +15,13 @@ This collection provides a series of Ansible modules and plugins for interacting
 To install the collection hosted in Galaxy:
 
 ```bash
-ansible-galaxy collection install cloudscale_ch.cloudscale
+ansible-galaxy collection install cloudscale_ch.cloud
 ```
 
 To upgrade to the latest version of the collection:
 
 ```bash
-ansible-galaxy collection install cloudscale_ch.cloudscale --force
+ansible-galaxy collection install cloudscale_ch.cloud --force
 ```
 
 ## Usage
@@ -73,7 +73,7 @@ For existing Ansible roles, please also reference the full namespace, collection
 To use a pluign, please reference the full namespace, collection name, and plugins name that you want to use:
 
 ```yaml
-plugin: cloudscale_ch.cloud.cloudscale
+plugin: cloudscale_ch.cloud.<myplugin>
 ```
 
 ## Contributing
