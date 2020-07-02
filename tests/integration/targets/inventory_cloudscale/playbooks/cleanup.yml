@@ -8,7 +8,7 @@
   register: server_list
 
 - name: Remove all servers created by this test run
-  cloudscale_server:
+  cloudscale_ch.cloud.server:
     uuid: '{{ item.uuid }}'
     state: 'absent'
   when: cloudscale_resource_prefix in item.name

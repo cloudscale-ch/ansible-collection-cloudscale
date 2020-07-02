@@ -3,7 +3,7 @@
   hosts: localhost
   gather_facts: False
   roles:
-    - cloudscale_common
+    - common
   tasks:
     - block:
         - import_tasks: setup.yml

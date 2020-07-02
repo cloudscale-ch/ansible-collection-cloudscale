@@ -3,7 +3,7 @@
 # Exit on errors, exit when accessing unset variables and print all commands
 set -eux
 
-# Set the role path so that the cloudscale_common role is available
+# Set the role path so that the common role is available
 export ANSIBLE_ROLES_PATH="../"
 
 # Set the filter plugin search path so that the safe_group_name filter is available
