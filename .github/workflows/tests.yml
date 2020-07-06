@@ -6,7 +6,7 @@ on:
     - master
   pull_request:
   schedule:
-    - cron: '0 5 * * *'  # Run daily at 5:00 UTC
+  - cron: '0 5 * * *'  # Run daily at 5:00 UTC
 
 jobs:
   build-collection-artifact:
@@ -166,8 +166,9 @@ jobs:
     - name: Add config file
       env:
         CONFIG_FILE: ${{ secrets.CONFIG_FILE }}
+        INI_FILE: tests/integration/cloud-config-cloudscale.ini
       run: |
-        echo "$CONFIG_FILE" > tests/integration/cloud-config-cloudscale.ini
+        echo -n "$CONFIG_FILE" > $INI_FILE && [ -s $INI_FILE ] || >&2 echo no secrets provided; exit 1
     - name: Run the tests
       run: >-
         ~/.local/bin/ansible-test
