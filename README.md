@@ -55,7 +55,7 @@ Or you can add full namepsace and collecton name in the `collections` element:
   collections:
     - cloudscale_ch.cloudscale
   tasks:
-    - cloudscale_server:
+    - server:
         name: web1
         image: debian-10
         flavor: flex-2
