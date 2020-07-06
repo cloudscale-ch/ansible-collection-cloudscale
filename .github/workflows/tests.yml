@@ -17,7 +17,7 @@ jobs:
         runner-os:
         - ubuntu-latest
         ansible-version:
-        - git+https://github.com/ansible/ansible.git@devel
+        - devel
         runner-python-version:
         - 3.8
     steps:
@@ -37,7 +37,7 @@ jobs:
         pip
         install
         --user
-        ${{ matrix.ansible-version }}
+        https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz
     - name: Build a collection tarball
       run: >-
         ~/.local/bin/ansible-galaxy
@@ -65,7 +65,7 @@ jobs:
         runner-python-version:
         - 3.6
         ansible-version:
-        - git+https://github.com/ansible/ansible.git@devel
+        - devel
     steps:
     - name: Set up Python ${{ matrix.runner-python-version }}
       uses: actions/setup-python@v1
@@ -85,7 +85,7 @@ jobs:
         pip
         install
         --user
-        ${{ matrix.ansible-version }}
+        https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz
     - name: Download migrated collection artifacts
       uses: actions/download-artifact@v1
       with:
@@ -123,7 +123,7 @@ jobs:
         runner-python-version:
         - 3.6
         ansible-version:
-        - git+https://github.com/ansible/ansible.git@devel
+        - devel
         python-version:
         - 3.6
         - 2.7
@@ -143,7 +143,7 @@ jobs:
         pip
         install
         --user
-        ${{ matrix.ansible-version }}
+        https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz
     - name: Install requirements
       run: >-
         python -m
