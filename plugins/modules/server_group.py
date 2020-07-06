@@ -17,7 +17,7 @@ description:
 author:
   - René Moser (@resmo)
   - Denis Krienbühl (@href)
-version_added: "1.0"
+version_added: "1.0.0"
 options:
   name:
     description:
