@@ -168,7 +168,7 @@ jobs:
         CONFIG_FILE: ${{ secrets.CONFIG_FILE }}
         INI_FILE: tests/integration/cloud-config-cloudscale.ini
       run: |
-        echo -n "$CONFIG_FILE" > $INI_FILE && [ -s $INI_FILE ] || >&2 echo no secrets provided; exit 1
+        echo -n "$CONFIG_FILE" > $INI_FILE && [ -s $INI_FILE ] || (>&2 echo no secrets provided; exit 1)
     - name: Run the tests
       run: >-
         ~/.local/bin/ansible-test
