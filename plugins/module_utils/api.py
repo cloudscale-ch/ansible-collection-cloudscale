@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from copy import deepcopy
+import time
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
@@ -65,12 +66,25 @@ class AnsibleCloudscaleBase(object):
             data = self._module.jsonify(data)
             headers['Content-type'] = 'application/json'
 
-        resp, info = fetch_url(self._module,
-                               api_endpoint,
-                               headers=headers,
-                               method=method,
-                               data=data,
-                               timeout=self._module.params['api_timeout'])
+        retries = 3
+        for retry in range(0, retries):
+            resp, info = fetch_url(
+                self._module,
+                api_endpoint,
+                headers=headers,
+                method=method,
+                data=data,
+                timeout=self._module.params['api_timeout'],
+            )
+
+            if info['status'] != 500:
+                break
+
+            delay = 2 ** retry
+            time.sleep(delay)
+        else:
+            self._module.fail_json(msg='Failure while calling the cloudscale.ch API with %s for '
+                                       '"%s".' % (method, api_call), fetch_url_info=info)
 
         if info['status'] in (200, 201):
             return self._module.from_json(to_text(resp.read(), errors='surrogate_or_strict'))
@@ -87,11 +101,24 @@ class AnsibleCloudscaleBase(object):
         return self._post_or_patch(api_call, 'PATCH', data)
 
     def _delete(self, api_call):
-        resp, info = fetch_url(self._module,
-                               API_URL + api_call,
-                               headers=self._auth_header,
-                               method='DELETE',
-                               timeout=self._module.params['api_timeout'])
+        retries = 3
+        for retry in range(0, retries):
+            resp, info = fetch_url(
+                self._module,
+                API_URL + api_call,
+                headers=self._auth_header,
+                method='DELETE',
+                timeout=self._module.params['api_timeout'],
+            )
+
+            if info['status'] != 500:
+                break
+
+            delay = 2 ** retry
+            time.sleep(delay)
+        else:
+            self._module.fail_json(msg='Failure while calling the cloudscale.ch API with DELETE for '
+                                       '"%s".' % api_call, fetch_url_info=info)
 
         if info['status'] == 204:
             return None
