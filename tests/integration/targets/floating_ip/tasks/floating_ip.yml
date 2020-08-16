@@ -1,3 +1,22 @@
+- name: Request regional floating IP in check mode
+  cloudscale_ch.cloud.floating_ip:
+    server: '{{ test01.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    prefix_length: '{{ item.prefix_length | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  check_mode: true
+  register: floating_ip
+- name: Verify request floating IP in check mode
+  assert:
+    that:
+      - floating_ip is changed
+      - floating_ip.state == 'absent'
+
 - name: Request regional floating IP
   cloudscale_ch.cloud.floating_ip:
     server: '{{ test01.uuid }}'
@@ -5,31 +24,42 @@
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
     prefix_length: '{{ item.prefix_length | default(omit) }}'
     region: '{{ cloudscale_test_region }}'
-
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
   register: floating_ip
 - name: Verify request floating IP
   assert:
     that:
-      - floating_ip is successful
       - floating_ip is changed
-      - floating_ip.region.slug == '{{ cloudscale_test_region }}'
+      - floating_ip.region.slug == cloudscale_test_region
       # TODO: fix test
       # - (item.ip_version == 4 and floating_ip.ip | ipv4) or (item.ip_version == 6 and floating_ip.ip | ipv6)
       - floating_ip.server == test01.uuid
+      - floating_ip.tags.project == 'ansible-test'
+      - floating_ip.tags.stage == 'production'
+      - floating_ip.tags.sla == '24-7'
 
 - name: Check floating IP idempotence
   cloudscale_ch.cloud.floating_ip:
     server: '{{ test01.uuid }}'
     ip: '{{ floating_ip.ip }}'
     region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
   register: floating_ip_idempotence
 - name: Verify floating IP idempotence
   assert:
     that:
-      - floating_ip_idempotence is successful
       - floating_ip_idempotence is not changed
       - floating_ip_idempotence.server == test01.uuid
-      - floating_ip.region.slug == '{{ cloudscale_test_region }}'
+      - floating_ip.region.slug == cloudscale_test_region
+      - floating_ip.tags.project == 'ansible-test'
+      - floating_ip.tags.stage == 'production'
+      - floating_ip.tags.sla == '24-7'
 
 - name: Request global floating IP
   cloudscale_ch.cloud.floating_ip:
@@ -42,7 +72,6 @@
 - name: Verify global floating IP
   assert:
     that:
-      - global_floating_ip is successful
       - global_floating_ip is changed
       - global_floating_ip.region == None
       - global_floating_ip.type == 'global'
@@ -58,7 +87,6 @@
 - name: Verify release of global floating IP
   assert:
     that:
-      - global_floating_ip is successful
       - global_floating_ip is changed
       - global_floating_ip.state == 'absent'
 
@@ -80,7 +108,6 @@
 - name: Verify move floating IPv4 to second server
   assert:
     that:
-      - move_ip is successful
       - move_ip is changed
       - move_ip.server == test02.uuid
 
@@ -103,7 +130,6 @@
 - name: Verify release floating IPs
   assert:
     that:
-      - release_ip is successful
       - release_ip is changed
       - release_ip.state == 'absent'
 
@@ -115,7 +141,6 @@
 - name: Verify release floating IPs idempotence
   assert:
     that:
-      - release_ip is successful
       - release_ip is not changed
       - release_ip.state == 'absent'
 

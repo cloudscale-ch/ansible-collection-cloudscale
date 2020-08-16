@@ -23,7 +23,7 @@ notes:
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Denis Krienbühl (@href)
-version_added: "1.0.0"
+version_added: 1.0.0
 options:
   state:
     description:
@@ -71,6 +71,11 @@ options:
       - Reverse PTR entry for this address.
       - You cannot set a reverse PTR entry for IPv6 floating networks. Reverse PTR entries are only allowed for single addresses.
     type: str
+  tags:
+    description:
+      - Tags associated with the floating IP. Set this to C({}) to clear any tags.
+    type: dict
+    version_added: 1.1.0
 extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
@@ -157,6 +162,12 @@ state:
   returned: success
   type: str
   sample: present
+tags:
+  description: Tags assosiated with the floating IP.
+  returned: success
+  type: dict
+  sample: { 'project': 'my project' }
+  version_added: 1.1.0
 '''
 
 import traceback
@@ -225,12 +236,15 @@ class AnsibleCloudscaleFloatingIP(AnsibleCloudscaleBase):
             self._module.fail_json(msg='Missing required parameter(s) to request a floating IP: %s.' %
                                    ' '.join(missing_parameters))
 
-        data = {'ip_version': params['ip_version'],
-                'server': params['server']}
-
-        for p in ('prefix_length', 'reverse_ptr', 'type', 'region'):
-            if params[p]:
-                data[p] = params[p]
+        data = {
+            'ip_version': params['ip_version'],
+            'server': params['server'],
+            'prefix_length': params['prefix_length'],
+            'reverse_ptr': params['reverse_ptr'],
+            'type': params['type'],
+            'region': params['region'],
+            'tags': params['tags'],
+        }
 
         self.info = self._resp2info(self._post('floating-ips', data))
 
@@ -240,9 +254,16 @@ class AnsibleCloudscaleFloatingIP(AnsibleCloudscaleBase):
 
     def update_floating_ip(self):
         params = self._module.params
-        if 'server' not in params or not params['server']:
+
+        if not params['server']:
             self._module.fail_json(msg='Missing required parameter to update a floating IP: server.')
-        self.info = self._resp2info(self._post('floating-ips/%s' % params['ip'], {'server': params['server']}))
+
+        data = {
+            'server': params['server'],
+            'tags': params['tags'],
+        }
+
+        self.info = self._resp2info(self._post('floating-ips/%s' % params['ip'], data))
 
 
 def main():
@@ -256,6 +277,7 @@ def main():
         region=dict(type='str'),
         prefix_length=dict(choices=(56,), type='int'),
         reverse_ptr=dict(type='str'),
+        tags=dict(type='dict'),
     ))
 
     module = AnsibleModule(
