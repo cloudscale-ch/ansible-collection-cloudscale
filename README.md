@@ -1,6 +1,5 @@
 
-![CI tests](https://github.com/cloudscale-ch/ansible-collection-cloudscale/workflows/CI%20tests/badge.svg)
-[![Codecov](https://codecov.io/gh/cloudscale_ch/ansible-collection-cloudscale/branch/master/graph/badge.svg)](https://codecov.io/gh/cloudscale_ch/ansible-collection-cloudscale)
+![Collection Integration tests](https://github.com/cloudscale-ch/ansible-collection-cloudscale/workflows/Collection%20Integration%20tests/badge.svg)
 [![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](LICENSE)
 
 # Ansible Collection for cloudscale.ch Cloud
