@@ -1,0 +1,59 @@
+name: Mail info test
+
+on:
+  push:
+
+jobs:
+  integration-test:
+    name: Integration test using Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runner-python-version:
+        - 3.6
+        python-version:
+        - 3.6
+        - 2.7
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+      - name: Send mail
+        shell: python
+        run: |
+          from smtplib import SMTP
+          from email import EmailMessage
+
+          email = EmailMessage()
+          email['TO'] = '${{ secret.CRON_RCPT }}'
+          email['FROM'] = 'noreply@github.com'
+          email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
+          email.set_content("""
+          Some output here...
+          """)
+            
+          with SMTP(${{ secret.MAILSERVER }}) as smtp:
+            smtp.starttls()
+            smtp.send_message(email)
