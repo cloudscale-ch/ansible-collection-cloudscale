@@ -21,9 +21,9 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Fail this
-        id: failing
-        run: '/bin/false'
+      # - name: Fail this
+      #   id: failing
+      #   run: '/bin/false'
       - name: Don't fail this
         id: succeeding
         run: '/bin/true'
