@@ -21,28 +21,20 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Dump job context
-        id: job_context
+      - name: Fail this
+        id: failing
+        run: '/bin/false'
+      - name: Don't fail this
+        id: succeeding
+        run: '/bin/true'
+      - name: Dump steps context
+        id: steps_context
         env:
-          JOB_CONTEXT: ${{ toJson(job) }}
-        run: echo "$JOB_CONTEXT"
-      - name: Dump runner context
-        id: runner_context
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        id: strategy_context
-        env:
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        id: matrix_context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
-      - name: Send mail
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Send mail in case of failure
         id: send_mail
+        if: ${{ failure() }}
         shell: python3 {0}
         run: |
           from smtplib import SMTP
@@ -54,18 +46,9 @@ jobs:
           email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
           email.set_content("""
           Integration tests using Python ${{ matrix.python-version }} failed:
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           """)
 
           with SMTP('${{ secrets.MAILSERVER }}') as smtp:
             smtp.starttls()
-            print('Sending mail message ... ', end='', flush=True)
             smtp.send_message(email)
-            print('done.')
-          import sys
-          print('Error: none', file=sys.stderr)
-
-      - name: Dump steps context
-        id: steps_context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
