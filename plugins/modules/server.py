@@ -238,7 +238,7 @@ server_groups:
   type: list
   sample: [ {"href": "https://api.cloudscale.ch/v1/server-groups/...", "uuid": "...", "name": "db-group"} ]
 tags:
-  description: Tags assosiated with the volume.
+  description: Tags assosiated with the server.
   returned: success
   type: dict
   sample: { 'project': 'my project' }
