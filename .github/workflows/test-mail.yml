@@ -54,6 +54,6 @@ jobs:
           Some output here...
           """)
             
-          with SMTP(${{ secrets.MAILSERVER }}) as smtp:
+          with SMTP('${{ secrets.MAILSERVER }}') as smtp:
             smtp.starttls()
             smtp.send_message(email)
