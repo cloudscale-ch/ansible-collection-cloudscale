@@ -44,7 +44,7 @@ jobs:
         shell: python
         run: |
           from smtplib import SMTP
-          from email import EmailMessage
+          from email.message import EmailMessage
 
           email = EmailMessage()
           email['TO'] = '${{ secrets.CRON_RCPT }}'
