@@ -46,6 +46,14 @@ jobs:
       run: |
         echo -n "$CONFIG_FILE" > $INI_FILE && [ -s $INI_FILE ] || (>&2 echo no secrets provided; exit 1)
 
+    - name: Ensure no other integration test is currently running
+      uses: softprops/turnstyle@v0.1.3
+      timeout-minutes: 60
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        same-branch-only: false
+
     - name: Run the tests
       run: >-
         ansible-test
