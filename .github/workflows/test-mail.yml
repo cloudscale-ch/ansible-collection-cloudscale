@@ -41,7 +41,7 @@ jobs:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
       - name: Send mail
-        shell: python
+        shell: python3
         run: |
           from smtplib import SMTP
           from email.message import EmailMessage
