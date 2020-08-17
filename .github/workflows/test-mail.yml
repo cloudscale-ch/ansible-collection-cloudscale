@@ -53,12 +53,17 @@ jobs:
           email['FROM'] = 'noreply@github.com'
           email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
           email.set_content("""
-          Integration tests using ${{ matrix.python-version }} failed:
+          Integration tests using Python ${{ matrix.python-version }} failed:
           """)
 
           with SMTP('${{ secrets.MAILSERVER }}') as smtp:
             smtp.starttls()
+            print('Sending mail message ... ', end='', flush=True)
             smtp.send_message(email)
+            print('done.')
+          import sys
+          print('Error: none', file=sys.stderr)
+
       - name: Dump steps context
         id: steps_context
         env:
