@@ -47,13 +47,13 @@ jobs:
           from email import EmailMessage
 
           email = EmailMessage()
-          email['TO'] = '${{ secret.CRON_RCPT }}'
+          email['TO'] = '${{ secrets.CRON_RCPT }}'
           email['FROM'] = 'noreply@github.com'
           email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
           email.set_content("""
           Some output here...
           """)
             
-          with SMTP(${{ secret.MAILSERVER }}) as smtp:
+          with SMTP(${{ secrets.MAILSERVER }}) as smtp:
             smtp.starttls()
             smtp.send_message(email)
