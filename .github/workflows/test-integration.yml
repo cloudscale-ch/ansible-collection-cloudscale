@@ -78,3 +78,24 @@ jobs:
     - uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: false
+
+    - name: Send mail in case of failure
+      id: send_mail
+      if: ${{ failure() && github.event_name == 'schedule' }}
+      shell: python3 {0}
+      run: |
+        from smtplib import SMTP
+        from email.message import EmailMessage
+
+        email = EmailMessage()
+        email['TO'] = '${{ secrets.CRON_RCPT }}'
+        email['FROM'] = 'noreply@github.com'
+        email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
+        email.set_content("""
+        Integration tests using Python ${{ matrix.python-version }} failed:
+        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        """)
+
+        with SMTP('${{ secrets.MAILSERVER }}') as smtp:
+          smtp.starttls()
+          smtp.send_message(email)
