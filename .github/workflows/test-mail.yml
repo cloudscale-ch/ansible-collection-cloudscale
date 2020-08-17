@@ -1,7 +1,8 @@
 name: Mail info test
 
 on:
-  push:
+  schedule:
+  - cron: '*/5 * * * *'  # Run all 5 minutes
 
 jobs:
   integration-test:
