@@ -23,15 +23,11 @@ def cloudscale_argument_spec():
     )
 
 
-class AnsibleCloudscaleBase(object):
+class AnsibleCloudscaleApi(object):
 
     def __init__(self, module):
         self._module = module
         self._auth_header = {'Authorization': 'Bearer %s' % module.params['api_token']}
-        self._result = {
-            'changed': False,
-            'diff': dict(before=dict(), after=dict()),
-        }
 
     def _get(self, api_call):
         resp, info = fetch_url(self._module, API_URL + api_call,
@@ -99,6 +95,133 @@ class AnsibleCloudscaleBase(object):
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with DELETE for '
                                        '"%s".' % api_call, fetch_url_info=info)
 
+
+class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
+
+    def __init__(
+        self,
+        module,
+        resource_name='',
+        resource_key_uuid='uuid',
+        resource_key_name='name',
+        resource_create_param_keys=None,
+        resource_update_param_keys=None,
+    ):
+        super(AnsibleCloudscaleCommon, self).__init__(module)
+        self._result = {
+            'changed': False,
+            'diff': dict(
+                before=dict(),
+                after=dict()
+            ),
+        }
+        self._resource_data = dict()
+
+        # The identifier key of the resource, usually 'uuid'
+        self.resource_key_uuid = resource_key_uuid
+
+        # The name key of the resource, usually 'name'
+        self.resource_key_name = resource_key_name
+
+        # The API resource e.g server-group
+        self.resource_name = resource_name
+
+        # List of params used to create the resource
+        self.resource_create_param_keys = resource_create_param_keys or ['name']
+
+        # List of params used to update the resource
+        self.resource_update_param_keys = resource_update_param_keys or ['name']
+
+    def _init_resource(self):
+        return {
+            'state': "absent",
+            self.resource_key_uuid: self._module.params.get(self.resource_key_uuid) or self._resource_data.get(self.resource_key_uuid),
+            self.resource_key_name: self._module.params.get(self.resource_key_name) or self._resource_data.get(self.resource_key_name),
+        }
+
+    def query(self):
+        # Query by UUID
+        uuid = self._module.params[self.resource_key_uuid]
+        if uuid is not None:
+            resource = self._get('%s/%s' % (self.resource_name, uuid))
+            if resource:
+                self._resource_data = resource
+
+        # Query by name
+        else:
+            name = self._module.params[self.resource_key_name]
+            matching = []
+            resources = self._get('%s' % self.resource_name)
+            for resource in resources:
+                if resource[self.resource_key_name] == name:
+                    matching.append(resource)
+
+            # Fail on more than one resource with identical name
+            if len(matching) > 1:
+                self._module.fail_json(
+                    msg="More than one %s resource with '%s' exists: %s. "
+                        "Use the '%s' parameter to identify the resource." % (
+                            self.resource_name,
+                            self.resource_key_name,
+                            name,
+                            self.resource_key_uuid
+                        )
+                )
+            elif len(matching) == 1:
+                self._resource_data = matching[0]
+        return self._resource_data
+
+    def create(self):
+        # Fail if UUID/ID was provided but the resource was not found on state=present.
+        uuid = self._module.params.get(self.resource_key_uuid)
+        if uuid is not None:
+            self._module.fail_json(msg="The resource with UUID '%s' was not found "
+                                   "and we would create a new one with different UUID, "
+                                   "this is probably not want you have asked for." % uuid)
+
+        self._result['changed'] = True
+        resource = dict()
+
+        data = dict()
+        for param in self.resource_create_param_keys:
+            data[param] = self._module.params.get(param)
+
+        self._result['diff']['before'] = self._init_resource()
+        self._result['diff']['after'] = deepcopy(data)
+
+        if not self._module.check_mode:
+            resource = self._post(self.resource_name, data)
+        return resource
+
+    def update(self, resouce):
+        updated = False
+        for param in self.resource_update_param_keys:
+            updated = self._param_updated(param, resouce) or updated
+
+        # Refresh if resource was updated in live mode
+        if updated and not self._module.check_mode:
+            resouce = self.query()
+        return resouce
+
+    def present(self):
+        resource = self.query()
+        if not resource:
+            resource = self.create()
+        else:
+            resource = self.update(resource)
+        return self.get_result(resource)
+
+    def absent(self):
+        resource = self.query()
+        if resource:
+            self._result['changed'] = True
+            self._result['diff']['before'] = deepcopy(resource)
+            self._result['diff']['after'] = self._init_resource()
+
+            if not self._module.check_mode:
+                self._delete('%s/%s' % (self.resource_name, resource[self.resource_key_uuid]))
+        return self.get_result(resource)
+
     def _param_updated(self, key, resource):
         param = self._module.params.get(key)
         if param is None:
@@ -123,6 +246,22 @@ class AnsibleCloudscaleBase(object):
                     self._patch(href, patch_data)
                     return True
         return False
+
+    def get_result(self, resource):
+        if resource:
+            resource['state'] = "present"
+        else:
+            resource = self._init_resource()
+
+        for k, v in resource.items():
+            self._result[k] = v
+        return self._result
+
+
+class AnsibleCloudscaleBase(AnsibleCloudscaleCommon):
+
+    def __init__(self, module):
+        super(AnsibleCloudscaleBase, self).__init__(module)
 
     def get_result(self, resource):
         if resource:
