@@ -13,7 +13,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - not obj.uuid
+      - not obj.id
 
 - name: Create objects user
   cloudscale_ch.cloud.objects_user:
@@ -28,14 +28,14 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - obj.uuid
+      - obj.id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
       - obj.tags.sla == '24-7'
 
 - name: Remember uuid
   set_fact:
-    objects_user_uuid: '{{ obj.uuid }}'
+    objects_user_uuid: '{{ obj.id }}'
 
 - name: Create objects user idempotence
   cloudscale_ch.cloud.objects_user:
@@ -50,7 +50,7 @@
     that:
       - obj is not changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - obj.uuid == objects_user_uuid
+      - obj.id == objects_user_uuid
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
       - obj.tags.sla == '24-7'
@@ -70,7 +70,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - obj.uuid == objects_user_uuid
+      - obj.id == objects_user_uuid
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
       - obj.tags.sla == '24-7'
@@ -89,7 +89,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.uuid == objects_user_uuid
+      - obj.id == objects_user_uuid
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'staging'
       - obj.tags.sla == '8-5'
@@ -108,7 +108,7 @@
     that:
       - obj is not changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.uuid == objects_user_uuid
+      - obj.id == objects_user_uuid
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'staging'
       - obj.tags.sla == '8-5'
@@ -124,7 +124,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.uuid == objects_user_uuid
+      - obj.id == objects_user_uuid
 
 - name: Delete objects user
   cloudscale_ch.cloud.objects_user:
@@ -136,7 +136,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.uuid == objects_user_uuid
+      - obj.id == objects_user_uuid
 
 - name: Delete objects user idempotence
   cloudscale_ch.cloud.objects_user:
@@ -148,4 +148,4 @@
     that:
       - obj is not changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - not obj.uuid
+      - not obj.id

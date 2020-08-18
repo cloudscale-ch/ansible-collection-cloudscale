@@ -9,9 +9,9 @@
 
 - name: Remove all objects users created by this test run
   cloudscale_ch.cloud.objects_user:
-    uuid: '{{ item.uuid }}'
+    id: '{{ item.id }}'
     state: absent
   when: cloudscale_resource_prefix in item.display_name
   with_items: '{{ objects_user_list.json }}'
   loop_control:
-    label: '{{ item.display_name }} ({{ item.uuid }})'
+    label: '{{ item.display_name }} ({{ item.id }})'
