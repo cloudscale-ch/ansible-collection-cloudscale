@@ -1,2 +1,0 @@
-minor_changes:
-- floating_ip - added tags support (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/16)

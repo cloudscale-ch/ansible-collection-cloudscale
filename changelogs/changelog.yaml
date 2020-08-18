@@ -1,0 +1,13 @@
+ancestor: null
+releases:
+  1.1.0:
+    changes:
+      minor_changes:
+      - floating_ip - added tags support (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/16)
+    fragments:
+    - 16-floating_ip_tags.yml
+    modules:
+    - description: Manages objects users on the cloudscale.ch IaaS service
+      name: objects_user
+      namespace: ''
+    release_date: '2020-08-18'
