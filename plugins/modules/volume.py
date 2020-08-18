@@ -171,108 +171,21 @@ from ..module_utils.api import (
 
 class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
 
-    def __init__(self, module):
-        super(AnsibleCloudscaleVolume, self).__init__(module)
-        self._info = {}
-
-    def _init_container(self):
-        return {
-            'uuid': self._module.params.get('uuid') or self._info.get('uuid'),
-            'name': self._module.params.get('name') or self._info.get('name'),
-            'state': 'absent',
-        }
-
-    def _create(self, volume):
+    def create(self, resource):
         # Fail when missing params for creation
         self._module.fail_on_missing_params(['name', 'size_gb'])
-
-        # Fail if a user uses a UUID and state=present but the volume was not found.
-        if self._module.params.get('uuid'):
-            self._module.fail_json(msg="The volume with UUID '%s' was not found "
-                                   "and we would create a new one with different UUID, "
-                                   "this is probably not want you have asked for." % self._module.params.get('uuid'))
-
-        self._result['changed'] = True
-        data = {
-            'name': self._module.params.get('name'),
-            'type': self._module.params.get('type'),
-            'zone': self._module.params.get('zone'),
-            'size_gb': self._module.params.get('size_gb') or 'ssd',
-            'server_uuids': self._module.params.get('server_uuids') or [],
-            'tags': self._module.params.get('tags'),
-        }
-        if not self._module.check_mode:
-            volume = self._post('volumes', data)
-        return volume
-
-    def _update(self, volume):
-        update_params = (
-            'name',
-            'size_gb',
-            'server_uuids',
-            'tags',
-        )
-        updated = False
-        for param in update_params:
-            updated = self._param_updated(param, volume) or updated
-
-        # Refresh if resource was updated in live mode
-        if updated and not self._module.check_mode:
-            volume = self.get_volume()
-        return volume
-
-    def get_volume(self):
-        self._info = self._init_container()
-
-        uuid = self._info.get('uuid')
-        if uuid is not None:
-            volume = self._get('volumes/%s' % uuid)
-            if volume:
-                self._info.update(volume)
-                self._info['state'] = 'present'
-
-        else:
-            name = self._info.get('name')
-            matching_volumes = []
-            for volume in self._get('volumes'):
-                if volume['name'] == name:
-                    matching_volumes.append(volume)
-
-            if len(matching_volumes) > 1:
-                self._module.fail_json(msg="More than one volume with name exists: '%s'. "
-                                       "Use the 'uuid' parameter to identify the volume." % name)
-            elif len(matching_volumes) == 1:
-                self._info.update(matching_volumes[0])
-                self._info['state'] = 'present'
-        return self._info
-
-    def present(self):
-        volume = self.get_volume()
-        if volume.get('state') == 'absent':
-            volume = self._create(volume)
-        else:
-            volume = self._update(volume)
-        return volume
-
-    def absent(self):
-        volume = self.get_volume()
-        if volume.get('state') != 'absent':
-            self._result['changed'] = True
-            if not self._module.check_mode:
-                volume['state'] = "absent"
-                self._delete('volumes/%s' % volume['uuid'])
-        return volume
+        return super(AnsibleCloudscaleVolume, self).create(resource)
 
 
 def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
-        state=dict(default='present', choices=('present', 'absent')),
-        name=dict(),
-        uuid=dict(),
-        zone=dict(),
+        state=dict(type='str', default='present', choices=('present', 'absent')),
+        name=dict(type='str'),
+        uuid=dict(type='str'),
+        zone=dict(type='str'),
         size_gb=dict(type='int'),
-        type=dict(choices=('ssd', 'bulk')),
+        type=dict(type='str', choices=('ssd', 'bulk')),
         server_uuids=dict(type='list', elements='str', aliases=['server_uuid']),
         tags=dict(type='dict'),
     ))
@@ -283,14 +196,29 @@ def main():
         supports_check_mode=True,
     )
 
-    cloudscale_volume = AnsibleCloudscaleVolume(module)
+    cloudscale_volume = AnsibleCloudscaleVolume(
+        module,
+        resource_name='volumes',
+        resource_create_param_keys=[
+            'name',
+            'type',
+            'zone',
+            'size_gb',
+            'server_uuids',
+            'tags',
+        ],
+        resource_update_param_keys=[
+            'name',
+            'size_gb',
+            'server_uuids',
+            'tags',
+        ],
+    )
 
     if module.params['state'] == 'absent':
-        server_group = cloudscale_volume.absent()
+        result = cloudscale_volume.absent()
     else:
-        server_group = cloudscale_volume.present()
-
-    result = cloudscale_volume.get_result(server_group)
+        result = cloudscale_volume.present()
     module.exit_json(**result)
 
 

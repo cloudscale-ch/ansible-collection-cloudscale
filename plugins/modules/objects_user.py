@@ -115,7 +115,7 @@ state:
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
 from ..module_utils.api import (
-    AnsibleCloudscaleCommon,
+    AnsibleCloudscaleBase,
     cloudscale_argument_spec,
 )
 
@@ -136,7 +136,7 @@ def main():
         supports_check_mode=True,
     )
 
-    cloudscale_objects_user = AnsibleCloudscaleCommon(
+    cloudscale_objects_user = AnsibleCloudscaleBase(
         module,
         resource_name='objects-users',
         resource_key_uuid='id',

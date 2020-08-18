@@ -96,7 +96,7 @@ class AnsibleCloudscaleApi(object):
                                        '"%s".' % api_call, fetch_url_info=info)
 
 
-class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
+class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
     def __init__(
         self,
@@ -107,7 +107,7 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
         resource_create_param_keys=None,
         resource_update_param_keys=None,
     ):
-        super(AnsibleCloudscaleCommon, self).__init__(module)
+        super(AnsibleCloudscaleBase, self).__init__(module)
         self._result = {
             'changed': False,
             'diff': dict(
@@ -140,12 +140,16 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
         }
 
     def query(self):
+        # Initialize
+        self._resource_data = self._init_resource()
+
         # Query by UUID
         uuid = self._module.params[self.resource_key_uuid]
         if uuid is not None:
             resource = self._get('%s/%s' % (self.resource_name, uuid))
             if resource:
                 self._resource_data = resource
+                self._resource_data['state'] = "present"
 
         # Query by name
         else:
@@ -169,9 +173,11 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
                 )
             elif len(matching) == 1:
                 self._resource_data = matching[0]
+                self._resource_data['state'] = "present"
+
         return self._resource_data
 
-    def create(self):
+    def create(self, resource):
         # Fail if UUID/ID was provided but the resource was not found on state=present.
         uuid = self._module.params.get(self.resource_key_uuid)
         if uuid is not None:
@@ -180,17 +186,20 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
                                    "this is probably not want you have asked for." % uuid)
 
         self._result['changed'] = True
-        resource = dict()
 
         data = dict()
         for param in self.resource_create_param_keys:
             data[param] = self._module.params.get(param)
 
-        self._result['diff']['before'] = self._init_resource()
+        self._result['diff']['before'] = deepcopy(resource)
         self._result['diff']['after'] = deepcopy(data)
+        self._result['diff']['after'].update({
+            'state': "present",
+        })
 
         if not self._module.check_mode:
             resource = self._post(self.resource_name, data)
+            resource['state'] = "present"
         return resource
 
     def update(self, resouce):
@@ -205,21 +214,22 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
 
     def present(self):
         resource = self.query()
-        if not resource:
-            resource = self.create()
+        if resource['state'] == "absent":
+            resource = self.create(resource)
         else:
             resource = self.update(resource)
         return self.get_result(resource)
 
     def absent(self):
         resource = self.query()
-        if resource:
+        if resource['state'] != "absent":
             self._result['changed'] = True
             self._result['diff']['before'] = deepcopy(resource)
             self._result['diff']['after'] = self._init_resource()
 
             if not self._module.check_mode:
                 self._delete('%s/%s' % (self.resource_name, resource[self.resource_key_uuid]))
+                resource['state'] = "absent"
         return self.get_result(resource)
 
     def _param_updated(self, key, resource):
@@ -246,22 +256,6 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
                     self._patch(href, patch_data)
                     return True
         return False
-
-    def get_result(self, resource):
-        if resource:
-            resource['state'] = "present"
-        else:
-            resource = self._init_resource()
-
-        for k, v in resource.items():
-            self._result[k] = v
-        return self._result
-
-
-class AnsibleCloudscaleBase(AnsibleCloudscaleCommon):
-
-    def __init__(self, module):
-        super(AnsibleCloudscaleBase, self).__init__(module)
 
     def get_result(self, resource):
         if resource:
