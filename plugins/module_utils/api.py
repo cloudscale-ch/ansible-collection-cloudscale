@@ -193,15 +193,15 @@ class AnsibleCloudscaleCommon(AnsibleCloudscaleApi):
             resource = self._post(self.resource_name, data)
         return resource
 
-    def update(self, resouce):
+    def update(self, resource):
         updated = False
         for param in self.resource_update_param_keys:
-            updated = self._param_updated(param, resouce) or updated
+            updated = self._param_updated(param, resource) or updated
 
         # Refresh if resource was updated in live mode
         if updated and not self._module.check_mode:
-            resouce = self.query()
-        return resouce
+            resource = self.query()
+        return resource
 
     def present(self):
         resource = self.query()
