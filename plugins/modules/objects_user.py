@@ -30,8 +30,6 @@ options:
       - Name of the objects user.
       - Either I(display_name) or I(id) is required.
     type: str
-    aliases:
-      - uuid
   tags:
     description:
       - Tags associated with the objects user. Set this to C({}) to clear any tags.
@@ -126,7 +124,7 @@ def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
         display_name=dict(type='str', aliases=['name']),
-        id=dict(type='str', aliases=['uuid']),
+        id=dict(type='str'),
         tags=dict(type='dict'),
         state=dict(type='str', default='present', choices=('present', 'absent')),
     ))

@@ -35,7 +35,7 @@
 
 - name: Remember uuid
   set_fact:
-    objects_user_uuid: '{{ obj.id }}'
+    objects_user_id: '{{ obj.id }}'
 
 - name: Create objects user idempotence
   cloudscale_ch.cloud.objects_user:
@@ -50,14 +50,14 @@
     that:
       - obj is not changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - obj.id == objects_user_uuid
+      - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
       - obj.tags.sla == '24-7'
 
 - name: Update objects user in check mode
   cloudscale_ch.cloud.objects_user:
-    uuid: '{{ objects_user_uuid }}'
+    id: '{{ objects_user_id }}'
     display_name: '{{ cloudscale_resource_prefix }}-obj2'
     tags:
       project: ansible-test
@@ -70,14 +70,14 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - obj.id == objects_user_uuid
+      - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
       - obj.tags.sla == '24-7'
 
 - name: Update objects user
   cloudscale_ch.cloud.objects_user:
-    uuid: '{{ objects_user_uuid }}'
+    id: '{{ objects_user_id }}'
     display_name: '{{ cloudscale_resource_prefix }}-obj2'
     tags:
       project: ansible-test
@@ -89,14 +89,14 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.id == objects_user_uuid
+      - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'staging'
       - obj.tags.sla == '8-5'
 
 - name: Update objects user idempotence
   cloudscale_ch.cloud.objects_user:
-    uuid: '{{ objects_user_uuid }}'
+    id: '{{ objects_user_id }}'
     display_name: '{{ cloudscale_resource_prefix }}-obj2'
     tags:
       project: ansible-test
@@ -108,7 +108,7 @@
     that:
       - obj is not changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.id == objects_user_uuid
+      - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'staging'
       - obj.tags.sla == '8-5'
@@ -124,7 +124,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.id == objects_user_uuid
+      - obj.id == objects_user_id
 
 - name: Delete objects user
   cloudscale_ch.cloud.objects_user:
@@ -136,7 +136,7 @@
     that:
       - obj is changed
       - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
-      - obj.id == objects_user_uuid
+      - obj.id == objects_user_id
 
 - name: Delete objects user idempotence
   cloudscale_ch.cloud.objects_user:

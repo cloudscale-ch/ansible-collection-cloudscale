@@ -32,12 +32,12 @@
     - obj is failed
     - obj.msg.startswith("More than one objects-users resource with 'display_name' exists")
 
-- name: Fail creation with UUID
+- name: Fail creation with ID
   cloudscale_ch.cloud.objects_user:
-    uuid: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
+    id: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
   register: obj
   ignore_errors: True
-- name: 'VERIFY: Fail server group creation with UUID'
+- name: 'VERIFY: Fail server group creation with ID'
   assert:
     that:
     - obj is failed
