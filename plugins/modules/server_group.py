@@ -124,90 +124,13 @@ from ..module_utils.api import (
 )
 
 
-class AnsibleCloudscaleServerGroup(AnsibleCloudscaleBase):
-
-    def __init__(self, module, namespace):
-        super(AnsibleCloudscaleServerGroup, self).__init__(module)
-        self._info = {}
-
-    def _init_container(self):
-        return {
-            'uuid': self._module.params.get('uuid') or self._info.get('uuid'),
-            'name': self._module.params.get('name') or self._info.get('name'),
-            'state': 'absent',
-        }
-
-    def _create_server_group(self, server_group):
-        self._module.fail_on_missing_params(['name'])
-        self._result['changed'] = True
-        data = {
-            'name': self._module.params.get('name'),
-            'type': self._module.params.get('type'),
-            'zone': self._module.params.get('zone'),
-            'tags': self._module.params.get('tags'),
-        }
-        if not self._module.check_mode:
-            server_group = self._post('server-groups', data)
-        return server_group
-
-    def _update_server_group(self, server_group):
-        updated = self._param_updated('name', server_group)
-        updated = self._param_updated('tags', server_group) or updated
-
-        # Refresh if resource was updated in live mode
-        if updated and not self._module.check_mode:
-            server_group = self.get_server_group()
-        return server_group
-
-    def get_server_group(self):
-        self._info = self._init_container()
-
-        uuid = self._info.get('uuid')
-        if uuid is not None:
-            server_group = self._get('server-groups/%s' % uuid)
-            if server_group:
-                self._info.update(server_group)
-                self._info.update(dict(state='present'))
-
-        else:
-            name = self._info.get('name')
-            matching_server_groups = []
-            for server_group in self._get('server-groups'):
-                if server_group['name'] == name:
-                    matching_server_groups.append(server_group)
-
-            if len(matching_server_groups) > 1:
-                self._module.fail_json(msg="More than one server group with name exists: '%s'. "
-                                       "Use the 'uuid' parameter to identify the server group." % name)
-            elif len(matching_server_groups) == 1:
-                self._info.update(matching_server_groups[0])
-                self._info.update(dict(state='present'))
-        return self._info
-
-    def present_group(self):
-        server_group = self.get_server_group()
-        if server_group.get('state') == 'absent':
-            server_group = self._create_server_group(server_group)
-        else:
-            server_group = self._update_server_group(server_group)
-        return server_group
-
-    def absent_group(self):
-        server_group = self.get_server_group()
-        if server_group.get('state') != 'absent':
-            self._result['changed'] = True
-            if not self._module.check_mode:
-                self._delete('server-groups/%s' % server_group['uuid'])
-        return server_group
-
-
 def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
-        name=dict(),
-        uuid=dict(),
-        type=dict(default='anti-affinity'),
-        zone=dict(),
+        name=dict(type='str'),
+        uuid=dict(type='str'),
+        type=dict(type='str', default='anti-affinity'),
+        zone=dict(type='str'),
         tags=dict(type='dict'),
         state=dict(default='present', choices=['absent', 'present']),
     ))
@@ -215,16 +138,29 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_one_of=(('name', 'uuid'),),
+        required_if=(('state', 'present', ('name',),),),
         supports_check_mode=True,
     )
-    cloudscale_server_group = AnsibleCloudscaleServerGroup(module, 'cloudscale_server_group')
+
+    cloudscale_server_group = AnsibleCloudscaleBase(
+        module,
+        resource_name='server-groups',
+        resource_create_param_keys=[
+            'name',
+            'type',
+            'zone',
+            'tags',
+        ],
+        resource_update_param_keys=[
+            'name',
+            'tags',
+        ],
+    )
 
     if module.params['state'] == 'absent':
-        server_group = cloudscale_server_group.absent_group()
+        result = cloudscale_server_group.absent()
     else:
-        server_group = cloudscale_server_group.present_group()
-
-    result = cloudscale_server_group.get_result(server_group)
+        result = cloudscale_server_group.present()
     module.exit_json(**result)
 
 
