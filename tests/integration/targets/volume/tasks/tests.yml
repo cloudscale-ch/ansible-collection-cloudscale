@@ -258,5 +258,3 @@
       - bulk is successful
       - bulk is not changed
       - bulk.state == 'absent'
-
-- import_tasks: failures.yml
