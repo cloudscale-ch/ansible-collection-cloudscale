@@ -52,7 +52,7 @@ Or you can add full namepsace and collecton name in the `collections` element:
 - name: Using cloudscale.ch collection
   hosts: localhost
   collections:
-    - cloudscale_ch.cloudscale
+    - cloudscale_ch.cloud
   tasks:
     - server:
         name: web1
