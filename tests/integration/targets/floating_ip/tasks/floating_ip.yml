@@ -1,5 +1,6 @@
 - name: Request regional floating IP in check mode
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
@@ -19,6 +20,7 @@
 
 - name: Request regional floating IP
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
@@ -36,15 +38,15 @@
       - floating_ip.region.slug == cloudscale_test_region
       # TODO: fix test
       # - (item.ip_version == 4 and floating_ip.ip | ipv4) or (item.ip_version == 6 and floating_ip.ip | ipv6)
-      - floating_ip.server == test01.uuid
+      - floating_ip.server.uuid == test01.uuid
       - floating_ip.tags.project == 'ansible-test'
       - floating_ip.tags.stage == 'production'
       - floating_ip.tags.sla == '24-7'
 
 - name: Check floating IP idempotence
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
-    ip: '{{ floating_ip.ip }}'
     region: '{{ cloudscale_test_region }}'
     tags:
       project: ansible-test
@@ -55,7 +57,7 @@
   assert:
     that:
       - floating_ip_idempotence is not changed
-      - floating_ip_idempotence.server == test01.uuid
+      - floating_ip_idempotence.server.uuid == test01.uuid
       - floating_ip.region.slug == cloudscale_test_region
       - floating_ip.tags.project == 'ansible-test'
       - floating_ip.tags.stage == 'production'
@@ -63,6 +65,7 @@
 
 - name: Request global floating IP
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
@@ -77,7 +80,7 @@
       - global_floating_ip.type == 'global'
       # TODO: fix test
       # - (item.ip_version == 4 and global_floating_ip.ip | ipv4) or (item.ip_version == 6 and global_floating_ip.ip | ipv6)
-      - global_floating_ip.server == test01.uuid
+      - global_floating_ip.server.uuid == test01.uuid
 
 - name: Release global floating IP
   cloudscale_ch.cloud.floating_ip:
@@ -109,7 +112,7 @@
   assert:
     that:
       - move_ip is changed
-      - move_ip.server == test02.uuid
+      - move_ip.server.uuid == test02.uuid
 
 - name: Fail if server is missing on update
   cloudscale_ch.cloud.floating_ip:

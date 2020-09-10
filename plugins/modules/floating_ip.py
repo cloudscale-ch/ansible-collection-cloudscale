@@ -15,27 +15,33 @@ short_description: Manages floating IPs on the cloudscale.ch IaaS service
 description:
   - Create, assign and delete floating IPs on the cloudscale.ch IaaS service.
 notes:
-  - To create a new floating IP at least the C(ip_version) and C(server) options are required.
-  - Once a floating_ip is created all parameters except C(server) are read-only.
-  - It's not possible to request a floating IP without associating it with a server at the same time.
+  - Once a floating_ip is created all parameters except C(server) and C(tags) are read-only.
   - This module requires the ipaddress python library. This library is included in Python since version 3.3. It is available as a
     module on PyPI for earlier versions.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Denis Krienbühl (@href)
+  - René Moser (@resmo)
 version_added: 1.0.0
 options:
+  ip:
+    description:
+      - Floating IP address to change.
+      - One of C(ip) or C(name) is required to identify the floating IP.
+    aliases: [ network ]
+    type: str
+  name:
+    description:
+      - Name to identifiy the floating IP address.
+      - One of C(ip) or C(name) is required to identify the floating IP.
+    aliases: [ network ]
+    version_added: 2.0.0
+    type: str
   state:
     description:
       - State of the floating IP.
     default: present
     choices: [ present, absent ]
-    type: str
-  ip:
-    description:
-      - Floating IP address to change.
-      - Required to assign the IP to a different server or if I(state) is absent.
-    aliases: [ network ]
     type: str
   ip_version:
     description:
@@ -45,7 +51,6 @@ options:
   server:
     description:
       - UUID of the server assigned to this floating IP.
-      - Required unless I(state) is absent.
     type: str
   type:
     description:
@@ -80,19 +85,34 @@ extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
-# Request a new floating IP
+# Request a new floating IP without assignment to a server
 - name: Request a floating IP
   cloudscale_ch.cloud.floating_ip:
+    name: IP to my server
+    ip_version: 4
+    reverse_ptr: my-server.example.com
+    api_token: xxxxxx
+
+# Request a new floating IP with assignment
+- name: Request a floating IP
+  cloudscale_ch.cloud.floating_ip:
+    name: web
     ip_version: 4
     server: 47cec963-fcd2-482f-bdb6-24461b2d47b1
     reverse_ptr: my-server.example.com
     api_token: xxxxxx
-  register: floating_ip
 
-# Assign an existing floating IP to a different server
+# Assign an existing floating IP to a different server by its IP address
 - name: Move floating IP to backup server
   cloudscale_ch.cloud.floating_ip:
     ip: 192.0.2.123
+    server: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
+    api_token: xxxxxx
+
+# Assign an existing floating IP to a different server by name
+- name: Move floating IP to backup server
+  cloudscale_ch.cloud.floating_ip:
+    name: IP to my server
     server: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
     api_token: xxxxxx
 
@@ -104,7 +124,6 @@ EXAMPLES = '''
     server: 47cec963-fcd2-482f-bdb6-24461b2d47b1
     api_token: xxxxxx
     region: lpg1
-  register: floating_ip
 
 # Assign an existing floating network to a different server
 - name: Move floating IP to backup server
@@ -122,6 +141,12 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
+name:
+  description: The name of the floating ip
+  returned: success when state == present
+  type: str
+  sample: my floating ip
+  version_added: 2.0.0
 href:
   description: The API URL to get details about this floating IP.
   returned: success when state == present
@@ -187,90 +212,100 @@ from ..module_utils.api import (
 )
 
 
-class AnsibleCloudscaleFloatingIP(AnsibleCloudscaleBase):
+class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
 
     def __init__(self, module):
-        super(AnsibleCloudscaleFloatingIP, self).__init__(module)
+        super(AnsibleCloudscaleFloatingIp, self).__init__(
+            module=module,
+            resource_key_uuid='ip',
+            resource_name='floating-ips',
+            resource_create_param_keys=[
+                'ip_version',
+                'server',
+                'prefix_length',
+                'reverse_ptr',
+                'type',
+                'region',
+                'tags',
+            ],
+            resource_update_param_keys=[
+                'server',
+                'tags',
+            ],
+        )
 
-        # Initialize info dict
-        # Set state to absent, will be updated by self.update_info()
-        self.info = {'state': 'absent'}
+        self.name_tag = "ansible_name"
 
-        if self._module.params['ip']:
-            self.update_info()
+    def query(self):
+        # Initialize
+        self._resource_data = self.init_resource()
 
-    @staticmethod
-    def _resp2info(resp):
-        # If the API response has some content, the floating IP must exist
-        resp['state'] = 'present'
+        # Query by UUID
+        uuid = self._module.params[self.resource_key_uuid]
+        if uuid is not None:
+            resource = self._get('%s/%s' % (self.resource_name, uuid))
+            if resource:
+                self._resource_data = resource
+                self._resource_data['state'] = "present"
 
-        # Add the IP address to the response, otherwise handling get's to complicated as this
-        # has to be converted from the network all the time.
-        resp['ip'] = str(ip_network(resp['network']).network_address)
-
-        # Replace the server with just the UUID, the href to the server is useless and just makes
-        # things more complicated
-        if resp['server'] is not None:
-            resp['server'] = resp['server']['uuid']
-
-        return resp
-
-    def update_info(self):
-        resp = self._get('floating-ips/' + self._module.params['ip'])
-        if resp:
-            self.info = self._resp2info(resp)
         else:
-            self.info = {'ip': self._module.params['ip'],
-                         'state': 'absent'}
+            # Floating IP API has no name field, querying by the a custom tag used as name
+            name = self._module.params[self.resource_key_name]
+            resources = self._get('%s?tag:%s=%s' % (self.resource_name, self.name_tag, name))
+            if resources:
+                # Fail on more than one resource with identical name
+                if len(resources) > 1:
+                    self._module.fail_json(
+                        msg="More than one %s resource with '%s' exists: %s. "
+                            "Use the '%s' parameter to identify the resource." % (
+                                self.resource_name,
+                                self.resource_key_name,
+                                name,
+                                self.resource_key_uuid
+                            )
+                    )
+                elif len(resources) == 1:
+                    self._resource_data = resources[0]
+                    self._resource_data['state'] = "present"
 
-    def request_floating_ip(self):
-        params = self._module.params
+        return self._resource_data
 
-        # check for required parameters to request a floating IP
-        missing_parameters = []
-        for p in ('ip_version', 'server'):
-            if p not in params or not params[p]:
-                missing_parameters.append(p)
+    def _append_name_tag(self):
+        # Append name to the tags to handle idempotency
+        self._module.params['tags'] = self._module.params['tags'] or dict()
+        self._module.params['tags'].update({
+            self.name_tag: self._module.params[self.resource_key_name],
+        })
 
-        if len(missing_parameters) > 0:
-            self._module.fail_json(msg='Missing required parameter(s) to request a floating IP: %s.' %
-                                   ' '.join(missing_parameters))
+    def create(self, resource):
+        # Fail when missing params for creation
+        self._module.fail_on_missing_params([self.resource_key_name])
 
-        data = {
-            'ip_version': params['ip_version'],
-            'server': params['server'],
-            'prefix_length': params['prefix_length'],
-            'reverse_ptr': params['reverse_ptr'],
-            'type': params['type'],
-            'region': params['region'],
-            'tags': params['tags'],
-        }
+        # Append name to the tags to handle idempotency
+        self._append_name_tag()
+        return super(AnsibleCloudscaleFloatingIp, self).create(resource)
 
-        self.info = self._resp2info(self._post('floating-ips', data))
+    def update(self, resource):
+        # Append name to the tags to handle idempotency
+        self._append_name_tag()
+        return super(AnsibleCloudscaleFloatingIp, self).update(resource)
 
-    def release_floating_ip(self):
-        self._delete('floating-ips/%s' % self._module.params['ip'])
-        self.info = {'ip': self.info['ip'], 'state': 'absent'}
+    def get_result(self, resource):
+        if resource:
+            for k, v in resource.items():
+                self._result[k] = v
 
-    def update_floating_ip(self):
-        params = self._module.params
-
-        if not params['server']:
-            self._module.fail_json(msg='Missing required parameter to update a floating IP: server.')
-
-        data = {
-            'server': params['server'],
-            'tags': params['tags'],
-        }
-
-        self.info = self._resp2info(self._post('floating-ips/%s' % params['ip'], data))
-
+            # Transform the name tag back to a name field
+            if 'name' not in self._result:
+                self._result['name'] = self._result.get('tags', dict()).pop(self.name_tag, '')
+        return self._result
 
 def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
+        name=dict(type='str'),
         state=dict(default='present', choices=('present', 'absent'), type='str'),
-        ip=dict(aliases=('network', ), type='str'),
+        ip=dict(aliases=('network',), type='str'),
         ip_version=dict(choices=(4, 6), type='int'),
         server=dict(type='str'),
         type=dict(type='str', choices=('regional', 'global'), default='regional'),
@@ -282,36 +317,20 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_one_of=(('ip', 'ip_version'),),
+        required_one_of=(('ip', 'name'),),
         supports_check_mode=True,
     )
 
     if not HAS_IPADDRESS:
         module.fail_json(msg=missing_required_lib('ipaddress'), exception=IPADDRESS_IMP_ERR)
 
-    target_state = module.params['state']
-    target_server = module.params['server']
-    floating_ip = AnsibleCloudscaleFloatingIP(module)
-    current_state = floating_ip.info['state']
-    current_server = floating_ip.info['server'] if 'server' in floating_ip.info else None
+    cloudscale_floating_ip = AnsibleCloudscaleFloatingIp(module)
 
-    if module.check_mode:
-        module.exit_json(changed=not target_state == current_state or
-                         (current_state == 'present' and current_server != target_server),
-                         **floating_ip.info)
-
-    changed = False
-    if current_state == 'absent' and target_state == 'present':
-        floating_ip.request_floating_ip()
-        changed = True
-    elif current_state == 'present' and target_state == 'absent':
-        floating_ip.release_floating_ip()
-        changed = True
-    elif current_state == 'present' and current_server != target_server:
-        floating_ip.update_floating_ip()
-        changed = True
-
-    module.exit_json(changed=changed, **floating_ip.info)
+    if module.params['state'] == 'absent':
+        result = cloudscale_floating_ip.absent()
+    else:
+        result = cloudscale_floating_ip.present()
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
