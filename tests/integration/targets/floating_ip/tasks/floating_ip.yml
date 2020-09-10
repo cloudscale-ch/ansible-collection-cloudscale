@@ -34,8 +34,7 @@
     that:
       - floating_ip is changed
       - floating_ip.region.slug == cloudscale_test_region
-      # TODO: fix test
-      # - (item.ip_version == 4 and floating_ip.ip | ipv4) or (item.ip_version == 6 and floating_ip.ip | ipv6)
+      - (item.ip_version == 4 and floating_ip.ip | ipv4) or (item.ip_version == 6 and floating_ip.ip | ipv6)
       - floating_ip.server == test01.uuid
       - floating_ip.tags.project == 'ansible-test'
       - floating_ip.tags.stage == 'production'
@@ -63,7 +62,6 @@
 
 - name: Request global floating IP
   cloudscale_ch.cloud.floating_ip:
-    server: '{{ test01.uuid }}'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
     prefix_length: '{{ item.prefix_length | default(omit) }}'
@@ -75,9 +73,8 @@
       - global_floating_ip is changed
       - global_floating_ip.region == None
       - global_floating_ip.type == 'global'
-      # TODO: fix test
-      # - (item.ip_version == 4 and global_floating_ip.ip | ipv4) or (item.ip_version == 6 and global_floating_ip.ip | ipv6)
-      - global_floating_ip.server == test01.uuid
+      - (item.ip_version == 4 and global_floating_ip.ip | ipv4) or (item.ip_version == 6 and global_floating_ip.ip | ipv6)
+      - not global_floating_ip.server
 
 - name: Release global floating IP
   cloudscale_ch.cloud.floating_ip:
@@ -111,16 +108,17 @@
       - move_ip is changed
       - move_ip.server == test02.uuid
 
-- name: Fail if server is missing on update
+- name: Release floating IP in check mode
   cloudscale_ch.cloud.floating_ip:
     ip: '{{ floating_ip.ip }}'
-  register: update_failed
-  ignore_errors: True
-- name: Verify fail if server is missing on update
+    state: 'absent'
+  check_mode: true
+  register: release_ip
+- name: Verify release floating IPs
   assert:
     that:
-      - update_failed is failed
-      - "'Missing required parameter' in update_failed.msg"
+      - release_ip is changed
+      - release_ip.state == 'present'
 
 - name: Release floating IP
   cloudscale_ch.cloud.floating_ip:
@@ -143,14 +141,3 @@
     that:
       - release_ip is not changed
       - release_ip.state == 'absent'
-
-- name: Fail if server is missing on request
-  cloudscale_ch.cloud.floating_ip:
-    ip_version: 6
-  register: request_failed
-  ignore_errors: True
-- name: Verify fail if server is missing on request
-  assert:
-    that:
-      - request_failed is failed
-      - "'Missing required parameter' in request_failed.msg"
