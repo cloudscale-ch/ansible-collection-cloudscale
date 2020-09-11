@@ -16,7 +16,7 @@ description:
   - Create, assign and delete floating IPs on the cloudscale.ch IaaS service.
 notes:
   - Idempotency depends on the C(ip) parameter.
-  - Once a floating_ip is created all parameters except C(server), C(reverse_ptr) and C(tags) are read-only.
+  - Once a floating_ip is created, all parameters except C(server), C(reverse_ptr) and C(tags) are read-only.
   - This module requires the ipaddress python library. This library is included in Python since version 3.3. It is available as a
     module on PyPI for earlier versions.
 author:
