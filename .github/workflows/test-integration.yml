@@ -9,6 +9,9 @@ jobs:
   integration-test:
     name: Integration test using Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible_collections/cloudscale_ch/cloud
     strategy:
       fail-fast: false
       matrix:
@@ -19,12 +22,12 @@ jobs:
         - 2.7
     steps:
     - name: Check out code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         path: ansible_collections/cloudscale_ch/cloud
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -75,6 +78,7 @@ jobs:
         --requirements
         --group-by command
         --group-by version
+
     - uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: false
