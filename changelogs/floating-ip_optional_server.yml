@@ -1,0 +1,2 @@
+minor_changes:
+- floating_ip - Allow to reserve an IP without assignment to a server (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/31/).
