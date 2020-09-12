@@ -15,9 +15,8 @@ short_description: Manages floating IPs on the cloudscale.ch IaaS service
 description:
   - Create, assign and delete floating IPs on the cloudscale.ch IaaS service.
 notes:
-  - To create a new floating IP at least the C(ip_version) and C(server) options are required.
-  - Once a floating_ip is created all parameters except C(server) are read-only.
-  - It's not possible to request a floating IP without associating it with a server at the same time.
+  - Idempotency depends on the C(ip) parameter.
+  - Once a floating_ip is created, all parameters except C(server), C(reverse_ptr) and C(tags) are read-only.
   - This module requires the ipaddress python library. This library is included in Python since version 3.3. It is available as a
     module on PyPI for earlier versions.
 author:
@@ -45,7 +44,6 @@ options:
   server:
     description:
       - UUID of the server assigned to this floating IP.
-      - Required unless I(state) is absent.
     type: str
   type:
     description:
@@ -80,6 +78,12 @@ extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
+# Request a new floating IP without server assignment
+- name: Request a floating IP
+  cloudscale_ch.cloud.floating_ip:
+    ip_version: 4
+    api_token: xxxxxx
+
 # Request a new floating IP
 - name: Request a floating IP
   cloudscale_ch.cloud.floating_ip:
@@ -87,7 +91,6 @@ EXAMPLES = '''
     server: 47cec963-fcd2-482f-bdb6-24461b2d47b1
     reverse_ptr: my-server.example.com
     api_token: xxxxxx
-  register: floating_ip
 
 # Assign an existing floating IP to a different server
 - name: Move floating IP to backup server
@@ -104,7 +107,6 @@ EXAMPLES = '''
     server: 47cec963-fcd2-482f-bdb6-24461b2d47b1
     api_token: xxxxxx
     region: lpg1
-  register: floating_ip
 
 # Assign an existing floating network to a different server
 - name: Move floating IP to backup server
@@ -227,14 +229,7 @@ class AnsibleCloudscaleFloatingIP(AnsibleCloudscaleBase):
         params = self._module.params
 
         # check for required parameters to request a floating IP
-        missing_parameters = []
-        for p in ('ip_version', 'server'):
-            if p not in params or not params[p]:
-                missing_parameters.append(p)
-
-        if len(missing_parameters) > 0:
-            self._module.fail_json(msg='Missing required parameter(s) to request a floating IP: %s.' %
-                                   ' '.join(missing_parameters))
+        self._module.fail_on_missing_params(('ip_version',))
 
         data = {
             'ip_version': params['ip_version'],
