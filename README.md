@@ -45,7 +45,7 @@ To use a module from cloudscale.ch collection, please reference the full namespa
         api_token: ...
 ```
 
-Or you can add full namepsace and collecton name in the `collections` element:
+Or you can add full namepsace and collection name in the `collections` element:
 
 ```yaml
 ---
