@@ -1,9 +1,8 @@
 name: Collection Integration tests
 
 on:
-  push:
   schedule:
-  - cron: '0 5 * * *'  # Run daily at 5:00 UTC
+  - cron: '0 5 * * *'  # UTC
 
 jobs:
   integration-test:
