@@ -25,7 +25,7 @@ jobs:
     - name: Run cleanup
       run: |
         pip install cloudscale-cli
-        for resource in objects-user server floating-ip server-group;
+        for resource in objects-user server floating-ip server-group network;
         do
         echo "cleaning up $resource...";
         cloudscale $resource list --delete --force;
