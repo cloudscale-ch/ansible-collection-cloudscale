@@ -11,15 +11,24 @@ from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
 
-API_URL = 'https://api.cloudscale.ch/v1/'
-
 
 def cloudscale_argument_spec():
     return dict(
-        api_token=dict(fallback=(env_fallback, ['CLOUDSCALE_API_TOKEN']),
-                       no_log=True,
-                       required=True),
-        api_timeout=dict(default=30, type='int'),
+        api_url=dict(
+            type='str',
+            fallback=(env_fallback, ['CLOUDSCALE_API_URL']),
+            default='https://api.cloudscale.ch/v1',
+        ),
+        api_token=dict(
+            type='str',
+            fallback=(env_fallback, ['CLOUDSCALE_API_TOKEN']),
+            no_log=True,
+            required=True,
+        ),
+        api_timeout=dict(
+            type='int',
+            default=30,
+        ),
     )
 
 
@@ -27,10 +36,15 @@ class AnsibleCloudscaleApi(object):
 
     def __init__(self, module):
         self._module = module
+
+        self._api_url = module.params['api_url']
+        if not self._api_url.endswith('/'):
+            self._api_url = self._api_url + '/'
+
         self._auth_header = {'Authorization': 'Bearer %s' % module.params['api_token']}
 
     def _get(self, api_call):
-        resp, info = fetch_url(self._module, API_URL + api_call,
+        resp, info = fetch_url(self._module, self._api_url + api_call,
                                headers=self._auth_header,
                                timeout=self._module.params['api_timeout'])
 
@@ -44,8 +58,8 @@ class AnsibleCloudscaleApi(object):
 
     def _post_or_patch(self, api_call, method, data, filter_none=True):
         # This helps with tags when we have the full API resource href to update.
-        if API_URL not in api_call:
-            api_endpoint = API_URL + api_call
+        if self._api_url not in api_call:
+            api_endpoint = self._api_url + api_call
         else:
             api_endpoint = api_call
 
@@ -74,7 +88,7 @@ class AnsibleCloudscaleApi(object):
             return None
         else:
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with %s for '
-                                       '"%s".' % (method, api_call), fetch_url_info=info)
+                                       '"%s".' % (method, api_endpoint), fetch_url_info=info)
 
     def _post(self, api_call, data=None):
         return self._post_or_patch(api_call, 'POST', data)
@@ -83,8 +97,14 @@ class AnsibleCloudscaleApi(object):
         return self._post_or_patch(api_call, 'PATCH', data, filter_none)
 
     def _delete(self, api_call):
+        # api_call might be full href already
+        if self._api_url not in api_call:
+            api_endpoint = self._api_url + api_call
+        else:
+            api_endpoint = api_call
+
         resp, info = fetch_url(self._module,
-                               API_URL + api_call,
+                               api_endpoint,
                                headers=self._auth_header,
                                method='DELETE',
                                timeout=self._module.params['api_timeout'])
@@ -93,7 +113,7 @@ class AnsibleCloudscaleApi(object):
             return None
         else:
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with DELETE for '
-                                       '"%s".' % api_call, fetch_url_info=info)
+                                       '"%s".' % api_endpoint, fetch_url_info=info)
 
 
 class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
