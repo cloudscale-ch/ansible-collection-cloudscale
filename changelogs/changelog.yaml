@@ -11,3 +11,15 @@ releases:
       name: objects_user
       namespace: ''
     release_date: '2020-08-18'
+  1.2.0:
+    changes:
+      minor_changes:
+      - server_group - The module has been refactored and the code simplifed (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/23).
+      - volume - The module has been refactored and the code simplifed (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/24).
+    fragments:
+    - consolidate-modules.yml
+    modules:
+    - description: Manages networks on the cloudscale.ch IaaS service
+      name: network
+      namespace: ''
+    release_date: '2020-10-13'
