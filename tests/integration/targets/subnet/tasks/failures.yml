@@ -37,7 +37,6 @@
     - snet is failed
     - snet.msg.startswith("Network with 'name' not found")
 
-
 - name: Create two networks with the same name
   uri:
     url: 'https://api.cloudscale.ch/v1/networks'
