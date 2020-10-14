@@ -64,7 +64,7 @@ options:
     type: str
   tags:
     description:
-      - Tags assosiated with the subnet. Set this to C({}) to clear any tags.
+      - Tags associated with the subnet. Set this to C({}) to clear any tags.
     type: dict
 extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
