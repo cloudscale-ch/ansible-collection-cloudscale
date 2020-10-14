@@ -153,7 +153,7 @@ state:
   type: str
   sample: present
 tags:
-  description: Tags assosiated with the subnet.
+  description: Tags associated with the subnet.
   returned: success
   type: dict
   sample: { 'project': 'my project' }
