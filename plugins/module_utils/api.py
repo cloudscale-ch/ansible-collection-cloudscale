@@ -42,7 +42,7 @@ class AnsibleCloudscaleApi(object):
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with GET for '
                                        '"%s".' % api_call, fetch_url_info=info)
 
-    def _post_or_patch(self, api_call, method, data):
+    def _post_or_patch(self, api_call, method, data, filter_none=True):
         # This helps with tags when we have the full API resource href to update.
         if API_URL not in api_call:
             api_endpoint = API_URL + api_call
@@ -55,7 +55,7 @@ class AnsibleCloudscaleApi(object):
             # Deepcopy: Duplicate the data object for iteration, because
             # iterating an object and changing it at the same time is insecure
             for k, v in deepcopy(data).items():
-                if v is None:
+                if filter_none and v is None:
                     del data[k]
 
             data = self._module.jsonify(data)
@@ -79,8 +79,8 @@ class AnsibleCloudscaleApi(object):
     def _post(self, api_call, data=None):
         return self._post_or_patch(api_call, 'POST', data)
 
-    def _patch(self, api_call, data=None):
-        return self._post_or_patch(api_call, 'PATCH', data)
+    def _patch(self, api_call, data=None, filter_none=True):
+        return self._post_or_patch(api_call, 'PATCH', data, filter_none)
 
     def _delete(self, api_call):
         resp, info = fetch_url(self._module,

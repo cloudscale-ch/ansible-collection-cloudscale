@@ -56,6 +56,12 @@ options:
       - If not set, the cloudscale.ch default resolvers are used.
     type: list
     elements: str
+  reset:
+    description:
+      - Resets I(gateway_address) and I(dns_servers) to default values by the API.
+      - "Note: Idempotency is not given."
+    type: bool
+    default: false
   state:
     description:
       - State of the subnet.
@@ -238,6 +244,27 @@ class AnsibleCloudscaleSubnet(AnsibleCloudscaleBase):
         }
         return super(AnsibleCloudscaleSubnet, self).create(resource, data)
 
+    def update(self, resource):
+        # Resets to default values by the API
+        if self._module.params.get('reset'):
+            for key in ('dns_servers', 'gateway_address',):
+                # No need to reset if user set the param anyway.
+                if self._module.params.get(key) is None:
+                    self._result['changed'] = True
+                    patch_data = {
+                        key: None
+                    }
+                if not self._module.check_mode:
+                    href = resource.get('href')
+                    if not href:
+                        self._module.fail_json(msg='Unable to update %s, no href found.' % key)
+                    self._patch(href, patch_data, filter_none=False)
+
+            if not self._module.check_mode:
+                resource = self.query()
+
+        return super(AnsibleCloudscaleSubnet, self).update(resource)
+
 
 def main():
     argument_spec = cloudscale_argument_spec()
@@ -255,6 +282,7 @@ def main():
         gateway_address=dict(type='str'),
         dns_servers=dict(type='list', elements='str', default=None),
         tags=dict(type='dict'),
+        reset=dict(type='bool', default=False),
         state=dict(default='present', choices=['absent', 'present']),
     ))
 

@@ -167,6 +167,26 @@
       - snet.tags.stage == 'staging'
       - snet.tags.sla == '8-5'
 
+- name: Reset DNS servers in subnet
+  cloudscale_ch.cloud.subnet:
+    cidr: '{{ cloudscale_subnet_cidr }}'
+    network:
+      uuid: '{{ net.uuid }}'
+    gateway_address: 192.168.23.1
+    reset: true
+  register: snet
+- name: 'VERIFY: Update subnet'
+  assert:
+    that:
+      - snet is changed
+      - snet.cidr == cloudscale_subnet_cidr
+      - snet.uuid == subnet_uuid
+      - snet.dns_servers != ['9.9.9.9', '8.8.8.8']
+      - snet.gateway_address == '192.168.23.1'
+      - snet.tags.project == 'ansible-test'
+      - snet.tags.stage == 'staging'
+      - snet.tags.sla == '8-5'
+
 - name: Delete subnet in check mode
   cloudscale_ch.cloud.subnet:
     uuid: "{{ snet.uuid }}"
