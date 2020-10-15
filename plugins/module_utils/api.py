@@ -42,7 +42,7 @@ class AnsibleCloudscaleApi(object):
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with GET for '
                                        '"%s".' % api_call, fetch_url_info=info)
 
-    def _post_or_patch(self, api_call, method, data):
+    def _post_or_patch(self, api_call, method, data, filter_none=True):
         # This helps with tags when we have the full API resource href to update.
         if API_URL not in api_call:
             api_endpoint = API_URL + api_call
@@ -55,7 +55,7 @@ class AnsibleCloudscaleApi(object):
             # Deepcopy: Duplicate the data object for iteration, because
             # iterating an object and changing it at the same time is insecure
             for k, v in deepcopy(data).items():
-                if v is None:
+                if filter_none and v is None:
                     del data[k]
 
             data = self._module.jsonify(data)
@@ -79,8 +79,8 @@ class AnsibleCloudscaleApi(object):
     def _post(self, api_call, data=None):
         return self._post_or_patch(api_call, 'POST', data)
 
-    def _patch(self, api_call, data=None):
-        return self._post_or_patch(api_call, 'PATCH', data)
+    def _patch(self, api_call, data=None, filter_none=True):
+        return self._post_or_patch(api_call, 'PATCH', data, filter_none)
 
     def _delete(self, api_call):
         resp, info = fetch_url(self._module,
@@ -132,7 +132,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         # List of params used to update the resource
         self.resource_update_param_keys = resource_update_param_keys or ['name']
 
-    def _init_resource(self):
+    def init_resource(self):
         return {
             'state': "absent",
             self.resource_key_uuid: self._module.params.get(self.resource_key_uuid) or self._resource_data.get(self.resource_key_uuid),
@@ -141,7 +141,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
     def query(self):
         # Initialize
-        self._resource_data = self._init_resource()
+        self._resource_data = self.init_resource()
 
         # Query by UUID
         uuid = self._module.params[self.resource_key_uuid]
@@ -177,7 +177,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         return self._resource_data
 
-    def create(self, resource):
+    def create(self, resource, data=None):
         # Fail if UUID/ID was provided but the resource was not found on state=present.
         uuid = self._module.params.get(self.resource_key_uuid)
         if uuid is not None:
@@ -187,12 +187,15 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         self._result['changed'] = True
 
-        data = dict()
+        if not data:
+            data = dict()
+
         for param in self.resource_create_param_keys:
             data[param] = self._module.params.get(param)
 
         self._result['diff']['before'] = deepcopy(resource)
-        self._result['diff']['after'] = deepcopy(data)
+        self._result['diff']['after'] = deepcopy(resource)
+        self._result['diff']['after'].update(deepcopy(data))
         self._result['diff']['after'].update({
             'state': "present",
         })
@@ -225,7 +228,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         if resource['state'] != "absent":
             self._result['changed'] = True
             self._result['diff']['before'] = deepcopy(resource)
-            self._result['diff']['after'] = self._init_resource()
+            self._result['diff']['after'] = self.init_resource()
 
             if not self._module.check_mode:
                 self._delete('%s/%s' % (self.resource_name, resource[self.resource_key_uuid]))
@@ -237,24 +240,37 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         if param is None:
             return False
 
-        if resource and key in resource:
-            if param != resource[key]:
-                self._result['changed'] = True
+        if not resource or key not in resource:
+            return False
 
-                patch_data = {
-                    key: param
-                }
+        is_different = False
 
-                self._result['diff']['before'].update({key: resource[key]})
-                self._result['diff']['after'].update(patch_data)
+        # If it looks like a stub
+        if isinstance(resource[key], dict) and 'href' in resource[key]:
+            uuid = resource[key].get('href', '').split('/')[-1]
+            if param != uuid:
+                is_different = True
 
-                if not self._module.check_mode:
-                    href = resource.get('href')
-                    if not href:
-                        self._module.fail_json(msg='Unable to update %s, no href found.' % key)
+        elif param != resource[key]:
+            is_different = True
 
-                    self._patch(href, patch_data)
-                    return True
+        if is_different:
+            self._result['changed'] = True
+
+            patch_data = {
+                key: param
+            }
+
+            self._result['diff']['before'].update({key: resource[key]})
+            self._result['diff']['after'].update(patch_data)
+
+            if not self._module.check_mode:
+                href = resource.get('href')
+                if not href:
+                    self._module.fail_json(msg='Unable to update %s, no href found.' % key)
+
+                self._patch(href, patch_data)
+                return True
         return False
 
     def get_result(self, resource):

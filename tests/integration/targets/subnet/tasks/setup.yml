@@ -1,0 +1,7 @@
+---
+- name: Setup network
+  cloudscale_ch.cloud.network:
+    name: '{{ cloudscale_resource_prefix }}-net'
+    auto_create_ipv4_subnet: false
+    zone: '{{ cloudscale_test_zone }}'
+  register: net
