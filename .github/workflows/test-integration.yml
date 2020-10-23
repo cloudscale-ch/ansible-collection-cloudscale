@@ -1,6 +1,7 @@
 name: Collection Integration tests
 
 on:
+  push:
   schedule:
   - cron: '0 5 * * *'  # UTC
 
