@@ -10,6 +10,13 @@ class ModuleDocFragment(object):
 
     DOCUMENTATION = '''
 options:
+  api_url:
+    description:
+      - cloudscale.ch API URL.
+      - This can also be passed in the C(CLOUDSCALE_API_URL) environment variable.
+    default: https://api.cloudscale.ch/v1
+    type: str
+    version_added: 1.3.0
   api_token:
     description:
       - cloudscale.ch API token.
@@ -22,7 +29,6 @@ options:
     default: 30
     type: int
 notes:
-  - Instead of the I(api_token) parameter the C(CLOUDSCALE_API_TOKEN) environment variable can be used.
   - All operations are performed using the cloudscale.ch public API v1.
   - "For details consult the full API documentation: U(https://www.cloudscale.ch/en/api/v1)."
   - A valid API token is required for all operations. You can create as many tokens as you like using the cloudscale.ch control panel at
