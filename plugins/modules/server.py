@@ -428,7 +428,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
         self._result['changed'] = True
 
         data = deepcopy(self._module.params)
-        for i in ('uuid', 'state', 'force', 'api_timeout', 'api_token'):
+        for i in ('uuid', 'state', 'force', 'api_timeout', 'api_token', 'api_url'):
             del data[i]
         data['server_groups'] = self._get_server_group_ids()
 
