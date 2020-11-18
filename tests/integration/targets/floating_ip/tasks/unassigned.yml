@@ -1,6 +1,7 @@
 ---
 - name: Assign Floating IP to server test01
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-unassigned'
     ip_version: 6
     server: '{{ test01.uuid }}'
     reverse_ptr: '{{ cloudscale_resource_prefix }}-unassigned.example.com'

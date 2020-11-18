@@ -1,3 +1,6 @@
+---
+- import_tasks: deprecation_warning.yml
+
 - name: Cloudscale floating IP tests
   block:
     - name: Create a server

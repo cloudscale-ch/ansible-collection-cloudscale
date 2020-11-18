@@ -1,0 +1,2 @@
+minor_changes:
+- floating_ip - Added an optional name parameter to gain idempotency. The parameter will be required with release of version 2.0.0. (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/43/).
