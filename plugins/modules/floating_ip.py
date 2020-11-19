@@ -27,14 +27,14 @@ options:
   network:
     description:
       - Floating IP address to change.
-      - One of C(network) or C(name) is required to identify the floating IP.
+      - One of I(network) or I(name) is required to identify the floating IP.
     aliases: [ ip ]
     type: str
   name:
     description:
       - Name to identifiy the floating IP address for idempotency.
-      - One of C(network) or C(name) is required to identify the floating IP.
-      - "Note: C(name) will be required beginning of version 2.0.0."
+      - One of I(network) or I(name) is required to identify the floating IP.
+      - "Note: I(name) will be required for assigning a new floating IP beginning of version 2.0.0."
     version_added: 1.3.0
     type: str
   state:
@@ -151,7 +151,7 @@ EXAMPLES = '''
 
 RETURN = '''
 name:
-  description: The name of the floating ip
+  description: The name of the floating IP.
   returned: success
   type: str
   sample: my floating ip
@@ -264,7 +264,7 @@ class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
         # TODO: To be removed in 2.0.0
         if not self._module.params['name']:
             self._module.deprecate(
-                msg="Name is missing, this won't be supported in the future.",
+                msg="Name is missing, this won't be supported in the future",
                 version="2.0.0",
                 collection_name="cloudscale_ch.cloud"
             )
