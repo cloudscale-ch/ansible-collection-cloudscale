@@ -16,8 +16,6 @@ description:
   - Create, assign and delete floating IPs on the cloudscale.ch IaaS service.
 notes:
   - Once a floating_ip is created, all parameters except C(server), C(reverse_ptr) and C(tags) are read-only.
-  - This module requires the ipaddress python library. This library is included in Python since version 3.3. It is available as a
-    module on PyPI for earlier versions.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Denis Krienbühl (@href)
@@ -204,17 +202,7 @@ tags:
   version_added: 1.1.0
 '''
 
-import traceback
-
-IPADDRESS_IMP_ERR = None
-try:
-    from ipaddress import ip_network
-    HAS_IPADDRESS = True
-except ImportError:
-    IPADDRESS_IMP_ERR = traceback.format_exc()
-    HAS_IPADDRESS = False
-
-from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.api import (
     AnsibleCloudscaleBase,
     cloudscale_argument_spec,
@@ -298,9 +286,6 @@ def main():
         # required_one_of=(('network', 'name'),),
         supports_check_mode=True,
     )
-
-    if not HAS_IPADDRESS:
-        module.fail_json(msg=missing_required_lib('ipaddress'), exception=IPADDRESS_IMP_ERR)
 
     cloudscale_floating_ip = AnsibleCloudscaleFloatingIp(module)
 
