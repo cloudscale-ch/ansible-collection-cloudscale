@@ -343,6 +343,6 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
             # Transform the name tag to a name field
             if self.use_tag_for_name:
-                self._result['name'] = self._result.get('tags', dict()).pop(self.resource_name_tag, '')
+                self._result['name'] = self._result.get('tags', dict()).pop(self.resource_name_tag, None)
 
         return self._result
