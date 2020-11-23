@@ -152,6 +152,16 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         # List of params used to update the resource
         self.resource_update_param_keys = resource_update_param_keys or ['name']
 
+        # Resource has no name field but tags, we use a defined tag as name
+        self.use_tag_for_name = False
+        self.resource_name_tag = "ansible_name"
+
+        # Constraint Keys to match when query by name
+        self.query_constraint_keys = []
+
+    def pre_transform(self, resource):
+        return resource
+
     def init_resource(self):
         return {
             'state': "absent",
@@ -166,6 +176,11 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         # Query by UUID
         uuid = self._module.params[self.resource_key_uuid]
         if uuid is not None:
+
+            # network id case
+            if "/" in uuid:
+                uuid = uuid.split("/")[0]
+
             resource = self._get('%s/%s' % (self.resource_name, uuid))
             if resource:
                 self._resource_data = resource
@@ -174,11 +189,25 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         # Query by name
         else:
             name = self._module.params[self.resource_key_name]
+
+            # Resource has no name field, we use a defined tag as name
+            if self.use_tag_for_name:
+                resources = self._get('%s?tag:%s=%s' % (self.resource_name, self.resource_name_tag, name))
+            else:
+                resources = self._get('%s' % self.resource_name)
+
             matching = []
-            resources = self._get('%s' % self.resource_name)
             for resource in resources:
-                if resource[self.resource_key_name] == name:
-                    matching.append(resource)
+                if self.use_tag_for_name:
+                    resource[self.resource_key_name] = resource['tags'].get(self.resource_name_tag)
+
+                # Skip resource if constraints is not given e.g. in case of floating_ip the ip_version differs
+                for constraint_key in self.query_constraint_keys:
+                    if resource[constraint_key] != self._module.params[constraint_key]:
+                        break
+                else:
+                    if resource[self.resource_key_name] == name:
+                        matching.append(resource)
 
             # Fail on more than one resource with identical name
             if len(matching) > 1:
@@ -195,7 +224,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
                 self._resource_data = matching[0]
                 self._resource_data['state'] = "present"
 
-        return self._resource_data
+        return self.pre_transform(self._resource_data)
 
     def create(self, resource, data=None):
         # Fail if UUID/ID was provided but the resource was not found on state=present.
@@ -222,6 +251,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         if not self._module.check_mode:
             resource = self._post(self.resource_name, data)
+            resource = self.pre_transform(resource)
             resource['state'] = "present"
         return resource
 
@@ -237,6 +267,15 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
     def present(self):
         resource = self.query()
+
+        if self.use_tag_for_name:
+            name_tag_value = self._module.params[self.resource_key_name] or resource.get('tags', dict()).get(self.resource_name_tag)
+            if name_tag_value:
+                self._module.params['tags'] = self._module.params['tags'] or dict()
+                self._module.params['tags'].update({
+                    self.resource_name_tag: name_tag_value
+                })
+
         if resource['state'] == "absent":
             resource = self.create(resource)
         else:
@@ -251,7 +290,11 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
             self._result['diff']['after'] = self.init_resource()
 
             if not self._module.check_mode:
-                self._delete('%s/%s' % (self.resource_name, resource[self.resource_key_uuid]))
+                href = resource.get('href')
+                if not href:
+                    self._module.fail_json(msg='Unable to delete %s, no href found.')
+
+                self._delete(href)
                 resource['state'] = "absent"
         return self.get_result(resource)
 
@@ -297,4 +340,9 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         if resource:
             for k, v in resource.items():
                 self._result[k] = v
+
+            # Transform the name tag to a name field
+            if self.use_tag_for_name:
+                self._result['name'] = self._result.get('tags', dict()).pop(self.resource_name_tag, '')
+
         return self._result

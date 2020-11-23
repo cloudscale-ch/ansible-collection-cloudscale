@@ -13,7 +13,7 @@
     # ip: '{{ item.network | ipaddr("address") }}'
     ip:  '{{ item.network.split("/")[0] }}'
     state: 'absent'
-  when: cloudscale_resource_prefix in (item.reverse_ptr | string )
+  when: "cloudscale_resource_prefix in (item.reverse_ptr | string ) or ('ansible_name' in item.tags and cloudscale_resource_prefix in item.tags['ansible_name'])"
   with_items: '{{ floating_ip_list.json }}'
   loop_control:
     label: '{{ item.reverse_ptr }} ({{ item.network }})'

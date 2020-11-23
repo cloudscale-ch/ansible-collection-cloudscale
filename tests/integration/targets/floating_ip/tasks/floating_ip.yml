@@ -1,5 +1,6 @@
 - name: Request regional floating IP in check mode
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
@@ -19,6 +20,7 @@
 
 - name: Request regional floating IP
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
@@ -29,7 +31,7 @@
       stage: production
       sla: 24-7
   register: floating_ip
-- name: Verify request floating IP
+- name: Verify request regional floating IP
   assert:
     that:
       - floating_ip is changed
@@ -40,17 +42,20 @@
       - floating_ip.tags.stage == 'production'
       - floating_ip.tags.sla == '24-7'
 
-- name: Check floating IP idempotence
+- name: Request regional floating IP idempotence
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
     server: '{{ test01.uuid }}'
-    ip: '{{ floating_ip.ip }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    prefix_length: '{{ item.prefix_length | default(omit) }}'
     region: '{{ cloudscale_test_region }}'
     tags:
       project: ansible-test
       stage: production
       sla: 24-7
   register: floating_ip_idempotence
-- name: Verify floating IP idempotence
+- name: Verify request regional floating IP idempotence
   assert:
     that:
       - floating_ip_idempotence is not changed
@@ -60,8 +65,28 @@
       - floating_ip.tags.stage == 'production'
       - floating_ip.tags.sla == '24-7'
 
+- name: Request regional floating IP different IP version in check mode
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    ip_version: '{{ 6 if item.ip_version == 4 else 4 }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    prefix_length: '{{ item.prefix_length | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: floating_ip_version_differ
+  check_mode: true
+- name: Verify Request regional floating IP different IP version in check mode
+  assert:
+    that:
+      - floating_ip_version_differ is changed
+      - not floating_ip_version_differ.network
+
 - name: Request global floating IP
   cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-global-floating-ip'
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
     prefix_length: '{{ item.prefix_length | default(omit) }}'
@@ -76,7 +101,7 @@
       # - (item.ip_version == 4 and global_floating_ip.ip | ipv4) or (item.ip_version == 6 and global_floating_ip.ip | ipv6)
       - not global_floating_ip.server
 
-- name: Release global floating IP
+- name: Remove global floating IP
   cloudscale_ch.cloud.floating_ip:
     ip: '{{ global_floating_ip.ip }}'
     state: 'absent'
@@ -86,16 +111,6 @@
     that:
       - global_floating_ip is changed
       - global_floating_ip.state == 'absent'
-
-- name: Check network parameter alias
-  cloudscale_ch.cloud.floating_ip:
-    server: '{{ test01.uuid }}'
-    network: '{{ floating_ip.ip }}'
-  register: floating_ip_network
-- name: Verify network parameter alias
-  assert:
-    that:
-      - floating_ip_network is successful
 
 - name: Move floating IP to second server
   cloudscale_ch.cloud.floating_ip:
@@ -108,35 +123,35 @@
       - move_ip is changed
       - move_ip.server == test02.uuid
 
-- name: Release floating IP in check mode
+- name: Remove floating IP in check mode
   cloudscale_ch.cloud.floating_ip:
     ip: '{{ floating_ip.ip }}'
     state: 'absent'
-  check_mode: true
   register: release_ip
-- name: Verify release floating IPs
+  check_mode: true
+- name: Verify Remove floating IP in check mode
   assert:
     that:
       - release_ip is changed
       - release_ip.state == 'present'
 
-- name: Release floating IP
+- name: Remove floating IP
   cloudscale_ch.cloud.floating_ip:
     ip: '{{ floating_ip.ip }}'
     state: 'absent'
   register: release_ip
-- name: Verify release floating IPs
+- name: Verify Remove floating IP
   assert:
     that:
       - release_ip is changed
       - release_ip.state == 'absent'
 
-- name: Release floating IP idempotence
+- name: Remove floating IP idempotence
   cloudscale_ch.cloud.floating_ip:
     ip: '{{ floating_ip.ip }}'
     state: 'absent'
   register: release_ip
-- name: Verify release floating IPs idempotence
+- name: Verify Remove floating IP idempotence
   assert:
     that:
       - release_ip is not changed
