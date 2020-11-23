@@ -156,6 +156,9 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         self.use_tag_for_name = False
         self.resource_name_tag = "ansible_name"
 
+        # Constraint Keys to match when query by name
+        self.query_constraint_keys = []
+
     def pre_transform(self, resource):
         return resource
 
@@ -198,8 +201,13 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
                 if self.use_tag_for_name:
                     resource[self.resource_key_name] = resource['tags'].get(self.resource_name_tag)
 
-                if resource[self.resource_key_name] == name:
-                    matching.append(resource)
+                # Skip resource if constraints is not given e.g. in case of floating_ip the ip_version differs
+                for constraint_key in self.query_constraint_keys:
+                    if resource[constraint_key] != self._module.params[constraint_key]:
+                        break
+                else:
+                    if resource[self.resource_key_name] == name:
+                        matching.append(resource)
 
             # Fail on more than one resource with identical name
             if len(matching) > 1:

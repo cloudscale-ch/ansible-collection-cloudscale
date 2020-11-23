@@ -65,6 +65,25 @@
       - floating_ip.tags.stage == 'production'
       - floating_ip.tags.sla == '24-7'
 
+- name: Request regional floating IP different IP version in check mode
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    ip_version: '{{ 6 if item.ip_version == 4 else 4 }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    prefix_length: '{{ item.prefix_length | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: floating_ip_version_differ
+  check_mode: true
+- name: Verify Request regional floating IP different IP version in check mode
+  assert:
+    that:
+      - floating_ip_version_differ is changed
+      - not floating_ip_version_differ.network
+
 - name: Request global floating IP
   cloudscale_ch.cloud.floating_ip:
     name: '{{ cloudscale_resource_prefix }}-global-floating-ip'

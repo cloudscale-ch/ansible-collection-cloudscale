@@ -232,6 +232,7 @@ class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
             ],
         )
         self.use_tag_for_name = True
+        self.query_constraint_keys = ['ip_version']
 
     def pre_transform(self, resource):
         if 'server' in resource and isinstance(resource['server'], dict):
