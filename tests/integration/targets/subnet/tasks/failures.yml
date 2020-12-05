@@ -37,6 +37,23 @@
     - snet is failed
     - snet.msg.startswith("Network with 'name' not found")
 
+- name: Fail creation unknown network uuid
+  cloudscale_ch.cloud.subnet:
+    cidr: '{{ cloudscale_subnet_cidr }}'
+    network:
+      uuid: 'f0bb5270-f66c-41d6-ac3b-a223cd280ced'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: snet
+  ignore_errors: True
+- name: 'VERIFY: Fail creation unknown network uuid'
+  assert:
+    that:
+    - snet is failed
+    - snet.msg.startswith("Network with 'uuid' not found")
+
 - name: Create two networks with the same name
   uri:
     url: 'https://api.cloudscale.ch/v1/networks'

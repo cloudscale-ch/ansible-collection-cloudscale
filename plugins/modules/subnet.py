@@ -143,6 +143,12 @@ network:
       returned: success
       type: str
       sample: my network
+    zone:
+        description: The zone the network is allocated in.
+        returned: success
+        type: dict
+        sample: { 'slug': 'rma1' }
+        version_added: 1.4.0
 gateway_address:
   description: The gateway address of the subnet.
   returned: success
@@ -191,12 +197,16 @@ class AnsibleCloudscaleSubnet(AnsibleCloudscaleBase):
                 'tags',
             ],
         )
+        self._network = None
 
-    def query_network(self):
+    def query_network(self, uuid=None):
+        if self._network is not None:
+            return self._network
+
         net_param = self._module.params['network']
+        net_uuid = uuid or net_param['uuid']
 
-        if net_param['uuid'] is not None:
-            net_uuid = net_param['uuid']
+        if net_uuid is not None:
             network = self._get('networks/%s' % net_uuid)
             if not network:
                 self._module.fail_json(msg="Network with 'uuid' not found: %s" % net_uuid)
@@ -228,13 +238,13 @@ class AnsibleCloudscaleSubnet(AnsibleCloudscaleBase):
         else:
             self._module.fail_json(msg="Either Network UUID or name is required.")
 
-        # For consistency, take a minimal network stub
-        _network = dict()
+        # For consistency, take a minimal network stub, but also include zone
+        self._network = dict()
         for k, v in network.items():
-            if k in ['name', 'uuid', 'href']:
-                _network[k] = v
+            if k in ['name', 'uuid', 'href', 'zone']:
+                self._network[k] = v
 
-        return _network
+        return self._network
 
     def create(self, resource):
         resource['network'] = self.query_network()
@@ -264,6 +274,11 @@ class AnsibleCloudscaleSubnet(AnsibleCloudscaleBase):
                 resource = self.query()
 
         return super(AnsibleCloudscaleSubnet, self).update(resource)
+
+    def get_result(self, resource):
+        if resource and 'network' in resource:
+            resource['network'] = self.query_network(uuid=resource['network']['uuid'])
+        return super(AnsibleCloudscaleSubnet, self).get_result(resource)
 
 
 def main():
