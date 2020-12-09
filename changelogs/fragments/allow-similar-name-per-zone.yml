@@ -1,0 +1,2 @@
+minor_changes:
+  - Implemented identical naming support of the same resource type per zone (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/46).

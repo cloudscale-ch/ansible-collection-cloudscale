@@ -156,6 +156,9 @@ def main():
             'tags',
         ],
     )
+    cloudscale_server_group.query_constraint_keys = [
+        'zone',
+    ]
 
     if module.params['state'] == 'absent':
         result = cloudscale_server_group.absent()

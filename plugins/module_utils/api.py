@@ -203,8 +203,14 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
                 # Skip resource if constraints is not given e.g. in case of floating_ip the ip_version differs
                 for constraint_key in self.query_constraint_keys:
-                    if resource[constraint_key] != self._module.params[constraint_key]:
-                        break
+                    if self._module.params[constraint_key] is not None:
+                        if constraint_key == 'zone':
+                            resource_value = resource['zone']['slug']
+                        else:
+                            resource_value = resource[constraint_key]
+
+                        if resource_value != self._module.params[constraint_key]:
+                            break
                 else:
                     if resource[self.resource_key_name] == name:
                         matching.append(resource)

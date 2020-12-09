@@ -182,6 +182,10 @@ def main():
         ],
     )
 
+    cloudscale_network.query_constraint_keys = [
+        'zone',
+    ]
+
     if module.params['state'] == 'absent':
         result = cloudscale_network.absent()
     else:
