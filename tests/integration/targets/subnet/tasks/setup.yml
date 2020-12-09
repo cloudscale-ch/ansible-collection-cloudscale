@@ -1,5 +1,11 @@
 ---
-- name: Setup network
+- name: Setup network in alt zone
+  cloudscale_ch.cloud.network:
+    name: '{{ cloudscale_resource_prefix }}-net'
+    auto_create_ipv4_subnet: false
+    zone: '{{ cloudscale_test_alt_zone }}'
+
+- name: Setup network in test zone
   cloudscale_ch.cloud.network:
     name: '{{ cloudscale_resource_prefix }}-net'
     auto_create_ipv4_subnet: false
