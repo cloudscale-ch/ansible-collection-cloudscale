@@ -1,0 +1,39 @@
+---
+cloudscale_server__name: "{{ inventory_hostname_short }}"
+cloudscale_server__image: debian-10
+cloudscale_server__flavor: flex-2
+cloudscale_server__force: false
+cloudscale_server__use_public_network: true
+cloudscale_server__use_private_network: false
+cloudscale_server__use_ipv6: true
+cloudscale_server__root_volume_size: 10
+
+cloudscale_server__interfaces: []
+# - network: public
+# - network: 2db69ba3-1864-4608-853a-0771b6885a3a
+
+cloudscale_server__volumes: []
+# Note: name will be prefixed with vm name by default
+# - name: ssd1
+#   type: ssd,
+#   size_gb: 10,
+#   state: detached
+# - name: bulk1
+#   type: bulk
+#   size_gb: 100
+
+cloudscale_server__server_groups: []
+cloudscale_server__password: "{{ omit }}"
+cloudscale_server__ssh_pubkey_path: "~/.ssh/id_ed25519.pub"
+cloudscale_server__ssh_keys: "{{ lookup('file', cloudscale_server__ssh_pubkey_path) }}"
+cloudscale_server__user_data: |
+  #cloud-config
+  manage_etc_hosts: true
+  fqdn: "{{ inventory_hostname }}"
+  package_upgrade: true
+
+cloudscale_server__floating_ips: []
+#  - ip_version: 4
+#    reverse_ptr: "{{ inventory_hostname }}"
+#  - ip_version: 6
+#    reverse_ptr: "{{ inventory_hostname }}"

@@ -1,0 +1,12 @@
+[stage:children]
+cloud
+
+[cloud:children]
+webs
+databases
+
+[webs]
+stage-web1-lpg1
+
+[databases]
+stage-db1-lpg1

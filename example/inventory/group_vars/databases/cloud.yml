@@ -1,0 +1,7 @@
+---
+cloudscale__tags:
+  project: gemini
+  role: db
+
+cloudscale_server__server_groups: "{{ cloud_env }}-db-{{ cloudscale__zone }}"
+cloudscale_server__flavor: flex-4

@@ -1,0 +1,12 @@
+[production:children]
+cloud
+
+[cloud:children]
+webs
+databases
+
+[webs]
+prod-web[1:3]-lpg1
+
+[databases]
+prod-db[1:3]-lpg1

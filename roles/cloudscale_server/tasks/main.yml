@@ -1,0 +1,47 @@
+---
+- name: Ensure server created
+  cloudscale_ch.cloud.server:
+    name: "{{ cloudscale_server__name }}"
+    image: "{{ cloudscale_server__image }}"
+    flavor: "{{ cloudscale_server__flavor }}"
+    ssh_keys: "{{ cloudscale_server__ssh_keys }}"
+    volume_size_gb: "{{ cloudscale_server__root_volume_size }}"
+    use_public_network: "{{ cloudscale_server__use_public_network }}"
+    use_private_network: "{{ cloudscale_server__use_private_network }}"
+    use_ipv6: "{{ cloudscale_server__use_ipv6 }}"
+    user_data: "{{ cloudscale_server__user_data }}"
+    password: "{{ cloudscale_server__password }}"
+    server_groups: "{{ cloudscale_server__server_groups }}"
+    force: "{{ cloudscale_server__force }}"
+    tags: "{{ cloudscale__tags }}"
+    zone: "{{ cloudscale__zone }}"
+    api_token: "{{ cloudscale__api_token }}"
+  register: _result_server
+  retries: 10
+  delay: 3
+
+- name: Ensure volumes attached/detached
+  cloudscale_ch.cloud.volume:
+    name: "{{ cloudscale_server__name }}-{{ item.name }}"
+    type: "{{ item.type }}"
+    size_gb: "{{ item.size_gb }}"
+    server_uuid: "{{ [] if 'state' in item and item.state == 'detached' else _result_server.uuid }}"
+    tags: "{{ cloudscale__tags }}"
+    zone: "{{ cloudscale__zone }}"
+    api_token: "{{ cloudscale__api_token }}"
+  loop: "{{ cloudscale_server__volumes }}"
+
+- name: Ensure floating IPs assigned
+  cloudscale_ch.cloud.floating_ip:
+    name: "{{ cloudscale_server__name }}"
+    ip_version: "{{ item.ip_version }}"
+    reverse_ptr: "{{ item.reverse_ptr | default(omit) }}"
+    tags: "{{ cloudscale__tags }}"
+    api_token: "{{ cloudscale__api_token }}"
+  register: cloudscale_server__results_floating_ip
+  loop: "{{ cloudscale_server__floating_ips }}"
+
+- name: Set ansible facts
+  set_fact:
+    ansible_host: "{{ _result_server | json_query('interfaces[?type==`public`].addresses[]') | json_query('[?version==`4`].address') | join }}"
+    ansible_user: "{{ _result_server | json_query('image.default_username') }}"

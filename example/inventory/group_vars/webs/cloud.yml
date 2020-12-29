@@ -1,0 +1,7 @@
+---
+cloudscale__tags:
+  project: gemini
+  role: web
+
+cloudscale_server__server_groups: "{{ cloud_env }}-web-{{ cloudscale__zone }}"
+cloudscale_server__flavor: flex-2

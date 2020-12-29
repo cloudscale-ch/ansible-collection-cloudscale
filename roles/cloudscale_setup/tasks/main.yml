@@ -1,0 +1,15 @@
+---
+- name: Ensure server groups exist
+  cloudscale_ch.cloud.server_group:
+    name: "{{ item.name }}"
+    type: anti-affinity
+    zone: "{{ item.zone | default(omit) }}"
+    tags: "{{ item.tags | default(omit) }}"
+    api_token: "{{ cloudscale__api_token }}"
+  loop: "{{ cloudscale_setup__server_groups }}"
+
+- name: Ensure networks exist
+  include_tasks: network.yml
+  loop: "{{ cloudscale_setup__networks }}"
+  loop_control:
+    loop_var: _cloudscale_setup__network

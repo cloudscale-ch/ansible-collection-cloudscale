@@ -1,0 +1,20 @@
+---
+- name: Ensure network exists
+  cloudscale_ch.cloud.network:
+    name: "{{ _cloudscale_setup__network.name }}"
+    zone: "{{ _cloudscale_setup__network.zone | default(omit) }}"
+    tags: "{{ _cloudscale_setup__network.tags | default(omit) }}"
+    mtu: "{{ _cloudscale_setup__network.mtu | default(omit) }}"
+    auto_create_ipv4_subnet: "{{ _cloudscale_setup__network.subnets is not defined }}"
+    api_token: "{{ cloudscale__api_token }}"
+
+- name: Ensure subnets exist
+  cloudscale_ch.cloud.subnet:
+    cidr: "{{ item.cidr }}"
+    gateway_address: "{{ item.gateway_address | default(omit) }}"
+    dns_servers: "{{ item.dns_servers | default(omit) }}"
+    network:
+      name: "{{ _cloudscale_setup__network.name }}"
+      zone: "{{ _cloudscale_setup__network.zone | default(omit) }}"
+    api_token: "{{ cloudscale__api_token }}"
+  loop: "{{ _cloudscale_setup__network.subnets | default([]) }}"

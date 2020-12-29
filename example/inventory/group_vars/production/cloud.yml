@@ -1,0 +1,19 @@
+---
+cloudscale_server__force: false
+cloudscale_setup__server_groups:
+  - name: prod-web-lpg1
+    zone: lpg1
+    tags:
+      project: gemini
+  - name: prod-web-rma1
+    zone: rma1
+    tags:
+      project: gemini
+  - name: prod-db-lpg1
+    zone: lpg1
+    tags:
+      project: gemini
+  - name: prod-db-rma1
+    zone: rma1
+    tags:
+      project: gemini

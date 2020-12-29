@@ -1,0 +1,11 @@
+---
+cloudscale_server__force: true
+cloudscale_setup__server_groups:
+  - name: stage-web-lpg1
+    zone: lpg1
+    tags:
+      project: gemini
+  - name: stage-db-lpg1
+    zone: lpg1
+    tags:
+      project: gemini

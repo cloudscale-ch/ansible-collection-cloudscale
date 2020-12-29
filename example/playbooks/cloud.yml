@@ -1,0 +1,30 @@
+---
+- name: Configure cloud setup
+  hosts: cloud
+  gather_facts: false
+  roles:
+    - role: cloudscale_ch.cloud.cloudscale_setup
+      delegate_to: localhost
+      run_once: true
+
+- name: Configure cloud servers
+  hosts: cloud
+  gather_facts: false
+  serial: 10
+  roles:
+    - role: cloudscale_ch.cloud.cloudscale_server
+      delegate_to: localhost
+
+  post_tasks:
+    - name: Wait for SSH reachable
+      delegate_to: localhost
+      wait_for:
+        port: 22
+        host: '{{ ansible_host }}'
+        search_regex: OpenSSH
+
+    - name: Wait for cloud-init finished
+      wait_for:
+        host: '{{ ansible_host }}'
+        path: /var/lib/cloud/instance/boot-finished
+        timeout: 600

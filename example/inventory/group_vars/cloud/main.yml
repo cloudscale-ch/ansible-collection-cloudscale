@@ -1,0 +1,4 @@
+---
+# The 3rd part of the hostname is the zone e.g. prod-web1-rma1 -> rma1
+cloudscale__zone: "{{ inventory_hostname_short.split('-')[2] }}"
+cloudscale_server__use_private_network: true

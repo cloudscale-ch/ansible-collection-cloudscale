@@ -1,0 +1,12 @@
+---
+cloudscale_setup__server_groups: []
+cloudscale_setup__networks: []
+# - name: private
+#   zone: dc1
+#   mtu: 9000
+#   subnets:
+#     - cidr: 192.168.1.0/24
+#       gateway_address: 192.168.1.1
+#       dns_servers:
+#         - 192.168.1.10
+#         - 192.168.1.11

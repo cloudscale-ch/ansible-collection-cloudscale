@@ -1,0 +1,4 @@
+---
+cloudscale__api_token: ""
+cloudscale__tags: "{{ omit }}"
+cloudscale__zone: "{{ omit }}"
