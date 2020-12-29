@@ -2,8 +2,11 @@ requires_ansible: '>=2.9.10'
 action_groups:
   cloudscale:
   - floating_ip
-  - server
+  - network
+  - objects_user
   - server_group
+  - server
+  - subnet
   - volume
 
 plugin_routing:
