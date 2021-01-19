@@ -115,7 +115,7 @@ EXAMPLES = '''
 - name: Start cloudscale.ch server
   cloudscale_ch.cloud.server:
     name: my-shiny-cloudscale-server
-    image: debian-8
+    image: debian-10
     flavor: flex-4
     ssh_keys: ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     server_groups: shiny-group
@@ -139,7 +139,7 @@ EXAMPLES = '''
 - name: Start cloudscale.ch server
   cloudscale_ch.cloud.server:
     name: my-shiny-cloudscale-server
-    image: debian-8
+    image: debian-10
     flavor: flex-8
     force: yes
     ssh_keys: ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -166,7 +166,7 @@ EXAMPLES = '''
 - name: Start server and wait for SSH host keys
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-ssh-key
-    image: debian-8
+    image: debian-10
     flavor: flex-4
     ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
     api_token: xxxxxx
