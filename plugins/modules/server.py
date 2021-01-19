@@ -89,6 +89,31 @@ options:
       - Enable IPv6 on the public network interface.
     default: yes
     type: bool
+  interfaces:
+    description:
+      - List of interface objects
+    type: list
+    elements: dict
+    version_added: 1.4.0
+    suboptions:
+      network:
+        description:
+           - Create a network interface on this network.
+        type: str
+      addresses:
+        description:
+          - Use a specific IP address from subnet range
+        type: list
+        elements: dict
+      suboptions:
+        subnet:
+          description:
+            - The uuid of the subnet
+          type: str
+        address:
+          description:
+            - The static IP address of the server.
+          type: str
   server_groups:
     description:
       - List of UUID or names of server groups.
@@ -174,6 +199,53 @@ EXAMPLES = '''
   until: server is not failed
   retries: 5
   delay: 2
+
+# Start a server with two network interfaces:
+#
+#    A public interface with IPv4/IPv6
+#    A private interface on a specific private network with an IPv4 address
+
+- name: Start a server with a public and private network interface
+  cloudscale_ch.cloud.server:
+    name: my-cloudscale-server-with-two-network-interfaces
+    image: debian-10
+    flavor: flex-4
+    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    api_token: xxxxxx
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet: UUID_of_private_subnet
+
+# Start a server with a specific IPv4 address from subnet range
+- name: Start a server with a specific IPv4 address from subnet range
+  cloudscale_ch.cloud.server:
+    name: my-cloudscale-server-with-specific-address
+    image: debian-10
+    flavor: flex-4
+    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    api_token: xxxxxx
+    interfaces:
+      - addresses:
+        - subnet: UUID_of_private_subnet
+          address: 'A.B.C.D'
+
+# Start a server with two network interfaces:
+#
+#    A public interface with IPv4/IPv6
+#    A private interface on a specific private network with no IPv4 address
+
+- name: Start a server with a private network interface and no IP address
+  cloudscale_ch.cloud.server:
+    name: my-cloudscale-server-with-specific-address
+    image: debian-10
+    flavor: flex-4
+    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    api_token: xxxxxx
+    interfaces:
+      - network: 'public'
+      - network: UUID_of_private_network
+        addresses: []
 '''
 
 RETURN = '''
@@ -451,6 +523,15 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
             if desired_server_group_ids != current_server_group_ids:
                 self._module.warn("Server groups can not be mutated, server needs redeployment to change groups.")
 
+        #:TODO: This block is wrong:
+	# We should check for changes in the _update_param function and make
+	# the diff match if none are spotted
+        interface_before = server_info.get('interfaces')
+        server_info = self._update_param('interfaces', server_info)
+        interface_after = server_info.get('interfaces')
+        if interface_before == interface_after and not self._module.params.get('force'):
+            self._result['changed'] = False;
+
         server_info = self._update_param('flavor', server_info, requires_stop=True)
         server_info = self._update_param('name', server_info)
         server_info = self._update_param('tags', server_info)
@@ -504,9 +585,21 @@ def main():
         bulk_volume_size_gb=dict(type='int'),
         ssh_keys=dict(type='list', elements='str'),
         password=dict(no_log=True),
-        use_public_network=dict(type='bool', default=True),
-        use_private_network=dict(type='bool', default=False),
+        use_public_network=dict(type='bool'),
+        use_private_network=dict(type='bool'),
         use_ipv6=dict(type='bool', default=True),
+        interfaces=dict(
+            type='list',
+            options=dict(
+                addresses=dict(
+                    type='dict',
+                    options=dict(
+                        address=dict(type='str'),
+                        subnet=dict(type='str'),
+                    ),
+                ),
+            ),
+        ),
         server_groups=dict(type='list', elements='str'),
         user_data=dict(),
         force=dict(type='bool', default=False),
@@ -515,6 +608,10 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=(
+            ['interface', 'use_public_network'],
+            ['interface', 'use_private_network'],
+        ),
         required_one_of=(('name', 'uuid'),),
         supports_check_mode=True,
     )
