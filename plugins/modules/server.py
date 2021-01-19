@@ -77,18 +77,44 @@ options:
   use_public_network:
     description:
       - Attach a public network interface to the server.
-    default: yes
     type: bool
   use_private_network:
     description:
       - Attach a private network interface to the server.
-    default: no
     type: bool
   use_ipv6:
     description:
       - Enable IPv6 on the public network interface.
     default: yes
     type: bool
+  interfaces:
+    description:
+      - List of network interface objects specifying the interfaces to be attached to the server.
+        See U(https://www.cloudscale.ch/en/api/v1/#interfaces-attribute-specification) for more details.
+    type: list
+    elements: dict
+    version_added: 1.4.0
+    suboptions:
+      network:
+        description:
+          - Create a network interface on the network identified by UUID.
+            Use 'public' instead of an UUID to attach a public network interface.
+            Can be omitted if a subnet is provided under addresses.
+        type: str
+      addresses:
+        description:
+          - Attach a private network interface and configure a subnet and/or an IP address.
+        type: list
+        elements: dict
+        suboptions:
+          subnet:
+            description:
+              - UUID of the subnet from which an address will be assigned.
+            type: str
+          address:
+            description:
+              - The static IP address of the interface. Use '[]' to avoid assigning an IP address via DHCP.
+            type: str
   server_groups:
     description:
       - List of UUID or names of server groups.
@@ -174,6 +200,53 @@ EXAMPLES = '''
   until: server is not failed
   retries: 5
   delay: 2
+
+# Start a server with two network interfaces:
+#
+#    A public interface with IPv4/IPv6
+#    A private interface on a specific private network with an IPv4 address
+
+- name: Start a server with a public and private network interface
+  cloudscale_ch.cloud.server:
+    name: my-cloudscale-server-with-two-network-interfaces
+    image: debian-10
+    flavor: flex-4
+    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    api_token: xxxxxx
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet: UUID_of_private_subnet
+
+# Start a server with a specific IPv4 address from subnet range
+- name: Start a server with a specific IPv4 address from subnet range
+  cloudscale_ch.cloud.server:
+    name: my-cloudscale-server-with-specific-address
+    image: debian-10
+    flavor: flex-4
+    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    api_token: xxxxxx
+    interfaces:
+      - addresses:
+        - subnet: UUID_of_private_subnet
+          address: 'A.B.C.D'
+
+# Start a server with two network interfaces:
+#
+#    A public interface with IPv4/IPv6
+#    A private interface on a specific private network with no IPv4 address
+
+- name: Start a server with a private network interface and no IP address
+  cloudscale_ch.cloud.server:
+    name: my-cloudscale-server-with-specific-address
+    image: debian-10
+    flavor: flex-4
+    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    api_token: xxxxxx
+    interfaces:
+      - network: 'public'
+      - network: UUID_of_private_network
+        addresses: []
 '''
 
 RETURN = '''
@@ -426,6 +499,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
 
     def _create_server(self, server_info):
         self._result['changed'] = True
+        self.normalize_interfaces_param()
 
         data = deepcopy(self._module.params)
         for i in ('uuid', 'state', 'force', 'api_timeout', 'api_token', 'api_url'):
@@ -450,6 +524,27 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
             current_server_group_ids = [grp['uuid'] for grp in server_info['server_groups']]
             if desired_server_group_ids != current_server_group_ids:
                 self._module.warn("Server groups can not be mutated, server needs redeployment to change groups.")
+
+        # Remove interface properties that were not filled out by the user
+        self.normalize_interfaces_param()
+
+        # Compare the interfaces as specified by the user, with the interfaces
+        # as received by the API. The structures are somewhat different, so
+        # they need to be evaluated in detail
+        wanted = self._module.params.get('interfaces')
+        actual = server_info.get('interfaces')
+
+        try:
+            update_interfaces = not self.has_wanted_interfaces(wanted, actual)
+        except KeyError as e:
+            self._module.fail_json(
+                msg="Error checking 'interfaces', missing key: %s" % e.args[0])
+
+        if update_interfaces:
+            server_info = self._update_param('interfaces', server_info)
+
+            if not self._result['changed']:
+                self._result['changed'] = server_info['interfaces'] != actual
 
         server_info = self._update_param('flavor', server_info, requires_stop=True)
         server_info = self._update_param('name', server_info)
@@ -490,6 +585,89 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
                 server_info = self._wait_for_state(('absent', ))
         return server_info
 
+    def has_wanted_interfaces(self, wanted, actual):
+        """ Compares the interfaces as specified by the user, with the
+        interfaces as reported by the server.
+
+        """
+
+        if len(wanted or ()) != len(actual or ()):
+            return False
+
+        def match_interface(spec):
+
+            # First, find the interface that belongs to the spec
+            for interface in actual:
+
+                # If we have a public network, only look for the right type
+                if spec.get('network') == 'public':
+                    if interface['type'] == 'public':
+                        break
+
+                # If we have a private network, check the network's UUID
+                if spec.get('network') is not None:
+                    if interface['type'] == 'private':
+                        if interface['network']['uuid'] == spec['network']:
+                            break
+
+                # If we only have an addresses block, match all subnet UUIDs
+                wanted_subnet_ids = set(
+                    a['subnet'] for a in (spec.get('addresses') or ()))
+
+                actual_subnet_ids = set(
+                    a['subnet']['uuid'] for a in interface['addresses'])
+
+                if wanted_subnet_ids == actual_subnet_ids:
+                    break
+            else:
+                return False  # looped through everything without match
+
+            # Fail if any of the addresses don't match
+            for wanted_addr in (spec.get('addresses') or ()):
+
+                # Unspecified, skip
+                if 'address' not in wanted_addr:
+                    continue
+
+                addresses = set(a['address'] for a in interface['addresses'])
+                if wanted_addr['address'] not in addresses:
+                    return False
+
+            # If the wanted address is an empty list, but the actual list is
+            # not, the user wants to remove automatically set addresses
+            if spec.get('addresses') == [] and interface['addresses'] != []:
+                return False
+
+            if interface['addresses'] == [] and spec.get('addresses') != []:
+                return False
+
+            return interface
+
+        for spec in wanted:
+
+            # If there is any interface that does not match, clearly not all
+            # wanted interfaces are present
+            if not match_interface(spec):
+                return False
+
+        return True
+
+    def normalize_interfaces_param(self):
+        """ Goes through the interfaces parameter and gets it ready to be
+        sent to the API. """
+
+        for spec in (self._module.params.get('interfaces') or ()):
+            if spec['addresses'] is None:
+                del spec['addresses']
+            if spec['network'] is None:
+                del spec['network']
+
+            for address in (spec.get('addresses') or ()):
+                if address['address'] is None:
+                    del address['address']
+                if address['subnet'] is None:
+                    del address['subnet']
+
 
 def main():
     argument_spec = cloudscale_argument_spec()
@@ -504,9 +682,24 @@ def main():
         bulk_volume_size_gb=dict(type='int'),
         ssh_keys=dict(type='list', elements='str'),
         password=dict(no_log=True),
-        use_public_network=dict(type='bool', default=True),
-        use_private_network=dict(type='bool', default=False),
+        use_public_network=dict(type='bool'),
+        use_private_network=dict(type='bool'),
         use_ipv6=dict(type='bool', default=True),
+        interfaces=dict(
+            type='list',
+            elements='dict',
+            options=dict(
+                network=dict(type='str'),
+                addresses=dict(
+                    type='list',
+                    elements='dict',
+                    options=dict(
+                        address=dict(type='str'),
+                        subnet=dict(type='str'),
+                    ),
+                ),
+            ),
+        ),
         server_groups=dict(type='list', elements='str'),
         user_data=dict(),
         force=dict(type='bool', default=False),
@@ -515,6 +708,10 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=(
+            ['interfaces', 'use_public_network'],
+            ['interfaces', 'use_private_network'],
+        ),
         required_one_of=(('name', 'uuid'),),
         supports_check_mode=True,
     )
