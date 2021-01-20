@@ -498,6 +498,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
 
     def _create_server(self, server_info):
         self._result['changed'] = True
+        self.normalize_interfaces_param()
 
         data = deepcopy(self._module.params)
         for i in ('uuid', 'state', 'force', 'api_timeout', 'api_token', 'api_url'):
@@ -523,14 +524,27 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
             if desired_server_group_ids != current_server_group_ids:
                 self._module.warn("Server groups can not be mutated, server needs redeployment to change groups.")
 
-        #:TODO: This block is wrong:
-	# We should check for changes in the _update_param function and make
-	# the diff match if none are spotted
-        interface_before = server_info.get('interfaces')
-        server_info = self._update_param('interfaces', server_info)
-        interface_after = server_info.get('interfaces')
-        if interface_before == interface_after and not self._module.params.get('force'):
-            self._result['changed'] = False;
+        # Remove interface properties that were not filled out by the user
+        self.normalize_interfaces_param()
+
+        # Compare the interfaces as specified by the user, with the interfaces
+        # as received by the API. The structures are somewhat different, so
+        # they need to be evaluated in detail
+        wanted = self._module.params.get('interfaces')
+        actual = server_info.get('interfaces')
+
+        try:
+            update_interfaces = self._module.params.get('force') \
+                or not self.has_wanted_interfaces(wanted, actual)
+        except KeyError as e:
+            self._module.fail_json(
+                msg="Error checking 'interfaces', missing key: %s" % e.args[0])
+
+        if update_interfaces:
+            server_info = self._update_param('interfaces', server_info)
+
+            if not self._result['changed']:
+                self._result['changed'] = server_info['interfaces'] != actual
 
         server_info = self._update_param('flavor', server_info, requires_stop=True)
         server_info = self._update_param('name', server_info)
@@ -571,6 +585,75 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
                 server_info = self._wait_for_state(('absent', ))
         return server_info
 
+    def has_wanted_interfaces(self, wanted, actual):
+        """ Compares the interfaces as specified by the user, with the
+        interfaces as reported by the server.
+
+        """
+
+        if len(wanted) != len(actual):
+            return False
+
+        def match_interface(spec):
+
+            # First, find the interface that belongs to the spec
+            for interface in actual:
+
+                # If we have a public network, only look for the right type
+                if spec.get('network') == 'public':
+                    if interface['type'] == 'public':
+                        break
+
+                # If we have a private network, check the network's UUID
+                if spec.get('network') is not None:
+                    if interface['type'] == 'private':
+                        if interface['network']['uuid'] == spec['network']:
+                            break
+
+                # If we only have an addresses block, match all subnet UUIDs
+                wanted_subnet_ids = {
+                    a['subnet'] for a in (spec.get('addresses') or ())}
+
+                actual_subnet_ids = {
+                    a['subnet']['uuid'] for a in interface['addresses']}
+
+                if wanted_subnet_ids == actual_subnet_ids:
+                    break
+            else:
+                return None  # looped through everything without match
+
+            # Fail if any of the addresses don't match
+            for wanted_addr in (spec.get('addresses') or ()):
+
+                # Unspecified, skip
+                if 'address' not in wanted_addr:
+                    continue
+
+                addresses = {a['address'] for a in interface['addresses']}
+                if wanted_addr['address'] not in addresses:
+                    return None
+
+            return interface
+
+        for spec in wanted:
+
+            # If there is any interface that does not match, clearly not all
+            # wanted interfaces are present
+            if not match_interface(spec):
+                return False
+
+        return True
+
+    def normalize_interfaces_param(self):
+        """ Goes through the interfaces parameter and gets it ready to be
+        sent to the API. """
+
+        for spec in self._module.params.get('interfaces'):
+            if spec['addresses'] is None:
+                del spec['addresses']
+            if spec['network'] is None:
+                del spec['network']
+
 
 def main():
     argument_spec = cloudscale_argument_spec()
@@ -590,9 +673,12 @@ def main():
         use_ipv6=dict(type='bool', default=True),
         interfaces=dict(
             type='list',
+            elements='dict',
             options=dict(
+                network=dict(type='str'),
                 addresses=dict(
-                    type='dict',
+                    type='list',
+                    element='dict',
                     options=dict(
                         address=dict(type='str'),
                         subnet=dict(type='str'),
@@ -609,8 +695,8 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=(
-            ['interface', 'use_public_network'],
-            ['interface', 'use_private_network'],
+            ['interfaces', 'use_public_network'],
+            ['interfaces', 'use_private_network'],
         ),
         required_one_of=(('name', 'uuid'),),
         supports_check_mode=True,
