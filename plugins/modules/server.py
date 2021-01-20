@@ -77,7 +77,7 @@ options:
   use_public_network:
     description:
       - Attach a public network interface to the server.
-    default: yes
+    default: false
     type: bool
   use_private_network:
     description:
@@ -91,29 +91,30 @@ options:
     type: bool
   interfaces:
     description:
-      - List of interface objects
+      - List of network interface objects.
     type: list
-    elements: dict
     version_added: 1.4.0
     suboptions:
       network:
         description:
-           - Create a network interface on this network.
+          - Create a network interface on the network identified by UUID. Use
+            'public' instead of an UUID to attach a public network interface.
+            Can be omitted if a subnet is provided under addresses.
         type: str
       addresses:
         description:
-          - Use a specific IP address from subnet range
+          - Attach a private network interface and configure a subnet and/or an IP address.
         type: list
-        elements: dict
-      suboptions:
-        subnet:
-          description:
-            - The uuid of the subnet
-          type: str
-        address:
-          description:
-            - The static IP address of the server.
-          type: str
+        suboptions:
+          subnet:
+            description:
+              - UUID of the subnet on which a private network interface will be created.
+            type: str
+          address:
+            description:
+              - The static IP address of the server. Use '[]' to avoid assigning an IP
+                address via DHCP.
+            type: str
   server_groups:
     description:
       - List of UUID or names of server groups.
