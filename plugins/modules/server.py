@@ -77,12 +77,10 @@ options:
   use_public_network:
     description:
       - Attach a public network interface to the server.
-    default: false
     type: bool
   use_private_network:
     description:
       - Attach a private network interface to the server.
-    default: no
     type: bool
   use_ipv6:
     description:
@@ -93,6 +91,7 @@ options:
     description:
       - List of network interface objects.
     type: list
+    elements: dict
     version_added: 1.4.0
     suboptions:
       network:
@@ -105,6 +104,7 @@ options:
         description:
           - Attach a private network interface and configure a subnet and/or an IP address.
         type: list
+        elements: dict
         suboptions:
           subnet:
             description:
