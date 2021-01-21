@@ -592,7 +592,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
 
         """
 
-        if len(wanted) != len(actual):
+        if len(wanted or ()) != len(actual or ()):
             return False
 
         def match_interface(spec):
@@ -679,7 +679,7 @@ def main():
                 network=dict(type='str'),
                 addresses=dict(
                     type='list',
-                    element='dict',
+                    elements='dict',
                     options=dict(
                         address=dict(type='str'),
                         subnet=dict(type='str'),
