@@ -612,11 +612,11 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
                             break
 
                 # If we only have an addresses block, match all subnet UUIDs
-                wanted_subnet_ids = {
-                    a['subnet'] for a in (spec.get('addresses') or ())}
+                wanted_subnet_ids = set(
+                    a['subnet'] for a in (spec.get('addresses') or ()))
 
-                actual_subnet_ids = {
-                    a['subnet']['uuid'] for a in interface['addresses']}
+                actual_subnet_ids = set(
+                    a['subnet']['uuid'] for a in interface['addresses'])
 
                 if wanted_subnet_ids == actual_subnet_ids:
                     break
@@ -630,7 +630,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
                 if 'address' not in wanted_addr:
                     continue
 
-                addresses = {a['address'] for a in interface['addresses']}
+                addresses = set(a['address'] for a in interface['addresses'])
                 if wanted_addr['address'] not in addresses:
                     return False
 
