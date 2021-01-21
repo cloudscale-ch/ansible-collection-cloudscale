@@ -649,7 +649,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
         """ Goes through the interfaces parameter and gets it ready to be
         sent to the API. """
 
-        for spec in self._module.params.get('interfaces'):
+        for spec in (self._module.params.get('interfaces') or ()):
             if spec['addresses'] is None:
                 del spec['addresses']
             if spec['network'] is None:
