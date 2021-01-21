@@ -621,7 +621,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
                 if wanted_subnet_ids == actual_subnet_ids:
                     break
             else:
-                return None  # looped through everything without match
+                return False  # looped through everything without match
 
             # Fail if any of the addresses don't match
             for wanted_addr in (spec.get('addresses') or ()):
@@ -632,7 +632,15 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
 
                 addresses = {a['address'] for a in interface['addresses']}
                 if wanted_addr['address'] not in addresses:
-                    return None
+                    return False
+
+            # If the wanted address is an empty list, but the actual list is
+            # not, the user wants to remove automatically set addresses
+            if spec.get('addresses') == [] and interface['addresses'] != []:
+                return False
+
+            if interface['addresses'] == [] and spec.get('addresses') != []:
+                return False
 
             return interface
 
@@ -654,6 +662,12 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
                 del spec['addresses']
             if spec['network'] is None:
                 del spec['network']
+
+            for address in (spec.get('addresses') or ()):
+                if address['address'] is None:
+                    del address['address']
+                if address['subnet'] is None:
+                    del address['subnet']
 
 
 def main():
