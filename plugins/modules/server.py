@@ -535,8 +535,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
         actual = server_info.get('interfaces')
 
         try:
-            update_interfaces = self._module.params.get('force') \
-                or not self.has_wanted_interfaces(wanted, actual)
+            update_interfaces = not self.has_wanted_interfaces(wanted, actual)
         except KeyError as e:
             self._module.fail_json(
                 msg="Error checking 'interfaces', missing key: %s" % e.args[0])
