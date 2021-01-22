@@ -89,15 +89,16 @@ options:
     type: bool
   interfaces:
     description:
-      - List of network interface objects.
+      - List of network interface objects specifying the interfaces to be attached to the server.
+        See U(https://www.cloudscale.ch/en/api/v1/#interfaces-attribute-specification) for more details.
     type: list
     elements: dict
     version_added: 1.4.0
     suboptions:
       network:
         description:
-          - Create a network interface on the network identified by UUID. Use
-            'public' instead of an UUID to attach a public network interface.
+          - Create a network interface on the network identified by UUID.
+            Use 'public' instead of an UUID to attach a public network interface.
             Can be omitted if a subnet is provided under addresses.
         type: str
       addresses:
@@ -108,12 +109,11 @@ options:
         suboptions:
           subnet:
             description:
-              - UUID of the subnet on which a private network interface will be created.
+              - UUID of the subnet from which an address will be assigned.
             type: str
           address:
             description:
-              - The static IP address of the server. Use '[]' to avoid assigning an IP
-                address via DHCP.
+              - The static IP address of the interface. Use '[]' to avoid assigning an IP address via DHCP.
             type: str
   server_groups:
     description:
