@@ -1,2 +1,0 @@
-bugfixes:
-  - Fix inventory plugin failing to launch (https://github.com/cloudscale-ch/ansible-collection-cloudscale/issues/49).

@@ -5,6 +5,19 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v1.3.1
+======
+
+Minor Changes
+-------------
+
+- Implemented identical naming support of the same resource type per zone (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/46).
+
+Bugfixes
+--------
+
+- Fix inventory plugin failing to launch (https://github.com/cloudscale-ch/ansible-collection-cloudscale/issues/49).
+
 v1.3.0
 ======
 
