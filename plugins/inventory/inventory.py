@@ -18,8 +18,12 @@ description:
     - Uses an YAML configuration file ending with either I(cloudscale.yml) or I(cloudscale.yaml) to set parameter values (also see examples).
 extends_documentation_fragment:
   - constructed
-  - cloudscale_ch.cloud.api_parameters
 options:
+    api_token:
+        description:
+          - cloudscale.ch API token.
+          - This can also be passed in the C(CLOUDSCALE_API_TOKEN) environment variable.
+        type: str
     plugin:
         description: |
             Token that ensures this is a source file for the 'cloudscale'
@@ -71,6 +75,7 @@ keyed_groups:
   - prefix: os
     key: cloudscale.image.operating_system | lower
 '''
+import os
 
 from collections import defaultdict
 from json import loads
@@ -79,7 +84,6 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.urls import open_url
 from ansible.inventory.group import to_safe_group_name
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
-from ..module_utils.api import API_URL
 
 iface_type_map = {
     'public_v4': ('public', 4),
@@ -93,11 +97,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     NAME = 'cloudscale'
 
+    @property
+    def api_url(self):
+        return os.environ.get(
+            'CLOUDSCALE_API_URL', 'https://api.cloudscale.ch/v1')
+
+    @property
+    def api_token(self):
+        return self.get_option('api_token') \
+            or os.environ.get('CLOUDSCALE_API_TOKEN')
+
     def _get_server_list(self):
+
         # Get list of servers from cloudscale.ch API
         response = open_url(
-            API_URL + '/servers',
-            headers={'Authorization': 'Bearer %s' % self._token}
+            self.api_url + '/servers',
+            headers={'Authorization': 'Bearer %s' % self.api_token}
         )
         return loads(response.read())
 
@@ -119,8 +134,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         self._read_config_data(path)
 
-        self._token = self.get_option('api_token')
-        if not self._token:
+        if not self.api_token:
             raise AnsibleError('Could not find an API token. Set the '
                                'CLOUDSCALE_API_TOKEN environment variable.')
 
