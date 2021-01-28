@@ -56,12 +56,12 @@ options:
       - Zone in which the volume resides (e.g. C(lgp1) or C(rma1)). Cannot be
         changed after creating the volume. Defaults to the project default zone.
     type: str
-  server_uuids:
+  servers:
     description:
       - UUIDs of the servers this volume is attached to. Set this to C([]) to
         detach the volume. Currently a volume can only be attached to a
         single server.
-    aliases: [ server_uuid ]
+    aliases: [ server_uuids, server_uuid ]
     type: list
     elements: str
   tags:
@@ -85,7 +85,7 @@ EXAMPLES = '''
 - name: Attach volume to server
   cloudscale_ch.cloud.volume:
     uuid: my_ssd_volume.uuid
-    server_uuids:
+    servers:
       - ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
     api_token: xxxxxx
 
@@ -95,7 +95,7 @@ EXAMPLES = '''
     name: my_ssd_volume
     zone: 'lpg1'
     size_gb: 50
-    server_uuids:
+    servers:
       - ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
     api_token: xxxxxx
 
@@ -103,7 +103,7 @@ EXAMPLES = '''
 - name: Detach volume from server
   cloudscale_ch.cloud.volume:
     uuid: my_ssd_volume.uuid
-    server_uuids: []
+    servers: []
     api_token: xxxxxx
 
 # Delete a volume
@@ -145,7 +145,7 @@ zone:
   returned: state == present
   type: dict
   sample: {'slug': 'lpg1'}
-server_uuids:
+servers:
   description: The UUIDs of the servers this volume is attached to.
   returned: state == present
   type: list
@@ -176,6 +176,33 @@ class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
         self._module.fail_on_missing_params(['name', 'size_gb'])
         return super(AnsibleCloudscaleVolume, self).create(resource)
 
+    def find_difference(self, key, resource, param):
+        is_different = False
+
+        if key == 'servers':
+            server_has = resource[key]
+            server_wanted = param
+            if len(param) > len(server_has):
+                is_different = True
+            else:
+                for has in server_has:
+                    if has["uuid"] not in param:
+                        is_different = True
+
+        # If it looks like a stub
+        elif isinstance(resource[key], dict) and 'href' in resource[key]:
+            uuid = resource[key].get('href', '').split('/')[-1]
+            if param != uuid:
+                is_different = True
+
+        elif param != resource[key]:
+            is_different = True
+
+        patch_data = {
+            key: param
+        }
+        return is_different, patch_data
+
 
 def main():
     argument_spec = cloudscale_argument_spec()
@@ -186,7 +213,7 @@ def main():
         zone=dict(type='str'),
         size_gb=dict(type='int'),
         type=dict(type='str', choices=('ssd', 'bulk')),
-        server_uuids=dict(type='list', elements='str', aliases=['server_uuid']),
+        servers=dict(type='list', elements='str', aliases=['server_uuids', 'server_uuid']),
         tags=dict(type='dict'),
     ))
 
@@ -204,13 +231,13 @@ def main():
             'type',
             'zone',
             'size_gb',
-            'server_uuids',
+            'servers',
             'tags',
         ],
         resource_update_param_keys=[
             'name',
             'size_gb',
-            'server_uuids',
+            'servers',
             'tags',
         ],
     )
