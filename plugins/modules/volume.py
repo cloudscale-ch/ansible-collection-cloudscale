@@ -177,18 +177,19 @@ class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
         return super(AnsibleCloudscaleVolume, self).create(resource)
 
     def find_difference(self, key, resource, param):
-        if key == 'servers':
-            is_different = False
-            server_has = resource[key]
-            server_wanted = param
-            if len(server_wanted) != len(server_has):
-                is_different = True
-            else:
-                for has in server_has:
-                    if has["uuid"] not in server_wanted:
-                        is_different = True
+        is_different = False
+
+        if key != 'servers':
+            return super(AnsibleCloudscaleVolume, self).find_difference(key, resource, param)
+
+        server_has = resource[key]
+        server_wanted = param
+        if len(server_wanted) != len(server_has):
+            is_different = True
         else:
-            is_different = super(AnsibleCloudscaleVolume, self).find_difference(key, resource, param)
+            for has in server_has:
+                if has["uuid"] not in server_wanted:
+                    is_different = True
 
         return is_different
 
