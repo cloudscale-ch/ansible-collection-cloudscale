@@ -177,7 +177,8 @@ class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
         return super(AnsibleCloudscaleVolume, self).create(resource)
 
     def find_difference(self, key, resource, param):
-        is_different, patch_data = super(AnsibleCloudscaleVolume, self).find_difference(key,resource,param)
+        is_different, patch_data = \
+            super(AnsibleCloudscaleVolume, self).find_difference(key, resource, param)
         if key == 'servers':
             is_different = False
             server_has = resource[key]
