@@ -32,7 +32,7 @@ options:
     description:
       - Name to identifiy the floating IP address for idempotency.
       - One of I(network) or I(name) is required to identify the floating IP.
-      - "Note: I(name) will be required for assigning a new floating IP beginning of version 2.0.0."
+      - Required for assigning a new floating IP.
     version_added: 1.3.0
     type: str
   state:
@@ -239,24 +239,9 @@ class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
             resource['server'] = resource['server']['uuid']
         return resource
 
-    # TODO: To be removed in 2.0.0
-    def query(self):
-        # Don't try to find anything without network or name
-        if not any([self._module.params['name'], self._module.params['network']]):
-            return self.init_resource()
-        return super(AnsibleCloudscaleFloatingIp, self).query()
-
     def create(self, resource):
         # Fail when missing params for creation
-        self._module.fail_on_missing_params(['ip_version'])
-
-        # TODO: To be removed in 2.0.0
-        if not self._module.params['name']:
-            self._module.deprecate(
-                msg="Name is missing, this won't be supported in the future",
-                version="2.0.0",
-                collection_name="cloudscale_ch.cloud"
-            )
+        self._module.fail_on_missing_params(['ip_version', 'name'])
         return super(AnsibleCloudscaleFloatingIp, self).create(resource)
 
     def get_result(self, resource):
@@ -283,8 +268,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        # TODO: Enable for version 2.0.0
-        # required_one_of=(('network', 'name'),),
+        required_one_of=(('network', 'name'),),
         supports_check_mode=True,
     )
 
