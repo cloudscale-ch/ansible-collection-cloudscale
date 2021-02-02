@@ -1,2 +1,0 @@
-breaking_changes:
-  - floating_ip - ``ǹame`` is required for assigning a new floating IP.
