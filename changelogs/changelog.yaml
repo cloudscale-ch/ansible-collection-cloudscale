@@ -48,3 +48,10 @@ releases:
     - allow-similar-name-per-zone.yml
     - fix-inventory-plugin-error.yml
     release_date: '2021-01-26'
+  2.0.0:
+    changes:
+      breaking_changes:
+      - "floating_ip - ``name`` is required for assigning a new floating IP."
+    fragments:
+    - floating-ip-require-name.yml
+    release_date: '2021-02-02'

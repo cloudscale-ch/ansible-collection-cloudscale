@@ -5,6 +5,14 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.0.0
+======
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- floating_ip - ``name`` is required for assigning a new floating IP.
+
 v1.3.1
 ======
 
