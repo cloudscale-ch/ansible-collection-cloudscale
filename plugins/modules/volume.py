@@ -84,7 +84,7 @@ EXAMPLES = '''
 # Attach an existing volume to a server
 - name: Attach volume to server
   cloudscale_ch.cloud.volume:
-    uuid: my_ssd_volume.uuid
+    uuid: "{{ my_ssd_volume.uuid }}"
     servers:
       - ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
     api_token: xxxxxx
@@ -102,7 +102,7 @@ EXAMPLES = '''
 # Detach volume from server
 - name: Detach volume from server
   cloudscale_ch.cloud.volume:
-    uuid: my_ssd_volume.uuid
+    uuid: "{{ my_ssd_volume.uuid }}"
     servers: []
     api_token: xxxxxx
 
