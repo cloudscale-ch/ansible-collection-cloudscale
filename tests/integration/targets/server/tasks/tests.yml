@@ -674,3 +674,290 @@
     that:
       - server_stopped is not changed
       - server_stopped.state == 'absent'
+
+- name: Create first private network
+  cloudscale_ch.cloud.network:
+    name: '{{ cloudscale_resource_prefix }}-test-interface-network'
+    state: present
+    zone: '{{ cloudscale_test_zone }}'
+  register: test_interface_network
+
+- name: Create second private network
+  cloudscale_ch.cloud.network:
+    name: '{{ cloudscale_resource_prefix }}-test-interface-network1'
+    state: present
+    zone: '{{ cloudscale_test_zone }}'
+  register: test_interface_network1
+
+- name: Create server in specific private network in check mode
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    flavor: '{{ cloudscale_test_flavor }}'
+    image: '{{ cloudscale_test_image }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
+    zone: '{{ cloudscale_test_zone }}'
+    state: running
+    interfaces:
+      - network: '{{ test_interface_network.uuid }}'
+  check_mode: yes
+  register: server
+- name: Verify Create server in specific private network in check mode
+  assert:
+    that:
+      - server.changed == True
+      - server.state == 'absent'
+
+- name: Create server in specific private network
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    flavor: '{{ cloudscale_test_flavor }}'
+    image: '{{ cloudscale_test_image }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
+    zone: '{{ cloudscale_test_zone }}'
+    state: running
+    interfaces:
+      - network: '{{ test_interface_network.uuid }}'
+  register: server
+- name: Verify Create server in specific private network
+  assert:
+    that:
+      - server.changed == True
+      - server.state == 'running'
+      - server.interfaces.0.network.name == '{{ cloudscale_resource_prefix }}-test-interface-network'
+
+- name: Create server in specific private network idempotency
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    flavor: '{{ cloudscale_test_flavor }}'
+    image: '{{ cloudscale_test_image }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
+    zone: '{{ cloudscale_test_zone }}'
+    state: running
+    interfaces:
+      - network: '{{ test_interface_network.uuid }}'
+  register: server
+- name: Verify Create server in specific private network idempotency
+  assert:
+    that:
+      - server.changed == False
+      - server.state == 'running'
+      - server.interfaces.0.network.name == '{{ cloudscale_resource_prefix }}-test-interface-network'
+
+- name: Remove private IP and add public network from server in check mode
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - network: '{{ test_interface_network.uuid }}'
+        addresses: []
+  check_mode: yes
+  register: server
+- name: Verify Remove private IP and add public network from server in check mode
+  assert:
+    that:
+      - server.changed == True
+      - server.interfaces.0.network.name == '{{ cloudscale_resource_prefix }}-test-interface-network'
+
+- name: Remove private IP and add public network from server
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - network: '{{ test_interface_network.uuid }}'
+        addresses: []
+  register: server2
+- name: Verify Remove private IP and add public network from server
+  assert:
+    that:
+      - server2.changed
+      - server2.interfaces | selectattr("type", "eq", "public") | list | length == 1
+      - server2.interfaces | selectattr("type", "eq", "private") | list | length == 1
+      - (server2.interfaces | selectattr("type", "eq", "private") | first).addresses == []
+
+- name: Remove private IP and add public network from server idempotency
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - network: '{{ test_interface_network.uuid }}'
+        addresses: []
+  register: server
+- name: Verify Remove private IP and add public network from server in check mode
+  assert:
+    that:
+      - server.changed == False
+
+- name: Remove private network from server in check mode
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+  check_mode: True
+  register: server
+- name: Verify Remove private network from server in check mode
+  assert:
+    that:
+      - server.changed == True
+      - server.interfaces | selectattr("type", "eq", "public") | list | length == 1
+      - server.interfaces | selectattr("type", "eq", "private") | list | length == 1
+
+- name: Remove private network from server
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+  register: server
+- name: Verify Remove private network from server
+  assert:
+    that:
+      - server.changed
+      - server.interfaces | selectattr("type", "eq", "public") | list | length == 1
+      - server.interfaces | selectattr("type", "eq", "private") | list | length == 0
+
+- name: Remove private network from server idempotency
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+  register: server
+- name: Verify Remove private network from server idempotency
+  assert:
+    that:
+      - server.changed == False
+
+- name: Attach specific private network to server in check mode
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - network: "{{ test_interface_network1.uuid }}"
+  check_mode: True
+  register: server
+- name: Verify Attach specific private network to server in check mode
+  assert:
+    that:
+      - server.changed == True
+      - server.interfaces | selectattr("type", "eq", "public") | list | length == 1
+      - server.interfaces | selectattr("type", "eq", "private") | list | length == 0
+
+- name: Attach specific private network to server
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - network: "{{ test_interface_network1.uuid }}"
+  register: server
+- name: Verify Attach specific private network to server
+  assert:
+    that:
+      - server.changed
+      - server.interfaces.1.network.uuid == test_interface_network1.uuid
+
+- name: Attach specific private network to server idempotency
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - network: "{{ test_interface_network1.uuid }}"
+  register: server
+- name: Verify Attach specific private network to server
+  assert:
+    that:
+      - server.changed == False
+
+- name: Set fact private IP address
+  set_fact:
+    private_address0: "{{ test_interface_network1.subnets.0.cidr | regex_replace('0/24','31') }}"
+    private_address1: "{{ test_interface_network1.subnets.0.cidr | regex_replace('0/24','32') }}"
+
+- name: Set a static IP in check mode
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet:  "{{ test_interface_network1.subnets.0.uuid }}"
+          address: "{{ private_address0 }}"
+  check_mode: True
+  register: server_alt
+- name: Verify Set a static IP check mode
+  assert:
+    that:
+      - server_alt.changed
+      - server.interfaces.1.addresses.0.address == server_alt.interfaces.1.addresses.0.address
+
+- name: Set a static IP
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet:  "{{ test_interface_network1.subnets.0.uuid }}"
+          address: "{{ private_address0 }}"
+  register: server
+- name: Verify Set a static IP
+  assert:
+    that:
+      - server.changed
+      - private_address0 == server.interfaces.1.addresses.0.address
+
+- name: Set a static IP idempotency
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet:  "{{ test_interface_network1.subnets.0.uuid }}"
+          address: "{{ private_address0 }}"
+  register: server
+- name: Verify Set a static IP idempotency
+  assert:
+    that:
+      - server.changed == False
+      - private_address0 == server.interfaces.1.addresses.0.address
+
+- name: Change a static IP in check mode
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet:  "{{ test_interface_network1.subnets.0.uuid }}"
+          address: "{{ private_address1 }}"
+  check_mode: True
+  register: server
+- name: Verify Change a static IP check mode
+  assert:
+    that:
+      - server.changed
+      - private_address0 == server.interfaces.1.addresses.0.address
+
+- name: Change a static IP
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet:  "{{ test_interface_network1.subnets.0.uuid }}"
+          address: "{{ private_address1 }}"
+  register: server
+- name: Verify Change a static IP
+  assert:
+    that:
+      - server.changed
+      - private_address1 == server.interfaces.1.addresses.0.address
+
+- name: Change a static IP idempotency
+  cloudscale_ch.cloud.server:
+    name: '{{ cloudscale_resource_prefix }}-test-interface'
+    interfaces:
+      - network: 'public'
+      - addresses:
+        - subnet:  "{{ test_interface_network1.subnets.0.uuid }}"
+          address: "{{ private_address1 }}"
+  register: server
+- name: Verify Change a static IP idempotency
+  assert:
+    that:
+      - server.changed == False
+      - private_address1 == server.interfaces.1.addresses.0.address
