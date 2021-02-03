@@ -61,6 +61,8 @@ options:
       - UUIDs of the servers this volume is attached to. Set this to C([]) to
         detach the volume. Currently a volume can only be attached to a
         single server.
+      - The aliases C(server_uuids) and C(server_uuid) are deprecated and will
+        be removed in version 3.0.0 of this collection.
     aliases: [ server_uuids, server_uuid ]
     type: list
     elements: str
@@ -225,6 +227,13 @@ def main():
         required_one_of=(('name', 'uuid'),),
         supports_check_mode=True,
     )
+
+    # TODO remove in version 3.0.0
+    if module.params.get('server_uuid') or module.params.get('server_uuids'):
+        module.deprecate('The aliases "server_uuid" and "server_uuids" have '
+                         'been deprecated and will be removed, use "servers" '
+                         'instead.',
+                         version='3.0.0', collection_name='cloudscale_ch.cloud')
 
     cloudscale_volume = AnsibleCloudscaleVolume(
         module,
