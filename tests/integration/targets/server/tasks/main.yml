@@ -9,3 +9,6 @@
     - import_role:
         name: common
         tasks_from: cleanup_server_groups
+    - import_role:
+        name: common
+        tasks_from: cleanup_networks
