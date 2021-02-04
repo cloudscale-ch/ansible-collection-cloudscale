@@ -3,6 +3,8 @@ name: Collection Integration tests
 on:
   schedule:
   - cron: '0 5 * * *'  # UTC
+  push:
+    tags: 'v*'
 
 jobs:
   integration-test:

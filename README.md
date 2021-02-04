@@ -86,6 +86,44 @@ There are many ways in which you can participate in the project, for example:
 - Review the documentation and make pull requests for anything from typos to new content
 - If you are interested in fixing issues and contributing directly to the code base, please see the [CONTRIBUTING](CONTRIBUTING.md) document.
 
+## Releasing
+
+### Prepare a new release
+
+The changelog is managed using the `antsibull` tool. You can install
+it using `pip install antsibull`
+
+1. Update version in galaxy.yml
+2. Update changelog using antsibull
+```
+antsibull-changelog release
+```
+3. Commit changelog and new version
+```
+git commit -m "Release version X.Y.Z" galaxy.yml CHANGELOG.rst changelogs/
+```
+4. Tag the release. Preferably create GPG signed tag if you have a GPG
+key. Version tags should be prefixed with "v" (otherwise the
+integration tests won't run automatically).
+```
+git tag -s -m "Version X.Y.Z" vX.Y.Z
+```
+5. Push the release and tag
+```
+git push origin master vX.Y.Z
+```
+
+### Release to Ansible Galaxy
+
+After the release is tagged and pushed to Github a release to Ansible
+Galaxy can be created using the release feature in Github:
+
+1. **Wait for integration tests to succeed. They should automatically
+run on new tags.** Only release if they succeed. Otherwise delete the
+tag and fix the issue.
+2. Create a release on Github by going to the release overview and
+   selecting "Draft a new release".
+
 ## License
 
 GNU General Public License v3.0
