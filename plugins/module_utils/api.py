@@ -304,14 +304,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
                 resource['state'] = "absent"
         return self.get_result(resource)
 
-    def _param_updated(self, key, resource):
-        param = self._module.params.get(key)
-        if param is None:
-            return False
-
-        if not resource or key not in resource:
-            return False
-
+    def find_difference(self, key, resource, param):
         is_different = False
 
         # If it looks like a stub
@@ -322,6 +315,18 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         elif param != resource[key]:
             is_different = True
+
+        return is_different
+
+    def _param_updated(self, key, resource):
+        param = self._module.params.get(key)
+        if param is None:
+            return False
+
+        if not resource or key not in resource:
+            return False
+
+        is_different = self.find_difference(key, resource, param)
 
         if is_different:
             self._result['changed'] = True

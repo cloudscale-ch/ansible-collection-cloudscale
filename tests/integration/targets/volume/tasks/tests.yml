@@ -64,7 +64,7 @@
 - name: Attach existing volume by name to server in check mode
   cloudscale_ch.cloud.volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
-    server_uuids:
+    servers:
       - '{{ server.uuid }}'
   check_mode: yes
   register: vol
@@ -73,12 +73,12 @@
     that:
       - vol is successful
       - vol is changed
-      - server.uuid not in vol.server_uuids
+      - server.uuid not in vol.servers
 
 - name: Attach existing volume by name to server
   cloudscale_ch.cloud.volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
-    server_uuids:
+    servers:
       - '{{ server.uuid }}'
   register: vol
 - name: 'VERIFY: Attach existing volume by name to server'
@@ -86,12 +86,12 @@
     that:
       - vol is successful
       - vol is changed
-      - server.uuid in vol.server_uuids
+      - server.uuid in vol.servers | map(attribute="uuid")
 
 - name: Attach existing volume by name to server idempotence
   cloudscale_ch.cloud.volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
-    server_uuids:
+    servers:
       - '{{ server.uuid }}'
   register: vol
 - name: 'VERIFY: Attach existing volume by name to server idempotence'
@@ -99,7 +99,7 @@
     that:
       - vol is successful
       - vol is not changed
-      - server.uuid in vol.server_uuids
+      - server.uuid in vol.servers | map(attribute="uuid")
 
 - name: Resize attached volume by UUID in check mode
   cloudscale_ch.cloud.volume:
@@ -187,7 +187,7 @@
     type: bulk
     zone: '{{ cloudscale_test_zone }}'
     size_gb: 100
-    server_uuids:
+    servers:
       - '{{ server.uuid }}'
   register: bulk
 - name: 'VERIFY: Create bulk volume and attach'
@@ -196,19 +196,19 @@
       - bulk is successful
       - bulk is changed
       - bulk.size_gb == 100
-      - server.uuid in bulk.server_uuids
+      - server.uuid in bulk.servers | map(attribute="uuid")
 
 - name: Detach volume by UUID
   cloudscale_ch.cloud.volume:
     uuid: '{{ bulk.uuid }}'
-    server_uuids: []
+    servers: []
   register: bulk
 - name: 'VERIFY: Detach volume by UUID'
   assert:
     that:
       - bulk is successful
       - bulk is changed
-      - bulk.server_uuids == []
+      - bulk.servers == []
 
 - name: Resize detached volume by name
   cloudscale_ch.cloud.volume:
