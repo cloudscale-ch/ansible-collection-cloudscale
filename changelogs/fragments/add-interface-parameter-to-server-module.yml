@@ -1,2 +1,0 @@
-minor_changes:
-  - Add interface parameter to server module (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/54).

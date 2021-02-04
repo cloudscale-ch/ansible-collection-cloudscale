@@ -1,2 +1,0 @@
-minor_changes:
-  - Rename server_uuids parameter to servers in volume module (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/54).

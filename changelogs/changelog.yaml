@@ -51,7 +51,20 @@ releases:
   2.0.0:
     changes:
       breaking_changes:
-      - "floating_ip - ``name`` is required for assigning a new floating IP."
+      - floating_ip - ``name`` is required for assigning a new floating IP.
     fragments:
     - floating-ip-require-name.yml
     release_date: '2021-02-02'
+  2.1.0:
+    changes:
+      deprecated_features:
+      - The aliases ``server_uuids`` and ``server_uuid`` of the servers parameter
+        in the volume module will be removed in version 3.0.0.
+      minor_changes:
+      - Add interface parameter to server module (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/54).
+      - Rename server_uuids parameter to servers in volume module (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/54).
+    fragments:
+    - add-interface-parameter-to-server-module.yml
+    - deprecate-server_uuids-volume-module.yml
+    - rename-server_uuids-parameter-to-servers.yml
+    release_date: '2021-02-04'

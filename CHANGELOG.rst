@@ -5,6 +5,20 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.1.0
+======
+
+Minor Changes
+-------------
+
+- Add interface parameter to server module (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/54).
+- Rename server_uuids parameter to servers in volume module (https://github.com/cloudscale-ch/ansible-collection-cloudscale/pull/54).
+
+Deprecated Features
+-------------------
+
+- The aliases ``server_uuids`` and ``server_uuid`` of the servers parameter in the volume module will be removed in version 3.0.0.
+
 v2.0.0
 ======
 
