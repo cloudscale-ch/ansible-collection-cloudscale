@@ -26,7 +26,8 @@ options:
   api_timeout:
     description:
       - Timeout in seconds for calls to the cloudscale.ch API.
-    default: 30
+      - This can also be passed in the C(CLOUDSCALE_API_TIMEOUT) environment variable.
+    default: 45
     type: int
 notes:
   - All operations are performed using the cloudscale.ch public API v1.

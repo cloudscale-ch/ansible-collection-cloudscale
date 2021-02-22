@@ -27,7 +27,8 @@ def cloudscale_argument_spec():
         ),
         api_timeout=dict(
             type='int',
-            default=30,
+            fallback=(env_fallback, ['CLOUDSCALE_API_TIMEOUT']),
+            default=45,
         ),
     )
 
