@@ -1,0 +1,189 @@
+---
+- name: Delete a non existent custom image by uuid
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    state: absent
+  loop:
+    - '415cded5-d57c-4dc9-88fb-ececd38fb8ea'
+
+- name: Fail delete a non existent custom image by name
+  cloudscale_ch.cloud.custom_image:
+    name: this-image-is-non-existent
+    state: absent
+  register: delete
+  ignore_errors: true
+- name: Verify Fail delete a non existend custom image by name
+  assert:
+    that:
+      - delete is failed
+      - delete.msg.startswith('state is absent but all of the following are missing\: uuid')
+
+- name: Import a custom image
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: image1
+- name: Verify import a custom image
+  assert:
+    that:
+      - image1 is changed
+      - image1.custom_image.name == "{{ cloudscale_resource_prefix }}-test-image"
+
+- name: Wait for import
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    import_status: true
+  loop:
+    - "{{ image1.uuid }}"
+  retries: 15
+  delay: 5
+  register: import_status
+  until: import_status.status is undefined or import_status.status == 'success'
+
+- name: Reimport a custom image without force
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: image
+- name: Verify import a custom image without force
+  assert:
+    that:
+      - image is not changed
+      - image.name == "{{ cloudscale_resource_prefix }}-test-image"
+
+- name: Import a custom image with force
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+    force: true
+  register: image2
+- name: Verify import a custom image with force
+  assert:
+    that:
+      - image2 is changed
+      - image2.custom_image.name == "{{ cloudscale_resource_prefix }}-test-image"
+      - image2.uuid != image1.uuid
+- name: Wait for import
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    import_status: true
+  loop:
+    - "{{ image2.uuid }}"
+  retries: 15
+  delay: 5
+  register: import_status
+  until: import_status.status is undefined or import_status.status == 'success'
+
+- name: Get newest image by name
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+  register: image_by_name
+- name: Verify get newest image by name
+  assert:
+    that:
+      - image_by_name is not changed
+      - image_by_name.uuid == image2.uuid
+
+- name: Get newest image by tags
+  cloudscale_ch.cloud.custom_image:
+    tags:
+      project: mars
+  register: image_by_tags
+- name: Verify get newest image by tags
+  assert:
+    that:
+      - image_by_tags is not changed
+      - image_by_tags.uuid == image2.uuid
+
+- name: Get newest image by slug
+  cloudscale_ch.cloud.custom_image:
+    slug: custom-ansible-image
+  register: image_by_slug
+- name: Verify get newest image by slug
+  assert:
+    that:
+      - image_by_slug is not changed
+      - image_by_slug.uuid == image2.uuid
+
+- name: Update slug of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    slug: ansible-image-slug
+  register: image
+  loop:
+    - "{{ image2.uuid }}"
+- name: Verify update slug of a custom image
+  assert:
+    that:
+      - image is changed
+
+- name: Get custom image with updated slug
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+  loop:
+    - "{{ image2.uuid }}"
+  register: image
+- name: Verify update slug of a custom image
+  assert:
+    that:
+      - image.results[0].slug == "ansible-image-slug"
+
+- name: Update tag of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    tags:
+      project: luna
+  register: image
+  loop:
+    - "{{ image2.uuid }}"
+- name: Verify update tag of a custom image
+  assert:
+    that:
+      - image is changed
+      - image.results[0].tags == "project: luna"
+
+- name: Update user_data_handling of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    user_data_handling: 'extend-cloud-config'
+  register: image
+  loop:
+    - "{{ image2.uuid }}"
+- name: Verify update user_data_handling of a custom image
+  assert:
+    that:
+      - image is changed
+
+- name: Get custom image with updated user_data_handling
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+  loop:
+    - "{{ image2.uuid }}"
+  register: image
+- debug:
+    var: image
+- name: Verify update user_data_handling of a custom image
+  assert:
+    that:
+      - image.results[0].user_data_handling == "extend-cloud-config"
