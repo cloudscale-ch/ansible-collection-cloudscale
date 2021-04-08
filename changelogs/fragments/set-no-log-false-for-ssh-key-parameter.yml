@@ -1,0 +1,2 @@
+minor_changes:
+    - Set "no_log=False" for the ssh_keys parameter in the server module to fix the sanity tests for ansible devel.
