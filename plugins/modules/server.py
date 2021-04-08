@@ -680,7 +680,7 @@ def main():
         zone=dict(),
         volume_size_gb=dict(type='int', default=10),
         bulk_volume_size_gb=dict(type='int'),
-        ssh_keys=dict(type='list', elements='str'),
+        ssh_keys=dict(type='list', elements='str', no_log=False),
         password=dict(no_log=True),
         use_public_network=dict(type='bool'),
         use_private_network=dict(type='bool'),
