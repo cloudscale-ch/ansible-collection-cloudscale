@@ -57,7 +57,7 @@
       - image1.import_status == 'success'
       - image1.name == "{{ cloudscale_resource_prefix }}-test-image"
 
-- name: Import a custom image without force (idempotency)
+- name: Import a custom image (idempotency)
   cloudscale_ch.cloud.custom_image:
     name: "{{ cloudscale_resource_prefix }}-test-image"
     state: present
@@ -69,16 +69,16 @@
       project: mars
     source_format: raw
   register: image
-- name: Verify import a custom image without force
+- name: Verify import a custom image (idempotency)
   assert:
     that:
       - image is not changed
       - image.name == "{{ cloudscale_resource_prefix }}-test-image"
       - image.uuid == image1.uuid
 
-- name: Import a custom image with force
+- name: Import a custom image
   cloudscale_ch.cloud.custom_image:
-    name: "{{ cloudscale_resource_prefix }}-test-image"
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
     state: present
     slug: custom-ansible-image
     url: "{{ image_url }}"
@@ -87,13 +87,12 @@
     tags:
       project: mars
     source_format: raw
-    force: true
   register: image2
-- name: Verify import a custom image with force
+- name: Verify import a custom image
   assert:
     that:
       - image2 is changed
-      - image2.custom_image.name == "{{ cloudscale_resource_prefix }}-test-image"
+      - image2.name == "{{ cloudscale_resource_prefix }}-test-image2"
       - image2.uuid != image1.uuid
 
 - name: Wait for import
@@ -107,38 +106,17 @@
   assert:
     that:
       - import_status is not changed
-      - import_status.name == "{{ cloudscale_resource_prefix }}-test-image"
+      - import_status.name == "{{ cloudscale_resource_prefix }}-test-image2"
 
 - name: Get newest image by name
   cloudscale_ch.cloud.custom_image:
-    name: "{{ cloudscale_resource_prefix }}-test-image"
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
   register: image_by_name
 - name: Verify get newest image by name
   assert:
     that:
       - image_by_name is not changed
       - image_by_name.uuid == image2.uuid
-
-- name: Get newest image by tags
-  cloudscale_ch.cloud.custom_image:
-    tags:
-      project: mars
-  register: image_by_tags
-- name: Verify get newest image by tags
-  assert:
-    that:
-      - image_by_tags is not changed
-      - image_by_tags.uuid == image2.uuid
-
-- name: Get newest image by slug
-  cloudscale_ch.cloud.custom_image:
-    slug: custom-ansible-image
-  register: image_by_slug
-- name: Verify get newest image by slug
-  assert:
-    that:
-      - image_by_slug is not changed
-      - image_by_slug.uuid == image2.uuid
 
 - name: Update slug of a custom image
   cloudscale_ch.cloud.custom_image:

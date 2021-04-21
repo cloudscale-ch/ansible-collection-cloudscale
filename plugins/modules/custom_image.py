@@ -65,11 +65,6 @@ options:
     choices: [ present, absent ]
     default: present
     type: str
-  force:
-    description: Import an image
-    choices: [ true, false ]
-    default: false
-    type: bool
 extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
@@ -80,7 +75,7 @@ EXAMPLES = r'''
     url: https://ubuntu.com/downloads/hirsute.img
     slug: my-custom-image
     user_data_handling: extend-cloud-config
-    zones: LPG1
+    zones: lpg1
     tags:
       project: luna
     state: present
@@ -168,6 +163,8 @@ state:
   sample: present
 '''
 
+from copy import deepcopy
+
 from time import sleep
 
 from ansible.module_utils.basic import (
@@ -215,46 +212,77 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             result = result[0]
         return result
 
-    def fetch_both_urls(self, api_call):
-        headers = self._auth_header
+    def check_for_uuid(self, resources):
+        if 'uuid' in self._module.params and self._module.params['uuid']:
+            res = []
+            for r in resources:
+                if r['uuid'] == self._module.params['uuid']:
+                    res = r
+            return res
+        else:
+            return resources
+
+    def fetch_both_urls(self, api_call, method='GET', data=None):
+        if method == 'GET':
+            headers = self._auth_header
+        else:
+            headers = self._auth_header.copy()
+            headers['Content-type'] = 'application/json'
 
         # Get image information
-        url = '%s%s' % (self._api_url, api_call)
+        if self._api_url not in api_call:
+            url = self._api_url + api_call
+        else:
+            url = api_call
         response, info = fetch_url(self._module,
                                    url,
                                    headers=headers,
+                                   method=method,
+                                   data=data,
                                    timeout=self._module.params['api_timeout'])
 
         # Add import to the url
         if api_call == 'custom-images':
             api_call = 'custom-images/import'
         else:
+            # api_call is in the form custom-images/uuid and we need to add import in the middle
             api_call = api_call.replace('/', '/import/')
 
-        # Get image import information
-        url = '%s%s' % (self._api_url, api_call)
-        response_import, info_import = fetch_url(self._module,
-                                                 url,
-                                                 headers=headers,
-                                                 timeout=self._module.params['api_timeout'])
+        if self._api_url not in api_call:
+            url = self._api_url + api_call
+        else:
+            url = api_call
 
-        if response_import:
-            response_import = self._module.from_json(to_text(response_import.read(),
-                                                             errors='surrogate_or_strict'))
-        if response:
+        # Get image import information
+        response_import = []
+        if method != 'PATCH':
+            response_import, info_import = fetch_url(self._module,
+                                                     url,
+                                                     method=method,
+                                                     headers=headers,
+                                                     data=data,
+                                                     timeout=self._module.params['api_timeout'])
+
+            if info_import['status'] in (200, 201):
+                response_import = self._module.from_json(to_text(response_import.read(),
+                                                                 errors='surrogate_or_strict'))
+        if info['status'] in (200, 201):
             response = self._module.from_json(to_text(response.read(), errors='surrogate_or_strict'))
+
+        if response:
             response = self.check_for_params(response, ['uuid', 'name', 'slug', 'tags'])
 
-        if response:
-            response_import = self.check_for_params(response_import,
-                                                    ['uuid', 'name', 'slug', 'tags'],
-                                                    response=response)
-        else:
-            response_import = self.check_for_params(response_import, ['name', 'uuid'], subkey='custom_image')
+        if response_import:
+            if response:
+                response_import = self.check_for_params(response_import,
+                                                        ['uuid', 'name'],
+                                                        response=response)
+            else:
+                response_import = self.check_for_params(response_import, ['name', 'uuid'], subkey='custom_image')
 
         if not response and response_import:
             ensure_keys = {
-                'created_at': '2050-01-01T00:00:00.000000Z',
+                'created_at': None,
                 'size_gb': 0,
                 'checksums': 0,
                 'user_data_handling': self._module.params['user_data_handling'],
@@ -278,12 +306,9 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             if 'status' in response_import:
                 response['import_status'] = response_import['status']
 
-            if 'uuid' in self._module.params and self._module.params['uuid']:
-                if response['uuid'] != self._module.params['uuid']:
-                    response = []
-            elif 'name' in self._module.params and self._module.params['name']:
-                if response['name'] != self._module.params['name']:
-                    response = []
+            if method != 'POST':
+                response = [response]
+                response = self.check_for_uuid(response)
 
             return response, info_import
 
@@ -292,7 +317,11 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             'error_message': 'error_message',
             'url': 'url'
         }
+        if info['status'] not in (200, 201):
+            return [], info
 
+        if isinstance(response_import, dict):
+            response_import = [response_import]
         if isinstance(response, dict):
             # One image is found
             if isinstance(response_import, dict):
@@ -301,6 +330,7 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
                 if response['uuid'] == r['uuid']:
                     for key in copy_keys:
                         response[copy_keys[key]] = r[key]
+            response = [response]
         else:
             # More than one image is found
             for r in response:
@@ -308,6 +338,8 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
                     if r['uuid'] == i['uuid']:
                         for key in copy_keys:
                             r[copy_keys[key]] = i[key]
+
+        response = self.check_for_uuid(response)
         return response, info
 
     def _get(self, api_call):
@@ -320,63 +352,36 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with GET for '
                                    '"%s"' % api_call, fetch_url_info=info)
 
-    def query(self):
+    def _post_or_patch(self, api_call, method, data, filter_none=True):
+        # This helps with tags when we have the full API resource href to update.
 
-        # Initialize
-        self._resource_data = self.init_resource()
+        if data is not None:
+            # Sanitize data dictionary
+            # Deepcopy: Duplicate the data object for iteration, because
+            # iterating an object and changing it at the same time is insecure
+            for k, v in deepcopy(data).items():
+                if filter_none and v is None:
+                    del data[k]
 
-        # Query by UUID
-        uuid = self._module.params[self.resource_key_uuid]
+            data = self._module.jsonify(data)
 
-        if uuid is not None:
+        resp, info = self.fetch_both_urls(api_call,
+                                          method=method,
+                                          data=data)
 
-            # Get image by uuid
-            resource = self._get('%s/%s' % (self.resource_name, uuid))
-
-            updated = False
-            if resource:
-                # Check if slug, tags or user_data_handling needs update
-                for key in ['slug', 'tags', 'user_data_handling']:
-                    if self._module.params[key] is not None:
-                        if self.find_difference(key,
-                                                resource,
-                                                self._module.params[key]):
-                            updated = True
-
-            # Get image import status by uuid
-            if not updated and not self._module.params['state'] == 'absent':
-                resource = self._get('%s/%s' % (self.resource_name, uuid))
-            if isinstance(resource, dict):
-                self._resource_data = resource
-                self._resource_data['state'] = 'present'
-            for r in resource:
-                if isinstance(r, dict):
-                    self._resource_data = r
-                    self._resource_data['state'] = 'present'
-
+        if info['status'] in (200, 201):
+            return resp
+        elif info['status'] == 204:
+            return None
         else:
-            # Get all images
-            resources = self._get('%s' % (self.resource_name))
+            self._module.fail_json(msg='Failure while calling the cloudscale.ch API with %s for '
+                                       '"%s".' % (method, api_call), fetch_url_info=info)
 
-            # Return newest image if at least one is found
-            # and force is not true
-            if len(resources) >= 1 and not self._module.params['force']:
-                if not isinstance(resources, dict):
-                    self._resource_data = sorted(resources,
-                                                 key=lambda
-                                                 item: item['created_at'],
-                                                 reverse=True)[0]
-                else:
-                    self._resource_data = resources
-                self._resource_data['state'] = 'present'
-            # Import new image
-            elif self._module.params['url'] is not None:
-                del self._module.params['force']
-                self._resource_data['state'] = 'absent'
-                self.resource_name += '/import'
-            else:
-                self._module.fail_json(msg="Cannot import a new image without url.")
-        return self.pre_transform(self._resource_data)
+    def _post(self, api_call, data=None):
+        if self._module.params['url']:
+            return self._post_or_patch("%s" % api_call, 'POST', data)
+        else:
+            self._module.fail_json(msg="Cannot import a new image without url.")
 
 
 def main():
@@ -394,12 +399,11 @@ def main():
                    choices=('present', 'absent')),
         zones=dict(type='list', elements='str'),
         source_format=dict(type='str', choices=('raw', )),
-        force=dict(type='bool', default=False, choices=(True, False))
     ))
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_one_of=(('name', 'uuid', 'slug', 'tags'),),
+        required_one_of=(('name', 'uuid'),),
         required_if=(('state', 'absent', ('uuid',)),),
         supports_check_mode=True,
     )
@@ -417,7 +421,6 @@ def main():
             'tags',
             'zones',
             'source_format',
-            'force',
         ],
         resource_update_param_keys=[
             'name',
@@ -430,7 +433,6 @@ def main():
     if module.params['state'] == "absent":
         result = cloudscale_custom_image.absent()
     else:
-        cloudscale_custom_image.resource_name = 'custom-images'
         result = cloudscale_custom_image.present()
     module.exit_json(**result)
 
