@@ -12,12 +12,10 @@
     name: this-image-is-non-existent
     state: absent
   register: delete
-  ignore_errors: true
 - name: Verify Fail delete a non existend custom image by name
   assert:
     that:
-      - delete is failed
-      - delete.msg.startswith('state is absent but all of the following are missing\: uuid')
+      - delete is not changed
 
 - name: Fail import a custom image without url
   cloudscale_ch.cloud.custom_image:
@@ -50,7 +48,7 @@
   register: image1
   retries: 15
   delay: 5
-  until: image1.import_status is defined and image1.import_status == 'success' and image1.name is defined
+  until: image1.import_status == 'success'
 - name: Verify import a custom image and wait for import
   assert:
     that:
@@ -101,7 +99,7 @@
   retries: 15
   delay: 5
   register: import_status
-  until: import_status.import_status is defined and import_status.import_status == 'success' and import_status.name is defined
+  until: import_status.import_status == 'success'
 - name: Verify Wait for import
   assert:
     that:
@@ -192,3 +190,39 @@
   assert:
     that:
       - image_list.json | selectattr("name","search", "{{ cloudscale_resource_prefix }}" ) | list | length == 2
+
+- name: Delete image by uuid
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image1.uuid }}"
+    state: absent
+  register: image1
+- name: Verify delete image by uuid
+  assert:
+    that:
+      - image1 is changed
+      - image1.state == 'absent'
+- name: Delete image by name
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ image2.name }}"
+    state: absent
+  register: image2
+- name: Verify delete image by uuid
+  assert:
+    that:
+      - image2 is changed
+      - image2.state == 'absent'
+
+- name: List all custom images
+  uri:
+    url: 'https://api.cloudscale.ch/v1/custom-images'
+    headers:
+      Authorization: 'Bearer {{ cloudscale_api_token }}'
+    status_code: 200
+  register: image_list
+  until: image_list is not failed
+  retries: 5
+  delay: 3
+- name: Verify that the two custom images of this test run are deleted
+  assert:
+    that:
+      - image_list.json | selectattr("name","search", "{{ cloudscale_resource_prefix }}" ) | list | length == 0

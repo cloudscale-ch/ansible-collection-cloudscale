@@ -86,7 +86,22 @@ EXAMPLES = r'''
   retries: 15
   delay: 5
   register: image
-  until: image.import_status is defined and image.import_status == 'success'
+  until: image.import_status == 'success'
+
+- name: Import custom image and wait until import succeeded
+  cloudscale_ch.cloud.custom_image:
+    name: "My Custom Image"
+    url: https://ubuntu.com/downloads/hirsute.img
+    slug: my-custom-image
+    user_data_handling: extend-cloud-config
+    zones: lpg1
+    tags:
+      project: luna
+    state: present
+  retries: 15
+  delay: 5
+  register: image
+  until: image.import_status == 'success'
 
 - name: Update custom image
   cloudscale_ch.cloud.custom_image:
@@ -101,6 +116,21 @@ EXAMPLES = r'''
   cloudscale_ch.cloud.custom_image:
     uuid: '{{ my_custom_image.uuid }}'
     state: absent
+
+- name: List all custom images
+  uri:
+    url: 'https://api.cloudscale.ch/v1/custom-images'
+    headers:
+      Authorization: 'Bearer {{ cloudscale_api_token }}'
+    status_code: 200
+  register: image_list
+  until: image_list is not failed
+  retries: 5
+  delay: 3
+- name: Search the image list for all images with name 'My Custom Image'
+  assert:
+    that:
+      - image_list.json | selectattr("name","search", "My Custom Image" )
 '''
 
 RETURN = r'''
@@ -404,7 +434,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_one_of=(('name', 'uuid'),),
-        required_if=(('state', 'absent', ('uuid',)),),
         supports_check_mode=True,
     )
 
