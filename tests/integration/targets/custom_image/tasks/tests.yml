@@ -49,6 +49,7 @@
   retries: 15
   delay: 5
   until: image1.import_status == 'success'
+  failed_when: image1.import_status == 'failed'
 - name: Verify import a custom image and wait for import
   assert:
     that:
@@ -74,7 +75,26 @@
       - image.name == "{{ cloudscale_resource_prefix }}-test-image"
       - image.uuid == image1.uuid
 
-- name: Import a custom image
+- name: Import a custom image with bad url
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}-non-existent"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: failed_import
+  ignore_errors: true
+  until: failed_import.import_status == 'failed'
+- name: Verify Fail import a custom image with bad url
+  assert:
+    that:
+      - failed_import.error_message.startswith('Expected HTTP 200, got HTTP 40')
+
+- name: Import a custom image and a failed import with that name exists
   cloudscale_ch.cloud.custom_image:
     name: "{{ cloudscale_resource_prefix }}-test-image2"
     state: present
@@ -100,6 +120,7 @@
   delay: 5
   register: import_status
   until: import_status.import_status == 'success'
+  failed_when: import_status.import_status == 'failed'
 - name: Verify Wait for import
   assert:
     that:
@@ -139,7 +160,7 @@
     that:
       - image.results[0].slug == "ansible-image-slug"
 
-- name: Update tag of a custom image
+- name: Update tags of a custom image
   cloudscale_ch.cloud.custom_image:
     uuid: "{{ item }}"
     tags:
@@ -147,7 +168,7 @@
   register: image
   loop:
     - "{{ image2.uuid }}"
-- name: Verify update tag of a custom image
+- name: Verify update tags of a custom image
   assert:
     that:
       - image is changed
@@ -175,6 +196,24 @@
   assert:
     that:
       - image.results[0].user_data_handling == "extend-cloud-config"
+
+- name: Update slug, tags and user_data_handling of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ item }}"
+    slug: yet-another-slug
+    tags:
+      project: jupiter
+    user_data_handling: 'pass-through'
+  loop:
+    - "{{ image2.uuid }}"
+  register: image
+- name: Verify update slug, tags and user_data_handling of a custom image
+  assert:
+    that:
+      - image is changed
+      - image.results[0].slug == "yet-another-slug"
+      - image.results[0].tags == "project: jupiter"
+      - image.results[0].user_data_handling == "pass-through"
 
 - name: List all custom images
   uri:

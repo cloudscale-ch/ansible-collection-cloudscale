@@ -79,14 +79,16 @@ EXAMPLES = r'''
     tags:
       project: luna
     state: present
+  register: my_custom_image
 
 - name: Wait until import succeeded
   cloudscale_ch.cloud.custom_image:
-    uuid: 11111111-1864-4608-853a-0771b6885a3a
+    uuid: "{{ my_custom_image.uuid }}"
   retries: 15
   delay: 5
   register: image
   until: image.import_status == 'success'
+  failed_when: image.import_status == 'failed'
 
 - name: Import custom image and wait until import succeeded
   cloudscale_ch.cloud.custom_image:
@@ -102,6 +104,7 @@ EXAMPLES = r'''
   delay: 5
   register: image
   until: image.import_status == 'success'
+  failed_when: image.import_status == 'failed'
 
 - name: Update custom image
   cloudscale_ch.cloud.custom_image:
@@ -327,6 +330,12 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             else:
                 response = response_import[0]['custom_image']
                 response_import = response_import[0]
+
+            if (self._module.params['url']
+                    and response_import['url'] != self._module.params['url']
+                    and response_import['status'] == 'failed'):
+                # Don't return a failed import with the same name but a different url
+                return [], info
 
             for key in ['error_message', 'tags', 'url']:
                 response[key] = response_import[key]
