@@ -139,11 +139,9 @@
 
 - name: Update slug of a custom image
   cloudscale_ch.cloud.custom_image:
-    uuid: "{{ item }}"
+    uuid: "{{ image2.uuid }}"
     slug: ansible-image-slug
   register: image
-  loop:
-    - "{{ image2.uuid }}"
 - name: Verify update slug of a custom image
   assert:
     that:
