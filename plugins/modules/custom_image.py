@@ -128,7 +128,7 @@ EXAMPLES = r'''
   register: image_list
 - name: Search the image list for all images with name 'My Custom Image'
   set_fact:
-    my_custom_images: "{{ image_list.json | selectattr("name","search", "My Custom Image" ) }}"
+    my_custom_images: '{{ image_list.json | selectattr("name","search", "My Custom Image" ) }}'
 '''
 
 RETURN = r'''
