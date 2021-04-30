@@ -191,21 +191,19 @@
 
 - name: Update slug, tags and user_data_handling of a custom image
   cloudscale_ch.cloud.custom_image:
-    uuid: "{{ item }}"
+    uuid: "{{ image2.uuid }}"
     slug: yet-another-slug
     tags:
       project: jupiter
     user_data_handling: 'pass-through'
-  loop:
-    - "{{ image2.uuid }}"
   register: image
 - name: Verify update slug, tags and user_data_handling of a custom image
   assert:
     that:
       - image is changed
-      - image.results[0].slug == "yet-another-slug"
-      - image.results[0].tags == "project: jupiter"
-      - image.results[0].user_data_handling == "pass-through"
+      - image.slug == "yet-another-slug"
+      - image.tags == "project: jupiter"
+      - image.user_data_handling == "pass-through"
 
 - name: List all custom images
   uri:
