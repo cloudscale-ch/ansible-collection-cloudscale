@@ -182,9 +182,7 @@
 
 - name: Get custom image with updated user_data_handling
   cloudscale_ch.cloud.custom_image:
-    uuid: "{{ item }}"
-  loop:
-    - "{{ image2.uuid }}"
+    uuid: "{{ image2.uuid }}"
   register: image
 - name: Verify update user_data_handling of a custom image
   assert:
