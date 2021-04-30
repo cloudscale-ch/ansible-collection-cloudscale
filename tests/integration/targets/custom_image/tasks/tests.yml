@@ -150,9 +150,7 @@
 
 - name: Get custom image with updated slug
   cloudscale_ch.cloud.custom_image:
-    uuid: "{{ item }}"
-  loop:
-    - "{{ image2.uuid }}"
+    uuid: "{{ image2.uuid }}"
   register: image
 - name: Verify update slug of a custom image
   assert:
