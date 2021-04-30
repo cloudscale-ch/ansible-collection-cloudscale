@@ -171,11 +171,9 @@
 
 - name: Update user_data_handling of a custom image
   cloudscale_ch.cloud.custom_image:
-    uuid: "{{ item }}"
+    uuid: "{{ image2.uuid }}"
     user_data_handling: 'extend-cloud-config'
   register: image
-  loop:
-    - "{{ image2.uuid }}"
 - name: Verify update user_data_handling of a custom image
   assert:
     that:
