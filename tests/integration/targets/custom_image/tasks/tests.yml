@@ -159,12 +159,10 @@
 
 - name: Update tags of a custom image
   cloudscale_ch.cloud.custom_image:
-    uuid: "{{ item }}"
+    uuid: "{{ image2.uuid }}"
     tags:
       project: luna
   register: image
-  loop:
-    - "{{ image2.uuid }}"
 - name: Verify update tags of a custom image
   assert:
     that:
