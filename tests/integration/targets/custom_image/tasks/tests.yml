@@ -30,6 +30,7 @@
 - name: Verify Fail import a custom image without url
   assert:
     that:
+      - failed_import is failed
       - failed_import.msg.startswith('Cannot import a new image without url.')
 
 - name: Import a custom image and wait for import
