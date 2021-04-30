@@ -167,7 +167,7 @@
   assert:
     that:
       - image is changed
-      - image.results[0].tags == "project: luna"
+      - image.tags == "project: luna"
 
 - name: Update user_data_handling of a custom image
   cloudscale_ch.cloud.custom_image:
