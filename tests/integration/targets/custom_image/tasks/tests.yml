@@ -245,7 +245,7 @@
     that:
       - image1 is changed
       - image1.state == 'absent'
-      
+
 - name: Delete image by name
   cloudscale_ch.cloud.custom_image:
     name: "{{ change_name.name }}"

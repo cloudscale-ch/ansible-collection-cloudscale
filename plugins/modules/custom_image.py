@@ -310,7 +310,7 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             else:
                 response_import = self.check_for_params(response_import, ['name', 'uuid'], subkey='custom_image')
 
-        if ( not response ) and response_import:
+        if (not response) and response_import:
             # A new image is imported or a failed import with no image exists
             ensure_keys = {
                 'created_at': None,
