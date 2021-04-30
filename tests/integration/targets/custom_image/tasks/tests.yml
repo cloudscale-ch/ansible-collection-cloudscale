@@ -131,7 +131,7 @@
   cloudscale_ch.cloud.custom_image:
     name: "{{ cloudscale_resource_prefix }}-test-image2"
   register: image_by_name
-- name: Verify get newest image by name
+- name: Verify get image by name
   assert:
     that:
       - image_by_name is not changed
