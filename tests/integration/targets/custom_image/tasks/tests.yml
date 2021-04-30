@@ -13,7 +13,7 @@
 - name: Verify Fail delete a non existend custom image by name
   assert:
     that:
-      - delete is not changed
+      - delete is failed
 
 - name: Fail import a custom image without url
   cloudscale_ch.cloud.custom_image:
