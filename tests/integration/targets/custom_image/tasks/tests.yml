@@ -2,10 +2,8 @@
 # This test triggers a bug in the api
 #- name: Delete a non existent custom image by uuid
 #  cloudscale_ch.cloud.custom_image:
-#    uuid: "{{ item }}"
+#    uuid: '415caea5-da7c-4aaa-aaaa-ececd38fb8ea'
 #    state: absent
-#  loop:
-#    - '415caea5-da7c-4aaa-aaaa-ececd38fb8ea'
 
 - name: Fail delete a non existent custom image by name
   cloudscale_ch.cloud.custom_image:
