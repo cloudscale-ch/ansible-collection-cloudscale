@@ -148,6 +148,7 @@
   assert:
     that:
       - image is changed
+      - image.slug == 'ansible-image-slug'
 
 - name: Get custom image with updated slug
   cloudscale_ch.cloud.custom_image:
