@@ -43,7 +43,7 @@ options:
       - How user_data will be handled when creating a server. There are
         currently two options, "pass-through" and "extend-cloud-config".
     type: str
-    choices: [ pass-through , extend-cloud-config ]
+    choices: [ pass-through, extend-cloud-config ]
   zones:
     description:
       - Specify zones in which the custom image will be available (e.g. C(lpg1)
@@ -54,7 +54,6 @@ options:
     description:
       - The file format of the image referenced in the url. Currently only raw
         is supported.
-    choices: [ raw ]
     type: str
   tags:
     description:
@@ -124,7 +123,7 @@ EXAMPLES = r'''
   uri:
     url: 'https://api.cloudscale.ch/v1/custom-images'
     headers:
-      Authorization: 'Bearer {{ cloudscale_api_token }}'
+      Authorization: 'Bearer {{ query("env", "CLOUDSCALE_API_TOKEN") }}'
     status_code: 200
   register: image_list
   until: image_list is not failed
@@ -198,8 +197,6 @@ state:
 
 from copy import deepcopy
 
-from time import sleep
-
 from ansible.module_utils.basic import (
     AnsibleModule,
 )
@@ -247,7 +244,7 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
 
     def check_for_uuid(self, resources):
         if 'uuid' in self._module.params and self._module.params['uuid']:
-            res = []
+            res = None
             for r in resources:
                 if r['uuid'] == self._module.params['uuid']:
                     res = r
@@ -313,7 +310,8 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             else:
                 response_import = self.check_for_params(response_import, ['name', 'uuid'], subkey='custom_image')
 
-        if not response and response_import:
+        if ( not response ) and response_import:
+            # A new image is imported or a failed import with no image exists
             ensure_keys = {
                 'created_at': None,
                 'size_gb': 0,
@@ -416,11 +414,11 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             self._module.fail_json(msg='Failure while calling the cloudscale.ch API with %s for '
                                        '"%s".' % (method, api_call), fetch_url_info=info)
 
-    def _post(self, api_call, data=None):
-        if self._module.params['url']:
-            return self._post_or_patch("%s" % api_call, 'POST', data)
-        else:
+    def create(self, resource, data=None):
+        if not self._module.params['url']:
             self._module.fail_json(msg="Cannot import a new image without url.")
+        else:
+            return super(AnsibleCloudscaleCustomImage, self).create(resource, data)
 
 
 def main():
@@ -437,7 +435,7 @@ def main():
         state=dict(type='str', default='present',
                    choices=('present', 'absent')),
         zones=dict(type='list', elements='str'),
-        source_format=dict(type='str', choices=('raw', )),
+        source_format=dict(type='str'),
     ))
 
     module = AnsibleModule(
