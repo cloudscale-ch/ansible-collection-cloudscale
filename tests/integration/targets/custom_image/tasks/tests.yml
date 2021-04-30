@@ -178,6 +178,7 @@
   assert:
     that:
       - image is changed
+      - image.user_data_handling = 'extend-cloud-config'
 
 - name: Get custom image with updated user_data_handling
   cloudscale_ch.cloud.custom_image:
