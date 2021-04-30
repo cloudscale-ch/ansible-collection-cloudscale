@@ -126,13 +126,9 @@ EXAMPLES = r'''
       Authorization: 'Bearer {{ query("env", "CLOUDSCALE_API_TOKEN") }}'
     status_code: 200
   register: image_list
-  until: image_list is not failed
-  retries: 5
-  delay: 3
 - name: Search the image list for all images with name 'My Custom Image'
-  assert:
-    that:
-      - image_list.json | selectattr("name","search", "My Custom Image" )
+  set_fact:
+    my_custom_images: "{{ image_list.json | selectattr("name","search", "My Custom Image" ) }}"
 '''
 
 RETURN = r'''

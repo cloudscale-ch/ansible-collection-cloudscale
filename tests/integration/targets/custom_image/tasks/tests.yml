@@ -292,7 +292,7 @@
       name: "{{ cloudscale_resource_prefix }}-test-image"
       slug: 'custom-ansible-image'
       zones:
-        - 'lpg1'
+        - 'rma1'
       user_data_handling: 'pass-through'
       tags:
         project: 'mars'
@@ -319,12 +319,13 @@
   until: import_status.import_status == 'success'
   failed_when: import_status.import_status == 'failed'
 
-- name: Fail get image by name when two exists
+- name: Fail get image by name when two exist
   cloudscale_ch.cloud.custom_image:
     name: "{{ cloudscale_resource_prefix }}-test-image"
   register: failed_image_by_name
   ignore_errors: true
-- assert:
+- name: Verify Fail get image by name when two exist
+  assert:
     that:
       - failed_image_by_name is failed
       - failed_image_by_name.msg.startswith("More than one custom-images resource with 'name' exists")
