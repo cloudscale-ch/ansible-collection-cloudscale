@@ -91,6 +91,7 @@
 - name: Verify Fail import a custom image with bad url
   assert:
     that:
+      - failed_import is failed
       - failed_import.error_message.startswith('Expected HTTP 200, got HTTP 40')
 
 - name: Import a custom image and a failed import with that name exists
