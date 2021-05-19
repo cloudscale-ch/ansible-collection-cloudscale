@@ -24,6 +24,12 @@ options:
     description:
       - The URL used to download the image.
     type: str
+  force_retry:
+    description:
+      - Retry the image import even if a failed import using the same name and
+        URL already exists. This is necessary to recover from download errors.
+    default: no
+    type: bool
   name:
     description:
       - The human readable name of the custom image. Either name or UUID must
@@ -180,10 +186,15 @@ tags:
   sample: { 'project': 'my project' }
 import_status:
   description: Shows the progress of an import. Values are one of
-    "in_progress", "success" or "error".
+    "started", "in_progress", "success" or "failed".
   returned: success
   type: str
   sample: "in_progress"
+error_message:
+  description: Error message in case of a failed import.
+  returned: success
+  type: str
+  sample: "Expected HTTP 200, got HTTP 403"
 state:
   description: The current status of the custom image.
   returned: success
@@ -191,7 +202,6 @@ state:
   sample: present
 '''
 
-from copy import deepcopy
 
 from ansible.module_utils.basic import (
     AnsibleModule,
@@ -210,212 +220,157 @@ from ansible.module_utils._text import (
 
 class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
 
-    def check_for_params(self, resource, keys, response=None, subkey=None):
-        if isinstance(resource, dict):
-            resource = [resource]
+    def _transform_import_to_image(self, imp):
+        # Create a stub image from the import
+        img = imp.get('custom_image', {})
+        return {
+            'href': img.get('href'),
+            'uuid': imp['uuid'],
+            'name': img.get('name'),
+            'created_at': None,
+            'size_gb': None,
+            'checksums': None,
+            'tags': imp['tags'],
+            'url': imp['url'],
+            'import_status': imp['status'],
+            'error_message': imp.get('error_message', ''),
+            # Even failed image imports are reported as present. This then
+            # represents a failed import resource.
+            'state': 'present',
+            # These fields are not present on the import, assume they are
+            # unchanged from the module parameters
+            'user_data_handling': self._module.params['user_data_handling'],
+            'zones': self._module.params['zones'],
+            'slug': self._module.params['slug'],
+        }
 
-        result = []
-        if response:
-            if isinstance(response, dict):
-                response = [response]
-            for rc in resource:
-                for rp in response:
-                    if rc['uuid'] == rp['uuid']:
-                        result.append(rc)
-        else:
-            for r in resource:
-                for key in keys:
-                    if key in self._module.params and self._module.params[key]:
-                        if subkey and subkey in r:
-                            if key in r[subkey] and r[subkey][key] == self._module.params[key]:
-                                result.append(r)
-                        else:
-                            if key in r and r[key] == self._module.params[key]:
-                                result.append(r)
-                        break
+    # This method can be replaced by calling AnsibleCloudscaleBase._get form
+    # AnsibleCloudscaleCustomImage._get once the API bug is fixed.
+    def _get_url(self, url):
 
-        if len(result) == 1:
-            result = result[0]
-        return result
-
-    def check_for_uuid(self, resources):
-        if 'uuid' in self._module.params and self._module.params['uuid']:
-            res = None
-            for r in resources:
-                if r['uuid'] == self._module.params['uuid']:
-                    res = r
-            return res
-        else:
-            return resources
-
-    def fetch_both_urls(self, api_call, method='GET', data=None):
-        if method == 'GET':
-            headers = self._auth_header
-        else:
-            headers = self._auth_header.copy()
-            headers['Content-type'] = 'application/json'
-
-        # Get image information
-        if self._api_url not in api_call:
-            url = self._api_url + api_call
-        else:
-            url = api_call
         response, info = fetch_url(self._module,
                                    url,
-                                   headers=headers,
-                                   method=method,
-                                   data=data,
+                                   headers=self._auth_header,
+                                   method='GET',
                                    timeout=self._module.params['api_timeout'])
 
-        # Add import to the url
-        if api_call == 'custom-images':
-            api_call = 'custom-images/import'
+        if info['status'] == 200:
+            response = self._module.from_json(
+                to_text(response.read(),
+                        errors='surrogate_or_strict'),
+            )
+        elif info['status'] == 404:
+            # Return None to be compatible with AnsibleCloudscaleBase._get
+            response = None
+        elif info['status'] == 500 and url.startswith(self._api_url + self.resource_name + '/import/'):
+            # Workaround a bug in the cloudscale.ch API which wrongly returns
+            # 500 instead of 404
+            response = None
         else:
-            # api_call is in the form custom-images/uuid and we need to add import in the middle
-            api_call = api_call.replace('/', '/import/')
+            self._module.fail_json(
+                msg='Failure while calling the cloudscale.ch API with GET for '
+                '"%s"' % url,
+                fetch_url_info=info,
+            )
 
-        if self._api_url not in api_call:
-            url = self._api_url + api_call
-        else:
-            url = api_call
-
-        # Get image import information
-        response_import = []
-        if method != 'PATCH':
-            response_import, info_import = fetch_url(self._module,
-                                                     url,
-                                                     method=method,
-                                                     headers=headers,
-                                                     data=data,
-                                                     timeout=self._module.params['api_timeout'])
-
-            if info_import['status'] in (200, 201):
-                response_import = self._module.from_json(to_text(response_import.read(),
-                                                                 errors='surrogate_or_strict'))
-        if info['status'] in (200, 201):
-            response = self._module.from_json(to_text(response.read(), errors='surrogate_or_strict'))
-
-        if response:
-            response = self.check_for_params(response, ['uuid', 'name', 'slug', 'tags'])
-
-        if response_import:
-            if response:
-                response_import = self.check_for_params(response_import,
-                                                        ['uuid', 'name'],
-                                                        response=response)
-            else:
-                response_import = self.check_for_params(response_import, ['name', 'uuid'], subkey='custom_image')
-
-        if (not response) and response_import:
-            # A new image is imported or a failed import with no image exists
-            ensure_keys = {
-                'created_at': None,
-                'size_gb': 0,
-                'checksums': 0,
-                'user_data_handling': self._module.params['user_data_handling'],
-                'zones': self._module.params['zones'],
-                'slug': self._module.params['slug'],
-                'import_status': 'Starting',
-                'state': 'present'
-            }
-
-            if isinstance(response_import, dict):
-                response = response_import['custom_image']
-            else:
-                response = response_import[0]['custom_image']
-                response_import = response_import[0]
-
-            if (self._module.params['url']
-                    and response_import['url'] != self._module.params['url']
-                    and response_import['status'] == 'failed'):
-                # Don't return a failed import with the same name but a different url
-                return [], info
-
-            for key in ['error_message', 'tags', 'url']:
-                response[key] = response_import[key]
-            for key in ensure_keys:
-                response[key] = ensure_keys[key]
-
-            if 'status' in response_import:
-                response['import_status'] = response_import['status']
-
-            if method != 'POST':
-                response = [response]
-                response = self.check_for_uuid(response)
-
-            return response, info_import
-
-        copy_keys = {
-            'status': 'import_status',
-            'error_message': 'error_message',
-            'url': 'url'
-        }
-        if info['status'] not in (200, 201):
-            return [], info
-
-        if isinstance(response_import, dict):
-            response_import = [response_import]
-        if isinstance(response, dict):
-            # One image is found
-            if isinstance(response_import, dict):
-                response_import = [response_import]
-            for r in response_import:
-                if response['uuid'] == r['uuid']:
-                    for key in copy_keys:
-                        response[copy_keys[key]] = r[key]
-            response = [response]
-        else:
-            # More than one image is found
-            for r in response:
-                for i in response_import:
-                    if r['uuid'] == i['uuid']:
-                        for key in copy_keys:
-                            r[copy_keys[key]] = i[key]
-
-        response = self.check_for_uuid(response)
-        return response, info
+        return response
 
     def _get(self, api_call):
-        resp, info = self.fetch_both_urls(api_call)
-        if info['status'] == 200:
-            return resp
-        elif info['status'] == 404:
+
+        # Split api_call into components
+        api_url, call_uuid = api_call.split(self.resource_name)
+
+        # If the api_call does not contain the API URL
+        if not api_url:
+            api_url = self._api_url
+
+        # Fetch image(s) from the regular API endpoint
+        response = self._get_url(api_url + self.resource_name + call_uuid) or []
+
+        # Additionally fetch image(s) from the image import API endpoint
+        response_import = self._get_url(
+            api_url + self.resource_name + '/import' + call_uuid,
+        ) or []
+
+        # No image was found
+        if call_uuid and response == [] and response_import == []:
             return None
+
+        # Convert single image responses (call with UUID) into a list
+        if call_uuid and response:
+            response = [response]
+        if call_uuid and response_import:
+            response_import = [response_import]
+
+        # Transform lists into UUID keyed dicts
+        response = dict([(i['uuid'], i) for i in response])
+        response_import = dict([(i['uuid'], i) for i in response_import])
+
+        # Filter the import list so that successfull and in_progress imports
+        # shadow failed imports
+        response_import_filtered = dict([(k,v) for k,v
+                                         in response_import.items()
+                                         if v['status'] in ('success',
+                                                            'in_progress')])
+        # Only add failed imports if no import with the same name exists
+        # Only add the last failed import in the list (there is no timestamp on
+        # imports)
+        import_names = set([ v['custom_image']['name'] for k,v
+                             in response_import_filtered.items()])
+        for k,v in reversed(response_import.items()):
+            name = v['custom_image']['name']
+            if (v['status'] == 'failed'
+                and name not in import_names):
+                import_names.add(name)
+                response_import_filtered[k] = v
+
+        # Merge import list into image list
+        for uuid, imp in response_import_filtered.items():
+            if uuid in response:
+                # Merge addtional fields only present on the import
+                response[uuid].update(
+                    url=imp['url'],
+                    import_status=imp['status'],
+                    error_message=imp.get('error_message', ''),
+                )
+            else:
+                response[uuid] = self._transform_import_to_image(imp)
+
+        if not call_uuid:
+            return response.values()
         else:
-            self._module.fail_json(msg='Failure while calling the cloudscale.ch API with GET for '
-                                   '"%s"' % api_call, fetch_url_info=info)
+            return next(iter(response.values()))
 
-    def _post_or_patch(self, api_call, method, data, filter_none=True):
-        # This helps with tags when we have the full API resource href to update.
+    def _post(self, api_call, data=None):
+        # Only new image imports are supported, no direct POST call to image
+        # resources are supported by the API
+        assert api_call.endswith('custom-images')
+        # Custom image imports use a different endpoint
+        api_call += '/import'
 
-        if data is not None:
-            # Sanitize data dictionary
-            # Deepcopy: Duplicate the data object for iteration, because
-            # iterating an object and changing it at the same time is insecure
-            for k, v in deepcopy(data).items():
-                if filter_none and v is None:
-                    del data[k]
-
-            data = self._module.jsonify(data)
-
-        resp, info = self.fetch_both_urls(api_call,
-                                          method=method,
-                                          data=data)
-
-        if info['status'] in (200, 201):
-            return resp
-        elif info['status'] == 204:
-            return None
+        if self._module.params['url']:
+            return self._transform_import_to_image(
+                self._post_or_patch("%s" % api_call, 'POST', data),
+            )
         else:
-            self._module.fail_json(msg='Failure while calling the cloudscale.ch API with %s for '
-                                       '"%s".' % (method, api_call), fetch_url_info=info)
-
-    def create(self, resource, data=None):
-        if not self._module.params['url']:
             self._module.fail_json(msg="Cannot import a new image without url.")
-        else:
-            return super(AnsibleCloudscaleCustomImage, self).create(resource, data)
 
+    def present(self):
+        resource = self.query()
+
+        if resource['state'] == "absent":
+            resource = self.create(resource)
+        else:
+            # If this is a failed upload and the URL changed or the "force_retry"
+            # parameter is used, create a new image import.
+            if (resource.get('import_status') == 'failed'
+                and (resource['url'] != self._module.params['url']
+                     or self._module.params['force_retry'])):
+                resource = self.create(resource)
+            else:
+                resource = self.update(resource)
+
+        return self.get_result(resource)
 
 def main():
     argument_spec = cloudscale_argument_spec()
@@ -423,6 +378,7 @@ def main():
         name=dict(type='str'),
         slug=dict(type='str'),
         url=dict(type='str'),
+        force_retry=dict(type='bool', default=False),
         user_data_handling=dict(type='str',
                                 choices=('pass-through',
                                          'extend-cloud-config')),

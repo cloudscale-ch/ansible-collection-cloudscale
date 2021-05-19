@@ -101,6 +101,52 @@
       - failed_import is failed
       - failed_import.error_message.startswith('Expected HTTP 200, got HTTP 40')
 
+- name: Import a custom image with bad url (idempotency)
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}-non-existent"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: failed_import_idempotency
+  ignore_errors: true
+  retries: 15
+  delay: 5
+  until: failed_import_idempotency.import_status == 'failed'
+  failed_when: failed_import_idempotency.import_status == 'failed'
+- name: Verify Fail import a custom image with bad url (idempotency)
+  assert:
+    that:
+      - failed_import_idempotency is failed
+      - failed_import_idempotency.error_message.startswith('Expected HTTP 200, got HTTP 40')
+      - failed_import.uuid == failed_import_idempotency.uuid
+
+# This task should not loop like the ones above because otherwise each
+# invocation in the loop will create a new import because of the "force_retry"
+# parameter. It just check that a new import is created everything else is
+# already covered above.
+- name: Import a custom image with bad url (retry)
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}-non-existent"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+    force_retry: true
+  register: failed_import_retry
+- name: Verify Fail import a custom image with bad url (retry)
+  assert:
+    that:
+      - failed_import.uuid != failed_import_retry.uuid
+
 - name: Import a custom image and a failed import with that name exists
   cloudscale_ch.cloud.custom_image:
     name: "{{ cloudscale_resource_prefix }}-test-image2"
