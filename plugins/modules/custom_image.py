@@ -317,7 +317,7 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
         # imports)
         import_names = set([ v['custom_image']['name'] for k,v
                              in response_import_filtered.items()])
-        for k,v in reversed(response_import.items()):
+        for k,v in reversed(list(response_import.items())):
             name = v['custom_image']['name']
             if (v['status'] == 'failed'
                 and name not in import_names):
