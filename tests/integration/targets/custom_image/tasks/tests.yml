@@ -1,0 +1,377 @@
+---
+- name: Delete a non existent custom image by uuid
+  cloudscale_ch.cloud.custom_image:
+    uuid: '415caea5-da7c-4aaa-aaaa-ececd38fb8ea'
+    state: absent
+  register: delete
+- name: Verify Delete a non existent custom image by uuid
+  assert:
+    that:
+      - delete.changed is false
+
+- name: Fail delete a non existent custom image by name
+  cloudscale_ch.cloud.custom_image:
+    name: this-image-is-non-existent
+    state: absent
+  register: delete
+- name: Verify Fail delete a non existend custom image by name
+  assert:
+    that:
+      - delete.changed is false
+
+- name: Fail import a custom image without url
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: failed_import
+  ignore_errors: true
+- name: Verify Fail import a custom image without url
+  assert:
+    that:
+      - failed_import is failed
+      - failed_import.msg.startswith('Cannot import a new image without url.')
+
+- name: Import a custom image and wait for import
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: image1
+  retries: 15
+  delay: 5
+  until: image1.import_status == 'success'
+  failed_when: image1.import_status == 'failed'
+- name: Verify import a custom image and wait for import
+  assert:
+    that:
+      - image1.import_status == 'success'
+      - image1.name == "{{ cloudscale_resource_prefix }}-test-image"
+
+- name: Import a custom image (idempotency)
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: image
+- name: Verify import a custom image (idempotency)
+  assert:
+    that:
+      - image is not changed
+      - image.name == "{{ cloudscale_resource_prefix }}-test-image"
+      - image.uuid == image1.uuid
+
+- name: Import a custom image with bad url
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}-non-existent"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: failed_import
+  ignore_errors: true
+  retries: 15
+  delay: 5
+  until: failed_import.import_status == 'failed'
+  failed_when: failed_import.import_status == 'failed'
+- name: Verify Fail import a custom image with bad url
+  assert:
+    that:
+      - failed_import is failed
+      - failed_import.error_message.startswith('Expected HTTP 200, got HTTP 40')
+
+- name: Import a custom image with bad url (idempotency)
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}-non-existent"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: failed_import_idempotency
+  ignore_errors: true
+  retries: 15
+  delay: 5
+  until: failed_import_idempotency.import_status == 'failed'
+  failed_when: failed_import_idempotency.import_status == 'failed'
+- name: Verify Fail import a custom image with bad url (idempotency)
+  assert:
+    that:
+      - failed_import_idempotency is failed
+      - failed_import_idempotency.error_message.startswith('Expected HTTP 200, got HTTP 40')
+      - failed_import.uuid == failed_import_idempotency.uuid
+
+# This task should not loop like the ones above because otherwise each
+# invocation in the loop will create a new import because of the "force_retry"
+# parameter. It just check that a new import is created everything else is
+# already covered above.
+- name: Import a custom image with bad url (retry)
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}-non-existent"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+    force_retry: true
+  register: failed_import_retry
+- name: Verify Fail import a custom image with bad url (retry)
+  assert:
+    that:
+      - failed_import.uuid != failed_import_retry.uuid
+
+- name: Import a custom image and a failed import with that name exists
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: image2
+- name: Verify import a custom image
+  assert:
+    that:
+      - image2 is changed
+      - image2.name == "{{ cloudscale_resource_prefix }}-test-image2"
+      - image2.uuid != image1.uuid
+
+- name: Wait for import
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+  retries: 15
+  delay: 5
+  register: import_status
+  until: import_status.import_status == 'success'
+  failed_when: import_status.import_status == 'failed'
+- name: Verify Wait for import
+  assert:
+    that:
+      - import_status is not changed
+      - import_status.name == "{{ cloudscale_resource_prefix }}-test-image2"
+
+- name: Get image by name
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image2"
+  register: image_by_name
+- name: Verify get image by name
+  assert:
+    that:
+      - image_by_name is not changed
+      - image_by_name.uuid == image2.uuid
+
+- name: Change the name of an image
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image-with-a-new-name"
+    uuid: "{{ image2.uuid }}"
+  register: change_name
+- name: Verify Change the name of an image
+  assert:
+    that:
+      - change_name.name == "{{ cloudscale_resource_prefix }}-test-image-with-a-new-name"
+      - change_name is changed
+
+- name: Update slug of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+    slug: ansible-image-slug
+  register: image
+- name: Verify update slug of a custom image
+  assert:
+    that:
+      - image is changed
+      - image.slug == 'ansible-image-slug'
+
+- name: Get custom image with updated slug
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+  register: image
+- name: Verify update slug of a custom image
+  assert:
+    that:
+      - image.slug == "ansible-image-slug"
+
+- name: Update tags of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+    tags:
+      project: luna
+  register: image
+- name: Verify update tags of a custom image
+  assert:
+    that:
+      - image is changed
+      - image.tags == "project: luna"
+
+- name: Update user_data_handling of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+    user_data_handling: 'extend-cloud-config'
+  register: image
+- name: Verify update user_data_handling of a custom image
+  assert:
+    that:
+      - image is changed
+      - image.user_data_handling == 'extend-cloud-config'
+
+- name: Get custom image with updated user_data_handling
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+  register: image
+- name: Verify update user_data_handling of a custom image
+  assert:
+    that:
+      - image.user_data_handling == "extend-cloud-config"
+
+- name: Update slug, tags and user_data_handling of a custom image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.uuid }}"
+    slug: yet-another-slug
+    tags:
+      project: jupiter
+    user_data_handling: 'pass-through'
+  register: image
+- name: Verify update slug, tags and user_data_handling of a custom image
+  assert:
+    that:
+      - image is changed
+      - image.slug == "yet-another-slug"
+      - image.tags == "project: jupiter"
+      - image.user_data_handling == "pass-through"
+
+- name: List all custom images, there should be two
+  uri:
+    url: 'https://api.cloudscale.ch/v1/custom-images'
+    headers:
+      Authorization: 'Bearer {{ cloudscale_api_token }}'
+    status_code: 200
+  register: image_list
+- name: Verify that two custom images are created by this test run
+  assert:
+    that:
+      - image_list.json | selectattr("name","search", "{{ cloudscale_resource_prefix }}" ) | list | length == 2
+
+- name: Delete image by uuid
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image1.uuid }}"
+    state: absent
+  register: image1
+- name: Verify delete image by uuid
+  assert:
+    that:
+      - image1 is changed
+      - image1.state == 'absent'
+
+- name: Delete image by name
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ change_name.name }}"
+    state: absent
+  register: image2
+- name: Verify delete image by name
+  assert:
+    that:
+      - image2 is changed
+      - image2.state == 'absent'
+- name: Check if all images got deleted
+  uri:
+    url: 'https://api.cloudscale.ch/v1/custom-images'
+    headers:
+      Authorization: 'Bearer {{ cloudscale_api_token }}'
+    status_code: 200
+  register: image_list
+- name: Verify that the two custom images of this test run are deleted
+  assert:
+    that:
+      - image_list.json | selectattr("name","search", "{{ cloudscale_resource_prefix }}" ) | list | length == 0
+
+- name: Import a custom image
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+    state: present
+    slug: custom-ansible-image
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    tags:
+      project: mars
+    source_format: raw
+  register: image1
+
+- name: Import a custom for the second time (uri module)
+  uri:
+    url: 'https://api.cloudscale.ch/v1/custom-images/import'
+    method: POST
+    headers:
+      Authorization: 'Bearer {{ cloudscale_api_token }}'
+    body:
+      url: "{{ image_url }}"
+      name: "{{ cloudscale_resource_prefix }}-test-image"
+      slug: 'custom-ansible-image'
+      zones:
+        - 'rma1'
+      user_data_handling: 'pass-through'
+      tags:
+        project: 'mars'
+      source_format: 'raw'
+    body_format: json
+    status_code: 201
+  register: image2
+
+- name: Wait for import of first image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image1.uuid }}"
+  retries: 15
+  delay: 5
+  register: import_status
+  until: import_status.import_status == 'success'
+  failed_when: import_status.import_status == 'failed'
+
+- name: Wait for import of second image
+  cloudscale_ch.cloud.custom_image:
+    uuid: "{{ image2.json.uuid }}"
+  retries: 15
+  delay: 5
+  register: import_status
+  until: import_status.import_status == 'success'
+  failed_when: import_status.import_status == 'failed'
+
+- name: Fail get image by name when two exist
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image"
+  register: failed_image_by_name
+  ignore_errors: true
+- name: Verify Fail get image by name when two exist
+  assert:
+    that:
+      - failed_image_by_name is failed
+      - failed_image_by_name.msg.startswith("More than one custom-images resource with 'name' exists")

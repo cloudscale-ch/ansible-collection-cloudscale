@@ -1,0 +1,7 @@
+---
+- block:
+    - import_tasks: tests.yml
+  always:
+    - import_role:
+        name: common
+        tasks_from: cleanup_custom_images
