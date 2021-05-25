@@ -68,3 +68,18 @@ releases:
     - deprecate-server_uuids-volume-module.yml
     - rename-server_uuids-parameter-to-servers.yml
     release_date: '2021-02-04'
+  2.2.0:
+    changes:
+      major_changes:
+      - Add custom_image module
+      minor_changes:
+      - Increase api_timeout to 45
+      - Read CLOUDSCALE_API_TIMEOUT environment variable
+    fragments:
+    - add-custom-image-module.yml
+    - increase-api-timeout-and-use-env.yml
+    modules:
+    - description: Manage custom images on the cloudscale.ch IaaS service
+      name: custom_image
+      namespace: ''
+    release_date: '2021-05-25'

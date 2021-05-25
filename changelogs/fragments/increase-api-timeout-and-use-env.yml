@@ -1,3 +1,0 @@
-minor_changes:
-    - Increase api_timeout to 45
-    - Read CLOUDSCALE_API_TIMEOUT environment variable

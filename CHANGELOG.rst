@@ -5,6 +5,20 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.2.0
+======
+
+Minor Changes
+-------------
+
+- Increase api_timeout to 45
+- Read CLOUDSCALE_API_TIMEOUT environment variable
+
+New Modules
+-----------
+
+- custom_image - Manage custom images on the cloudscale.ch IaaS service
+
 v2.1.0
 ======
 
