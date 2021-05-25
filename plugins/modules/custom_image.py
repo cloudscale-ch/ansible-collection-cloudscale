@@ -18,6 +18,7 @@ notes:
   - To import a new custom-image the I(url) and I(name) options are required.
 author:
   - Ciril Troxler (@ctx)
+  - Gaudenz Steinlin (@gaudenz)
 version_added: 2.2.0
 options:
   url:
@@ -38,7 +39,7 @@ options:
   uuid:
     description:
       - The unique identifier of the custom image import. Either name or UUID
-        must be present to change an existing image
+        must be present to change an existing image.
     type: str
   slug:
     description:
