@@ -308,19 +308,18 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
 
         # Filter the import list so that successfull and in_progress imports
         # shadow failed imports
-        response_import_filtered = dict([(k,v) for k,v
+        response_import_filtered = dict([(k, v) for k, v
                                          in response_import.items()
                                          if v['status'] in ('success',
                                                             'in_progress')])
         # Only add failed imports if no import with the same name exists
         # Only add the last failed import in the list (there is no timestamp on
         # imports)
-        import_names = set([ v['custom_image']['name'] for k,v
-                             in response_import_filtered.items()])
-        for k,v in reversed(list(response_import.items())):
+        import_names = set([v['custom_image']['name'] for k, v
+                           in response_import_filtered.items()])
+        for k, v in reversed(list(response_import.items())):
             name = v['custom_image']['name']
-            if (v['status'] == 'failed'
-                and name not in import_names):
+            if (v['status'] == 'failed' and name not in import_names):
                 import_names.add(name)
                 response_import_filtered[k] = v
 
@@ -344,7 +343,8 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
     def _post(self, api_call, data=None):
         # Only new image imports are supported, no direct POST call to image
         # resources are supported by the API
-        assert api_call.endswith('custom-images')
+        if not api_call.endswith('custom-images'):
+            self._module.fail_json(msg="Error: Bad api_call URL.")
         # Custom image imports use a different endpoint
         api_call += '/import'
 
@@ -371,6 +371,7 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
                 resource = self.update(resource)
 
         return self.get_result(resource)
+
 
 def main():
     argument_spec = cloudscale_argument_spec()
