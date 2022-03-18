@@ -40,8 +40,7 @@ To use a module from cloudscale.ch collection, please reference the full namespa
         name: web1
         image: debian-10
         flavor: flex-2
-        ssh_keys:
-          - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
+        ssh_keys: ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
         server_groups: web-group
         zone: lpg1
         api_token: ...
@@ -60,8 +59,7 @@ Or you can add full namepsace and collection name in the `collections` element:
         name: web1
         image: debian-10
         flavor: flex-2
-        ssh_keys:
-          - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
+        ssh_keys: ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
         server_groups: web-group
         zone: lpg1
         api_token: ...

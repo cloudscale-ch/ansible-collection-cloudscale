@@ -11,8 +11,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     zone: '{{ cloudscale_test_zone }}'
     tags:
@@ -32,8 +31,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     zone: '{{ cloudscale_test_zone }}'
     tags:
@@ -57,8 +55,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     zone: '{{ cloudscale_test_zone }}'
     tags:
@@ -82,8 +79,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     tags:
       project: ansible-test
@@ -106,8 +102,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     tags:
       project: ansible-test
@@ -129,8 +124,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     tags:
       project: ansible-test
@@ -152,8 +146,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
   register: server
 - name: Verify update tags idempotence
@@ -171,8 +164,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     tags: {}
   register: server
@@ -189,8 +181,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     tags: {}
   register: server
@@ -207,8 +198,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: no
   register: server
   check_mode: yes
@@ -225,8 +215,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: no
   register: server
 - name: Verify update flavor of a running server without force
@@ -242,8 +231,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: no
   register: server
 - name: Verify update flavor of a running server without force idempotence
@@ -260,8 +248,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: no
   register: server
   check_mode: yes
@@ -279,8 +266,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: no
   register: server
 - name: Verify update flavor and name of a running server without force
@@ -297,8 +283,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: no
   register: server
 - name: Verify update flavor and name of a running server without force idempotence
@@ -314,8 +299,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: yes
   register: server
   check_mode: yes
@@ -332,8 +316,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: yes
   register: server
 - name: Verify update flavor of a running server with force
@@ -349,8 +332,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     flavor: '{{ cloudscale_test_flavor_2 }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     force: yes
   register: server
 - name: Verify update flavor of a running server with force idempotence
@@ -370,8 +352,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     zone: '{{ cloudscale_test_zone }}'
     use_public_network: no
@@ -390,8 +371,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     zone: '{{ cloudscale_test_zone }}'
     use_public_network: no
@@ -413,8 +393,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-1'
     zone: '{{ cloudscale_test_zone }}'
     use_public_network: no
@@ -436,8 +415,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-stopped'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     server_groups: '{{ cloudscale_resource_prefix }}-group-2'
     use_public_network: no
     use_private_network: yes
@@ -549,8 +527,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     state: stopped
   register: server
   check_mode: yes
@@ -568,8 +545,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     state: stopped
   register: server
 - name: Verify update a stopped server without force
@@ -586,8 +562,7 @@
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     state: stopped
   register: server
 - name: Verify update a stopped server idempotence
@@ -719,8 +694,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-interface'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     zone: '{{ cloudscale_test_zone }}'
     state: running
     interfaces:
@@ -738,8 +712,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-interface'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     zone: '{{ cloudscale_test_zone }}'
     state: running
     interfaces:
@@ -757,8 +730,7 @@
     name: '{{ cloudscale_resource_prefix }}-test-interface'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
     zone: '{{ cloudscale_test_zone }}'
     state: running
     interfaces:

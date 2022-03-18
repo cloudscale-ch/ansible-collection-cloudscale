@@ -5,6 +5,5 @@
     flavor: '{{ cloudscale_test_flavor }}'
     zone: '{{ cloudscale_test_zone }}'
     image: '{{ cloudscale_test_image }}'
-    ssh_keys:
-      - '{{ cloudscale_test_ssh_key }}'
+    ssh_keys: '{{ cloudscale_test_ssh_key }}'
   register: server
