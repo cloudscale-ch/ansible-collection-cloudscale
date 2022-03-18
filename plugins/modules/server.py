@@ -143,7 +143,8 @@ EXAMPLES = '''
     name: my-shiny-cloudscale-server
     image: debian-10
     flavor: flex-4
-    ssh_keys: ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     server_groups: shiny-group
     zone: lpg1
     use_private_network: True
@@ -156,7 +157,8 @@ EXAMPLES = '''
     name: my-other-shiny-server
     image: ubuntu-16.04
     flavor: flex-8
-    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     server_groups: shiny-group
     zone: lpg1
     api_token: xxxxxx
@@ -168,7 +170,8 @@ EXAMPLES = '''
     image: debian-10
     flavor: flex-8
     force: yes
-    ssh_keys: ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     use_private_network: True
     bulk_volume_size_gb: 100
     api_token: xxxxxx
@@ -194,7 +197,8 @@ EXAMPLES = '''
     name: my-cloudscale-server-with-ssh-key
     image: debian-10
     flavor: flex-4
-    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
   register: server
   until: server is not failed
@@ -211,7 +215,8 @@ EXAMPLES = '''
     name: my-cloudscale-server-with-two-network-interfaces
     image: debian-10
     flavor: flex-4
-    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
     interfaces:
       - network: 'public'
@@ -224,7 +229,8 @@ EXAMPLES = '''
     name: my-cloudscale-server-with-specific-address
     image: debian-10
     flavor: flex-4
-    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
     interfaces:
       - addresses:
@@ -241,7 +247,8 @@ EXAMPLES = '''
     name: my-cloudscale-server-with-specific-address
     image: debian-10
     flavor: flex-4
-    ssh_keys: ssh-rsa XXXXXXXXXXX ansible@cloudscale
+    ssh_keys:
+      - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
     interfaces:
       - network: 'public'
