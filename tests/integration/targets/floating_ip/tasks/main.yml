@@ -6,7 +6,8 @@
         name: '{{ cloudscale_resource_prefix }}-test01'
         flavor: '{{ cloudscale_test_flavor }}'
         image: '{{ cloudscale_test_image }}'
-        ssh_keys: '{{ cloudscale_test_ssh_key }}'
+        ssh_keys:
+          - '{{ cloudscale_test_ssh_key }}'
         zone: '{{ cloudscale_test_zone }}'
       register: test01
 
@@ -15,7 +16,8 @@
         name: '{{ cloudscale_resource_prefix }}-test02'
         flavor: '{{ cloudscale_test_flavor }}'
         image: '{{ cloudscale_test_image }}'
-        ssh_keys: '{{ cloudscale_test_ssh_key }}'
+        ssh_keys:
+          - '{{ cloudscale_test_ssh_key }}'
         zone: '{{ cloudscale_test_zone }}'
       register: test02
 
