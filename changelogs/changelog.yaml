@@ -83,3 +83,8 @@ releases:
       name: custom_image
       namespace: ''
     release_date: '2021-05-25'
+  2.2.1:
+    changes:
+      minor_changes:
+      - 'Updated documentation: ``ssh_keys`` is a YAML list, not a string.'
+    release_date: '2022-03-21'

@@ -5,8 +5,21 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.2.1
+======
+
+Minor Changes
+-------------
+
+- Updated documentation: ``ssh_keys`` is a YAML list, not a string.
+
 v2.2.0
 ======
+
+Major Changes
+-------------
+
+- Add custom_image module
 
 Minor Changes
 -------------
