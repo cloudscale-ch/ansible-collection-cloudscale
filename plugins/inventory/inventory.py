@@ -9,7 +9,6 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 name: inventory
-plugin_type: inventory
 author:
   - Gaudenz Steinlin (@gaudenz)
 short_description: cloudscale.ch inventory source
