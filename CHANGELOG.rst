@@ -5,6 +5,14 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.2.2
+======
+
+Minor Changes
+-------------
+
+- Fixed inventory documentation.
+
 v2.2.1
 ======
 
