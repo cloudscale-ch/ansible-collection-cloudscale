@@ -53,7 +53,7 @@ options:
     type: str
   zone:
     description:
-      - Zone in which the volume resides (e.g. C(lgp1) or C(rma1)). Cannot be
+      - Zone in which the volume resides (e.g. C(lpg1) or C(rma1)). Cannot be
         changed after creating the volume. Defaults to the project default zone.
     type: str
   servers:
