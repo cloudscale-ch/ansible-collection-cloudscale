@@ -59,7 +59,7 @@ options:
     default: regional
   region:
     description:
-      - Region in which the floating IP resides (e.g. C(lgp) or C(rma)).
+      - Region in which the floating IP resides (e.g. C(lpg) or C(rma)).
         If omitted, the region of the project default zone is used.
         This parameter must be omitted if I(type) is set to C(global).
     type: str

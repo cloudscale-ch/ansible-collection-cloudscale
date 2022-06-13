@@ -52,7 +52,7 @@ options:
     type: str
   zone:
     description:
-      - Zone in which the server resides (e.g. C(lgp1) or C(rma1)).
+      - Zone in which the server resides (e.g. C(lpg1) or C(rma1)).
     type: str
   volume_size_gb:
     description:

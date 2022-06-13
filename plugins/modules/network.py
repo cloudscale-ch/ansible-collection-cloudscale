@@ -40,7 +40,7 @@ options:
     type: bool
   zone:
     description:
-      - Zone slug of the network (e.g. C(lgp1) or C(rma1)).
+      - Zone slug of the network (e.g. C(lpg1) or C(rma1)).
     type: str
   state:
     description:
