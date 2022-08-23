@@ -29,7 +29,7 @@ ansible-galaxy collection install cloudscale_ch.cloud --force
 
 ### Playbooks
 
-To use a module from cloudscale.ch collection, please reference the full namespace, collection name, and modules name that you want to use:
+To use a module from the cloudscale.ch collection, please reference the full namespace, collection name, and modules name that you want to use:
 
 ```yaml
 ---
@@ -47,7 +47,7 @@ To use a module from cloudscale.ch collection, please reference the full namespa
         api_token: ...
 ```
 
-Or you can add full namepsace and collection name in the `collections` element:
+Or you can add the full namespace and collection name in the `collections` element:
 
 ```yaml
 ---
@@ -69,11 +69,11 @@ Or you can add full namepsace and collection name in the `collections` element:
 
 ### Roles
 
-For existing Ansible roles, please also reference the full namespace, collection name, and modules name which used in tasks instead of just modules name.
+For existing Ansible roles, please also reference the full namespace, collection name, and modules name that are used in tasks instead of just modules name.
 
 ### Plugins
 
-To use a pluign, please reference the full namespace, collection name, and plugins name that you want to use:
+To use a plugin, please reference the full namespace, collection name, and plugins name that you want to use:
 
 ```yaml
 plugin: cloudscale_ch.cloud.<myplugin>
@@ -83,7 +83,7 @@ plugin: cloudscale_ch.cloud.<myplugin>
 
 There are many ways in which you can participate in the project, for example:
 
-- Submit bugs and feature requests, and help us verify as they are checked in
+- Submit bugs and feature requests, and help us verify them as they are checked in
 - Review source code changes
 - Review the documentation and make pull requests for anything from typos to new content
 - If you are interested in fixing issues and contributing directly to the code base, please see the [CONTRIBUTING](CONTRIBUTING.md) document.
@@ -104,7 +104,7 @@ antsibull-changelog release
 ```
 git commit -m "Release version X.Y.Z" galaxy.yml CHANGELOG.rst changelogs/
 ```
-4. Tag the release. Preferably create GPG signed tag if you have a GPG
+4. Tag the release. Preferably create a GPG signed tag if you have a GPG
 key. Version tags should be prefixed with "v" (otherwise the
 integration tests won't run automatically).
 ```
