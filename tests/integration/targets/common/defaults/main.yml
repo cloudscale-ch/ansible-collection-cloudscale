@@ -6,7 +6,7 @@ cloudscale_test_image: 'debian-10'
 cloudscale_alt_test_image: 'ubuntu-20.04'
 
 # The flavor to use for test servers
-cloudscale_test_flavor: 'flex-2'
+cloudscale_test_flavor: 'flex-4-2'
 
 # SSH key to use for test servers
 cloudscale_test_ssh_key: |
