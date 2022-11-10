@@ -1,0 +1,2 @@
+minor_changes:
+  - Streamlined the flavors to the new format ``flex-y-x`` across the related modules and tests.
