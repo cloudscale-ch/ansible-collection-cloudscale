@@ -142,7 +142,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-shiny-cloudscale-server
     image: debian-10
-    flavor: flex-4
+    flavor: flex-4-4
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     server_groups: shiny-group
@@ -156,7 +156,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-other-shiny-server
     image: ubuntu-16.04
-    flavor: flex-8
+    flavor: flex-8-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     server_groups: shiny-group
@@ -168,7 +168,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-shiny-cloudscale-server
     image: debian-10
-    flavor: flex-8
+    flavor: flex-8-2
     force: yes
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -196,7 +196,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-ssh-key
     image: debian-10
-    flavor: flex-4
+    flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
@@ -214,7 +214,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-two-network-interfaces
     image: debian-10
-    flavor: flex-4
+    flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
@@ -228,7 +228,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-specific-address
     image: debian-10
-    flavor: flex-4
+    flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
@@ -246,7 +246,7 @@ EXAMPLES = '''
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-specific-address
     image: debian-10
-    flavor: flex-4
+    flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     api_token: xxxxxx
@@ -281,7 +281,7 @@ flavor:
   description: The flavor that has been used for this server
   returned: success when not state == absent
   type: dict
-  sample: { "slug": "flex-4", "name": "Flex-4", "vcpu_count": 2, "memory_gb": 4 }
+  sample: { "slug": "flex-4-2", "name": "Flex-4-2", "vcpu_count": 2, "memory_gb": 4 }
 image:
   description: The image used for booting this server
   returned: success when not state == absent
