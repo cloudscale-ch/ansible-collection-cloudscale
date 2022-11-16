@@ -95,3 +95,15 @@ releases:
     fragments:
     - fix-sanity.yml
     release_date: '2022-05-21'
+  2.2.3:
+    changes:
+      minor_changes:
+      - Fixed a typo in region code.
+      - Fixed various documentation typos.
+      - Streamlined the flavors to the new format ``flex-y-x`` across the related
+        modules and tests.
+    fragments:
+    - 76-region-typos.yml
+    - 78-various-typos.yml
+    - 79-flavor-format.yml
+    release_date: '2022-11-16'

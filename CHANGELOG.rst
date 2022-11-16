@@ -5,6 +5,16 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.2.3
+======
+
+Minor Changes
+-------------
+
+- Fixed a typo in region code.
+- Fixed various documentation typos.
+- Streamlined the flavors to the new format ``flex-y-x`` across the related modules and tests.
+
 v2.2.2
 ======
 
