@@ -2,106 +2,106 @@ name: Collection Integration tests
 
 on:
   schedule:
-  - cron: '0 5 * * *'  # UTC
+    - cron: "0 5 * * *" # UTC
   push:
-    tags: 'v*'
-
+    tags: "v*"
+    branches:
+      - "test/**"
 jobs:
   integration-test:
     name: Integration test using Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: ansible_collections/cloudscale_ch/cloud
     strategy:
-      fail-fast: false
       max-parallel: 1
+      fail-fast: false
       matrix:
-        runner-python-version:
-        - 3.6
-        python-version:
-        - 3.6
-        - 2.7
+        ansible:
+          - stable-2.14
+        python:
+          - 3.10
     steps:
-    - name: Check out code
-      uses: actions/checkout@v3
-      with:
-        path: ansible_collections/cloudscale_ch/cloud
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          path: ansible_collections/cloudscale_ch/cloud
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install ansible and collection dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install ansible
-        pip install -r tests/requirements.txt
+      - name: Install ansible and collection dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+          pip install -r tests/requirements.txt
 
-    - name: Build and install collection
-      run: |
-        ansible-galaxy collection build .
-        ansible-galaxy collection install *.gz
+      - name: Build and install collection
+        run: |
+          ansible-galaxy collection build .
+          ansible-galaxy collection install *.gz
 
-    - name: Add config file
-      env:
-        CONFIG_FILE: ${{ secrets.CONFIG_FILE }}
-        INI_FILE: tests/integration/cloud-config-cloudscale.ini
-      run: |
-        echo -n "$CONFIG_FILE" > $INI_FILE && [ -s $INI_FILE ] || (>&2 echo no secrets provided; exit 1)
+      - name: Add config file
+        env:
+          CONFIG_FILE: ${{ secrets.CONFIG_FILE }}
+          INI_FILE: tests/integration/cloud-config-cloudscale.ini
+        run: |
+          echo -n "$CONFIG_FILE" > $INI_FILE && [ -s $INI_FILE ] || (>&2 echo no secrets provided; exit 1)
 
-    - name: Ensure no other integration test is currently running
-      uses: softprops/turnstyle@v1
-      timeout-minutes: 60
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        same-branch-only: false
+      - name: Ensure no other integration test is currently running
+        uses: softprops/turnstyle@v1
+        timeout-minutes: 60
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          same-branch-only: false
 
-    - name: Run the tests
-      run: >-
-        ansible-test
-        integration
-        --docker
-        -v
-        --diff
-        --color
-        --allow-unsupported
-        --continue-on-error
-        --coverage
-        cloud/cloudscale/
+      - name: Run the tests
+        run: >-
+          ansible-test
+          integration
+          --docker
+          -v
+          --diff
+          --color
+          --allow-unsupported
+          --continue-on-error
+          --coverage
+          cloud/cloudscale/
 
-    - name: Generate coverage report.
-      run: >-
-        ansible-test
-        coverage xml
-        -v
-        --requirements
-        --group-by command
-        --group-by version
+      - name: Generate coverage report.
+        run: >-
+          ansible-test
+          coverage xml
+          -v
+          --requirements
+          --group-by command
+          --group-by version
 
-    - uses: codecov/codecov-action@v3
-      with:
-        fail_ci_if_error: false
+      - uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: false
 
-    - name: Send mail in case of failure
-      id: send_mail
-      if: ${{ failure() && github.event_name == 'schedule' }}
-      shell: python3 {0}
-      run: |
-        from smtplib import SMTP
-        from email.message import EmailMessage
+      - name: Send mail in case of failure
+        id: send_mail
+        if: ${{ failure() && github.event_name == 'schedule' }}
+        shell: python3 {0}
+        run: |
+          from smtplib import SMTP
+          from email.message import EmailMessage
 
-        email = EmailMessage()
-        email['TO'] = '${{ secrets.CRON_RCPT }}'
-        email['FROM'] = 'noreply@github.com'
-        email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
-        email.set_content("""
-        Integration tests using Python ${{ matrix.python-version }} failed:
-        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        """)
+          email = EmailMessage()
+          email['TO'] = '${{ secrets.CRON_RCPT }}'
+          email['FROM'] = 'noreply@github.com'
+          email['Subject'] = 'Ansible Cloud Module Integration Test Failure'
+          email.set_content("""
+          Integration tests using Python ${{ matrix.python-version }} failed:
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          """)
 
-        with SMTP('${{ secrets.MAILSERVER }}') as smtp:
-          smtp.starttls()
-          smtp.send_message(email)
+          with SMTP('${{ secrets.MAILSERVER }}') as smtp:
+            smtp.starttls()
+            smtp.send_message(email)
