@@ -107,3 +107,10 @@ releases:
     - 78-various-typos.yml
     - 79-flavor-format.yml
     release_date: '2022-11-16'
+  2.2.4:
+    changes:
+      minor_changes:
+      - Add UEFI firmware type option for custom images.
+    fragments:
+    - add-uefi-option.yml
+    release_date: '2022-12-19'
