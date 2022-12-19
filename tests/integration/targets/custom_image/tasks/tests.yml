@@ -7,7 +7,7 @@
 - name: Verify Delete a non existent custom image by uuid
   assert:
     that:
-      - delete.changed is false
+      - delete is not changed
 
 - name: Fail delete a non existent custom image by name
   cloudscale_ch.cloud.custom_image:
@@ -17,7 +17,7 @@
 - name: Verify Fail delete a non existend custom image by name
   assert:
     that:
-      - delete.changed is false
+      - delete is not changed
 
 - name: Fail import a custom image without url
   cloudscale_ch.cloud.custom_image:
@@ -375,3 +375,24 @@
     that:
       - failed_image_by_name is failed
       - failed_image_by_name.msg.startswith("More than one custom-images resource with 'name' exists")
+
+- name: Import a custom image with firmware type uefi and wait for import
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ cloudscale_resource_prefix }}-test-image-uefi"
+    state: present
+    slug: custom-ansible-image-uefi
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    firmware_type: 'uefi'
+    source_format: raw
+  register: image1_uefi
+  retries: 15
+  delay: 5
+  until: image1_uefi.import_status == 'success'
+  failed_when: image1_uefi.import_status == 'failed'
+- name: Verify import a custom image and wait for import
+  assert:
+    that:
+      - image1_uefi.import_status == 'success'
+      - image1_uefi.name == "{{ cloudscale_resource_prefix }}-test-image-uefi"
