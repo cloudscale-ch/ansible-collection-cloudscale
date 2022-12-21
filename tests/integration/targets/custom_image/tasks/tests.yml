@@ -396,3 +396,20 @@
     that:
       - image1_uefi.import_status == 'success'
       - image1_uefi.name == "{{ cloudscale_resource_prefix }}-test-image-uefi"
+
+- name: Fail changing the firmware type of an already imported image from uefi to bios
+  cloudscale_ch.cloud.custom_image:
+    name: "{{ image1_uefi.name }}"
+    state: present
+    slug: "{{ image1_uefi.slug }}"
+    url: "{{ image_url }}"
+    zones: lpg1
+    user_data_handling: 'pass-through'
+    firmware_type: 'bios'
+    source_format: raw
+  register: fail_firmware_change
+  ignore_errors: true
+- name: Verify firmware type change failed
+  assert:
+    that:
+      - fail_firmware_change is failed

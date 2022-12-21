@@ -442,6 +442,7 @@ def main():
             'name',
             'slug',
             'user_data_handling',
+            'firmware_type',
             'tags',
         ],
     )
