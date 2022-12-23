@@ -380,6 +380,16 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
     def present(self):
         resource = self.query()
 
+        # If the module passes the firmware_type argument,
+        # and the module argument and API response are not the same for
+        # argument firmware_type.
+        if (resource.get('firmware_type') is not None
+                and resource.get('firmware_type') !=
+                self._module.params['firmware_type']):
+            # Custom error if the module tries to change the firmware_type.
+            msg = "Cannot change firmware type of an existing custom image"
+            self._module.fail_json(msg)
+
         if resource['state'] == "absent":
             resource = self.create(resource)
         else:
