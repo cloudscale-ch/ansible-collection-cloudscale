@@ -62,6 +62,13 @@ options:
       - The file format of the image referenced in the url. Currently only raw
         is supported.
     type: str
+  firmware_type:
+    description:
+      - The firmware type that will be used for servers created
+        with this image.
+    type: str
+    choices: [ bios, uefi ]
+    default: bios
   tags:
     description:
       - The tags assigned to the custom image.
@@ -111,6 +118,19 @@ EXAMPLES = r'''
   register: image
   until: image.import_status == 'success'
   failed_when: image.import_status == 'failed'
+
+- name: Import custom image with UEFI firmware type
+  cloudscale_ch.cloud.custom_image:
+    name: "My Custom UEFI Image"
+    url: https://ubuntu.com/downloads/hirsute.img
+    slug: my-custom-uefi-image
+    user_data_handling: extend-cloud-config
+    zones: lpg1
+    firmware_type: uefi
+    tags:
+      project: luna
+    state: present
+  register: my_custom_image
 
 - name: Update custom image
   cloudscale_ch.cloud.custom_image:
@@ -243,6 +263,7 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
             'user_data_handling': self._module.params['user_data_handling'],
             'zones': self._module.params['zones'],
             'slug': self._module.params['slug'],
+            'firmware_type': self._module.params['firmware_type'],
         }
 
     # This method can be replaced by calling AnsibleCloudscaleBase._get form
@@ -359,6 +380,16 @@ class AnsibleCloudscaleCustomImage(AnsibleCloudscaleBase):
     def present(self):
         resource = self.query()
 
+        # If the module passes the firmware_type argument,
+        # and the module argument and API response are not the same for
+        # argument firmware_type.
+        if (resource.get('firmware_type') is not None
+                and resource.get('firmware_type') !=
+                self._module.params['firmware_type']):
+            # Custom error if the module tries to change the firmware_type.
+            msg = "Cannot change firmware type of an existing custom image"
+            self._module.fail_json(msg)
+
         if resource['state'] == "absent":
             resource = self.create(resource)
         else:
@@ -385,6 +416,10 @@ def main():
                                 choices=('pass-through',
                                          'extend-cloud-config')),
         uuid=dict(type='str'),
+        firmware_type=dict(type='str',
+                           choices=('bios',
+                                    'uefi'),
+                           default=('bios')),
         tags=dict(type='dict'),
         state=dict(type='str', default='present',
                    choices=('present', 'absent')),
@@ -408,6 +443,7 @@ def main():
             'slug',
             'url',
             'user_data_handling',
+            'firmware_type',
             'tags',
             'zones',
             'source_format',
@@ -416,6 +452,7 @@ def main():
             'name',
             'slug',
             'user_data_handling',
+            'firmware_type',
             'tags',
         ],
     )
