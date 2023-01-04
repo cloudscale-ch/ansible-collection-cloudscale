@@ -5,6 +5,14 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.2.4
+======
+
+Minor Changes
+-------------
+
+- Add UEFI firmware type option for custom images.
+
 v2.2.3
 ======
 
