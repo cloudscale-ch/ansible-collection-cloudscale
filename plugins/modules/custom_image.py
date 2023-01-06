@@ -69,7 +69,7 @@ options:
     type: str
     choices: [ bios, uefi ]
     default: bios
-    version_added: "2.2.4"
+    version_added: "2.3.0"
   tags:
     description:
       - The tags assigned to the custom image.
