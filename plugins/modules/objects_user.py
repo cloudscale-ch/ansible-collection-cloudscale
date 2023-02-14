@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
@@ -113,11 +114,9 @@ state:
   sample: present
 '''
 
-from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
-from ..module_utils.api import (
-    AnsibleCloudscaleBase,
-    cloudscale_argument_spec,
-)
+from ansible.module_utils.basic import AnsibleModule
+
+from ..module_utils.api import AnsibleCloudscaleBase, cloudscale_argument_spec
 
 
 def main():
