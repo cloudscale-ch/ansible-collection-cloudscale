@@ -111,6 +111,35 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
             'state': 'absent',
         }
 
+    def _get_load_balancer(self, refresh=False):
+        if self._info and not refresh:
+            return self._info
+
+        self._info = self._init_load_balancer_container()
+
+        uuid = self._info.get('uuid')
+        if uuid is not None:
+            load_balancer_info = self._get('load-balancers/%s' % uuid)
+            if load_balancer_info:
+                self._info = self._transform_state(load_balancer_info)
+
+        else:
+            name = self._info.get('name')
+            if name is not None:
+                load_balancers = self._get('load_balancers') or []
+                matching_load_balancer = []
+                for load_balancer in load_balancers:
+                    if load_balancer['name'] == name:
+                        matching_load_balancer.append(load_balancer)
+
+                if len(matching_load_balancer) == 1:
+                    self._info = self._transform_state(matching_load_balancer[0])
+                elif len(matching_load_balancer) > 1:
+                    self._module.fail_json(msg="More than one server with name '%s' exists. "
+                                           "Use the 'uuid' parameter to identify the server." % name)
+
+        return self._info
+
     def _create_load_balancer(self, load_balancer_info):
         self._result['changed'] = True
 
@@ -145,16 +174,15 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=(),
-        required_one_of=(('name', 'uuid'), ('flavor'),),
+        required_one_of=(('name', 'uuid'),),
         supports_check_mode=True,
     )
 
     cloudscale_load_balancer = AnsibleCloudscaleLoadBalancer(module)
-    # if module.params['state'] == "absent":
-    #     server = cloudscale_server.absent_server()
-    # else:
-    #     server = cloudscale_server.present_server()
-    load_balancer = "null"
+    if module.params['state'] == "absent":
+        load_balancer = cloudscale_load_balancer.absent()
+    else:
+        load_balancer = cloudscale_load_balancer.present()
 
     result = cloudscale_load_balancer.get_result(load_balancer)
     module.exit_json(**result)
