@@ -1,0 +1,7 @@
+---
+- name: Test create a running load balancer with simple configuration
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-lb'
+    zone: '{{ cloudscale_test_zone }}'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+  register: load_balancer
