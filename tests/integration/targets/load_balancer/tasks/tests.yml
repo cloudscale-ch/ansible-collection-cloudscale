@@ -1,12 +1,26 @@
 ---
-- name: Test list all load balancers
-  cloudscale_ch.cloud.load_balancer:
-    name: 'test'
-
-- name: Test create a running load balancer with simple configuration
+- name: Test create a running load balancer (simple)
   cloudscale_ch.cloud.load_balancer:
     name: '{{ cloudscale_resource_prefix }}-lb'
     zone: '{{ cloudscale_test_zone }}'
     flavor: '{{ cloudscale_test_flavor_lb }}'
-    state: 'present'
   register: load_balancer
+- name: Verify create a running load balancer (simple)
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.state == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-lb'
+
+- name: Test create a running load balancer (simple) idempotence
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-lb'
+    zone: '{{ cloudscale_test_zone }}'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+  register: load_balancer
+- name: Verify create a running load balancer (simple) idempotence
+  assert:
+    that:
+      - load_balancer is not changed
+      - load_balancer.state == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-lb'
