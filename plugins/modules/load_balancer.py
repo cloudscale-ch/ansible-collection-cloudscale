@@ -117,6 +117,7 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
         # Initialize load balancer dictionary
         self._info = {}
 
+    # Init
     def _init_load_balancer_container(self):
         return {
             'uuid': self._module.params.get('uuid') or self._info.get('uuid'),
@@ -124,6 +125,7 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
             'state': 'absent',
         }
 
+    # Get a LB by name/uuid
     def _get_load_balancer_info(self, refresh=False):
         if self._info and not refresh:
             return self._info
@@ -161,6 +163,7 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
             load_balancer['state'] = 'absent'
         return load_balancer
 
+    # Create LB
     def _create_load_balancer(self, load_balancer_info):
         self._result['changed'] = True
 
@@ -175,19 +178,7 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
             load_balancer_info = self._wait_for_state(('running', ))
         return load_balancer_info
 
-    def _update_load_balancer(self, load_balancer_info):
-
-        previous_state = load_balancer_info.get('state')
-
-        #load_balancer_info = self._update_param('name', load_balancer_info)
-        #load_balancer_info = self._update_param('flavor', load_balancer_info, requires_stop=True)
-        #load_balancer_info = self._update_param('tags', load_balancer_info)
-
-        #if previous_state == "running":
-        #    load_balancer_info = self._start_stop_server(load_balancer_info, target_state="running", ignore_diff=True)
-
-        return load_balancer_info
-
+    # Wait for LB to be running
     def _wait_for_state(self, states):
         start = datetime.now()
         timeout = self._module.params['api_timeout'] * 2
@@ -207,19 +198,59 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
 
         self._module.fail_json(msg=msg)
 
+    # Update LB
+    def _update_load_balancer(self, load_balancer_info):
+
+        previous_state = load_balancer_info.get('state')
+
+        load_balancer_info = self._update_param('name', load_balancer_info)
+        # load_balancer_info = self._update_param('flavor', load_balancer_info, requires_stop=True)     # Not yet added to API
+        load_balancer_info = self._update_param('tags', load_balancer_info)
+
+        return load_balancer_info
+
+    # Update LB parameters
+    def _update_param(self, param_key, load_balancer_info, requires_stop=False):
+        param_value = self._module.params.get(param_key)
+        if param_value is None:
+            return load_balancer_info
+
+        if 'slug' in load_balancer_info[param_key]:
+            load_balancer_v = load_balancer_info[param_key]['slug']
+        else:
+            load_balancer_v = load_balancer_info[param_key]
+
+        if load_balancer_v != param_value:
+            # Set the diff output
+            self._result['diff']['before'].update({param_key: load_balancer_v})
+            self._result['diff']['after'].update({param_key: param_value})
+
+            self._result['changed'] = True
+            if not self._module.check_mode:
+                patch_data = {
+                    param_key: param_value,
+                }
+
+                # Response is 204: No Content
+                self._patch('load-balancers/%s' % load_balancer_info['uuid'], patch_data)
+
+                # State changes to "changing" after update, waiting for stopped/running
+                load_balancer_info = self._wait_for_state(('running'))
+
+        return load_balancer_info
+
+    # Modul state is absent
     def present_load_balancer(self):
         load_balancer_info = self._get_load_balancer_info()
 
         if load_balancer_info.get('state') != "absent":
-
             load_balancer_info = self._update_load_balancer(load_balancer_info)
-
         else:
             load_balancer_info = self._create_load_balancer(load_balancer_info)
-            #load_balancer_info = self._start_stop_server(load_balancer_info, target_state=self._module.params.get('state'))
 
         return load_balancer_info
 
+    # Modul state is present
     def absent_load_balancer(self):
         load_balancer_info = self._get_load_balancer_info()
         if load_balancer_info.get('state') != "absent":
