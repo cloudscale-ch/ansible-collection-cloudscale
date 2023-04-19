@@ -45,17 +45,24 @@ EXAMPLES = '''
 - name: Start cloudscale.ch load balancer
   cloudscale_ch.cloud.load_balancer:
     name: my-shiny-cloudscale-load-balancer
-    zone: lpg1
+    zone: rma1
     flavor: lb-small
-    vip_addresses:
-      subnet:
-        15e061ac-c98a-4a26-85df-b25d47801e99
-      address:
-        172.29.177.11
     tags:
       project: my project
     api_token: xxxxxx
-# .....
+
+# Create and start a load balancer with specific subnet
+- name: Start cloudscale.ch load balancer
+  cloudscale_ch.cloud.load_balancer:
+    name: my-shiny-cloudscale-load-balancer
+    zone: lpg1
+    flavor: lb-small
+    vip_addresses:
+      - subnet: d7b82c9b-5900-436c-9296-e94dca01c7a0
+        address: 172.25.12.1
+    tags:
+      project: my project
+    api_token: xxxxxx
 '''
 
 RETURN = '''
@@ -234,7 +241,7 @@ def main():
         zone=dict(),
         flavor=dict(choices=ALLOWED_LB_FLAVORS),
         vip_addresses=dict(
-            type='dict',
+            type='list',
             options=dict(
                 subnet=dict(type='str'),
                 address=dict(type='str'),
