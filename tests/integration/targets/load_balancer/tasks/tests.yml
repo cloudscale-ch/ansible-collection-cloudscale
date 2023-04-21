@@ -74,7 +74,7 @@
   cloudscale_ch.cloud.load_balancer:
     name: '{{ load_balancer.name }}'
   register: load_balancer
-- name: Verify update name of a running load balancer
+- name: Verify get a load balancer
   assert:
     that:
       - load_balancer is not changed
@@ -84,7 +84,7 @@
   cloudscale_ch.cloud.load_balancer:
     uuid: '{{ load_balancer.uuid }}'
   register: load_balancer
-- name: Verify update name of a running load balancer
+- name: Verify get a load balancer
   assert:
     that:
       - load_balancer is not changed
