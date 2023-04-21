@@ -1,0 +1,55 @@
+---
+# Create LB Pool
+- name: Test create a load balancer pool in check mode
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool
+  check_mode: yes
+- name: Verify create a load balancer pool in check mode
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.state == 'absent'
+
+- name: Test create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool
+
+- debug: var=load_balancer_pool
+
+- name: Verify create a load balancer pool
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool.load_balancer == '{{ load_balancer.uuid }}'
+      - load_balancer_pool.tags.project == 'ansible-test'
+      - load_balancer_pool.tags.stage == 'production'
+      - load_balancer_pool.tags.sla == '24-7''
+
+# Get LB Pool facts
+- name: Test get facts of a load balancer pool by name
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+  register: load_balancer_pool
+- name: Verify get a load balancer pool
+  assert:
+    that:
+      - load_balancer_pool is not changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+- debug: var=load_balancer_pool
