@@ -169,23 +169,6 @@ ALLOWED_STATES = ('running',
 ALLOWED_LB_FLAVORS = ('lb-small',
                       'lb-standard',
                       )
-ALLOWED_POOL_ALGORITHMUS = ('round_robin',
-                            'least_connections',
-                            'source_ip',
-                            )
-ALLOWED_POOL_PROTOCOLS = ('tcp',
-                          'proxy',
-                          'proxyv2',
-                          )
-ALLOWED_HEALTH_MONITOR_TYPES = ('ping',
-                                'tcp',
-                                'http',
-                                'https',
-                                'tls-hello',
-                                )
-ALLOWED_HEALTH_MONITOR_HTTP = ('http',
-                               'https',
-                               )
 
 
 class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
