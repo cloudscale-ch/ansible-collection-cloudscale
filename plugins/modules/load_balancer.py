@@ -27,6 +27,12 @@ author:
   - Kenneth Joss (@k-304)
 version_added: "0.0.1"
 options:
+  state:
+    description:
+      - State of the load balancer.
+    choices: [ running, absent ]
+    default: running
+    type: str
   name:
     description:
       - Name of the load balancer.
@@ -37,7 +43,35 @@ options:
       - UUID of the load balancer.
       - Either I(name) or I(uuid) are required.
     type: str
-  # .....
+  flavor:
+    description:
+      - Flavor of the load balancer.
+    type: str
+  vip_addresses:
+    description:
+      - VIP address through which incoming traffic is received.
+      - Can either be allocated in the public network or in the subnet of a private network.
+      - If empty, a new public IPv4 and IPv6 will be created.
+    type: list
+    elements: dict
+    suboptions:
+      subnet:
+        description:
+          - Create a VIP address on the subnet identified by this UUID.
+      address:
+        description:
+          - Use this address.
+          - Must be in the same range as subnet.
+          - If empty, a radom address will be used.
+  zone:
+    description:
+      - Zone in which the load balancer resides (e.g. C(lpg1) or C(rma1)).
+    type: str
+  tags:
+    description:
+      - Tags assosiated with the load balancer. Set this to C({}) to clear any tags.
+    type: dict
+extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
@@ -45,8 +79,8 @@ EXAMPLES = '''
 - name: Start cloudscale.ch load balancer
   cloudscale_ch.cloud.load_balancer:
     name: my-shiny-cloudscale-load-balancer
-    zone: rma1
     flavor: lb-small
+    zone: rma1
     tags:
       project: my project
     api_token: xxxxxx
@@ -55,11 +89,11 @@ EXAMPLES = '''
 - name: Start cloudscale.ch load balancer
   cloudscale_ch.cloud.load_balancer:
     name: my-shiny-cloudscale-load-balancer
-    zone: lpg1
     flavor: lb-small
     vip_addresses:
       - subnet: d7b82c9b-5900-436c-9296-e94dca01c7a0
         address: 172.25.12.1
+    zone: lpg1
     tags:
       project: my project
     api_token: xxxxxx
