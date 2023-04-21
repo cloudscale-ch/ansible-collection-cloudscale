@@ -25,7 +25,7 @@ notes:
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Kenneth Joss (@k-304)
-version_added: "0.0.1"
+version_added: "2.3.0"
 options:
   state:
     description:
