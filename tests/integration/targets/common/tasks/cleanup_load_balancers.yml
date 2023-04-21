@@ -11,7 +11,7 @@
   delay: 3
 
 - name: Remove all load balancers created by this test run
-  cloudscale_ch.cloud.server:
+  cloudscale_ch.cloud.load_balancer:
     uuid: '{{ item.uuid }}'
     state: 'absent'
   when: cloudscale_resource_prefix in item.name
