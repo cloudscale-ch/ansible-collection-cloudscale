@@ -71,6 +71,51 @@ href:
   returned: success when not state == absent
   type: str
   sample: https://api.cloudscale.ch/v1/load-balancers/0f62e0a7-f459-4fc4-9c25-9e57b6cb4b2f
+uuid:
+  description: The unique identifier for this load balancer
+  returned: success
+  type: str
+  sample: cfde831a-4e87-4a75-960f-89b0148aa2cc$
+name:
+  description: The display name of the load balancer
+  returned: success
+  type: str
+  sample: web-lb
+created_at:
+  description: The creation date and time of the load balancer.
+  returned: success when not state == absent
+  type: datetime
+  samle: 2023-02-07T15:32:02.308041Z
+status:
+  description: The current status of the load balancer
+  returned: success
+  type: str
+  sample: running
+zone:
+  description: The zone used for this load balancer
+  returned: success when not state == absent
+  type: dict
+  sample: { 'slug': 'lpg1' }
+flavor:
+  description: The flavor that has been used for this load balancer
+  returned: success when not state == absent
+  type: list
+  sample: { "slug": "lb-standard", "name": "LB-Standard" }
+vip_addresses:
+  description: List of vip_addresses for this load balancer
+  returned: success when not state == absent
+  type: list
+  sample: [ {"version": "4", "address": "192.0.2.110",
+            "subnet": [
+                "href": "https://api.cloudscale.ch/v1/subnets/92c70b2f-99cb-4811-8823-3d46572006e4",
+                "uuid": "92c70b2f-99cb-4811-8823-3d46572006e4",
+                "cidr": "192.0.2.0/24"
+            ]} ]
+tags:
+  description: Tags assosiated with the load balancer
+  returned: success
+  type: dict
+  sample: { 'project': 'my project' }
 '''
 
 from datetime import datetime, timedelta
