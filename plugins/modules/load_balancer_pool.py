@@ -12,16 +12,12 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: load_balancer
-short_description: Manages load balancers on the cloudscale.ch IaaS service
+short_description: Manages load balancer pools on the cloudscale.ch IaaS service
 description:
-  - List, create, update, delete load balancers on the cloudscale.ch IaaS service.
-  - List, create, update, delete pools on the cloudscale.ch IaaS service.
-  - List, create, update, delete pool members on the cloudscale.ch IaaS service.
-  - List, create, update, delete load balancer listeners on the cloudscale.ch IaaS service.
-  - List, create, update, delete load balancer health monitors on the cloudscale.ch IaaS service.
+  - List, create, update, delete load balancer pools on the cloudscale.ch IaaS service.
 notes:
-  - If I(uuid) option is provided, it takes precedence over I(name) for load balancer selection. This allows to update the load balancers's name.
-  - If no I(uuid) option is provided, I(name) is used for load balancer selection. If more than one load balancer with this name exists, execution is aborted.
+  - If I(uuid) option is provided, it takes precedence over I(name) for pool selection. This allows to update the load balancer pool's name.
+  - If no I(uuid) option is provided, I(name) is used for pool selection. If more than one pool with this name exists, execution is aborted.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Kenneth Joss (@k-304)
