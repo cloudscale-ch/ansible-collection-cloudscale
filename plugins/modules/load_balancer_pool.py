@@ -153,19 +153,16 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
         self._result['diff']['after'] = deepcopy(data)
         if not self._module.check_mode:
             self._post('load-balancers/pools', data)
-            #load_balancer_pool_info = self._wait_for_state(('running', ))
-            load_balancer_pool_info = self._wait_for_state()
+            load_balancer_pool_info = self._wait_for_state(('present', ))
         return load_balancer_pool_info
 
     # Wait for LB Pool to be up
-    #def _wait_for_state(self, states):
-    def _wait_for_state(self):
+    def _wait_for_state(self, states):
         start = datetime.now()
         timeout = self._module.params['api_timeout'] * 2
         while datetime.now() - start < timedelta(seconds=timeout):
             load_balancer_pool_info = self._get_load_balancer_pool_info(refresh=True)
-            #if load_balancer_info.get('state') in states:
-            if load_balancer_pool_info.get('created_at') is not None:
+            if load_balancer_pool_info.get('state') in states:
                 return load_balancer_pool_info
             sleep(1)
 
@@ -213,6 +210,8 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
 
                 # Response is 204: No Content
                 self._patch('load-balancers/pools/%s' % load_balancer_pool_info['uuid'], patch_data)
+
+                load_balancer_pool_info = self._wait_for_state(('present'))
 
         return load_balancer_pool_info
 
