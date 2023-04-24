@@ -10,7 +10,7 @@
   retries: 5
   delay: 3
 
-- name: Remove all load balancers created by this test run
+- name: Remove all load balancer pools created by this test run
   cloudscale_ch.cloud.load_balancer_pool:
     uuid: '{{ item.uuid }}'
     state: 'absent'
