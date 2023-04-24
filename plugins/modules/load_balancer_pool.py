@@ -66,6 +66,7 @@ RETURN = '''
 '''
 
 from datetime import datetime, timedelta
+from time import sleep
 from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule
@@ -74,8 +75,7 @@ from ..module_utils.api import (
     cloudscale_argument_spec,
 )
 
-ALLOWED_STATES = ('running',
-                  'stopped',
+ALLOWED_STATES = ('present',
                   'absent',
                   )
 ALLOWED_POOL_ALGORITHMUS = ('round_robin',
@@ -114,24 +114,32 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
         if uuid is not None:
             load_balancer_pool_info = self._get('load-balancers/pools/%s' % uuid)
             if load_balancer_pool_info:
-                self._info = load_balancer_pool_info
+                self._info = self._transform_state(load_balancer_pool_info)
 
         else:
             name = self._info.get('name')
             if name is not None:
                 load_balancer_pools = self._get('load-balancers/pools') or []
                 matching_load_balancer_pool = []
-                for pool in load_balancer_pools:
-                    if pool['name'] == name:
-                        matching_load_balancer_pool.append(pool)
+                for load_balancer_pool in load_balancer_pools:
+                    if load_balancer_pool['name'] == name:
+                        matching_load_balancer_pool.append(load_balancer_pool)
 
                 if len(matching_load_balancer_pool) == 1:
-                    self._info = matching_load_balancer_pool[0]
+                    self._info = self._transform_state(matching_load_balancer_pool[0])
                 elif len(matching_load_balancer_pool) > 1:
-                    self._module.fail_json(msg="More than one pool with name '%s' exists. "
+                    self._module.fail_json(msg="More than one load balancer with name '%s' exists. "
                                            "Use the 'uuid' parameter to identify the load balancer." % name)
 
         return self._info
+
+    @staticmethod
+    def _transform_state(load_balancer_pool):
+        if 'created_at' in load_balancer_pool:
+            load_balancer_pool['state'] = 'present'
+        else:
+            load_balancer_pool['state'] = 'absent'
+        return load_balancer_pool
 
     # Create LB Pool
     def _create_load_balancer_pool(self, load_balancer_pool_info):
@@ -145,20 +153,43 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
         self._result['diff']['after'] = deepcopy(data)
         if not self._module.check_mode:
             self._post('load-balancers/pools', data)
+            #load_balancer_pool_info = self._wait_for_state(('running', ))
+            load_balancer_pool_info = self._wait_for_state()
         return load_balancer_pool_info
 
-    # Update LB
+    # Wait for LB Pool to be up
+    #def _wait_for_state(self, states):
+    def _wait_for_state(self):
+        start = datetime.now()
+        timeout = self._module.params['api_timeout'] * 2
+        while datetime.now() - start < timedelta(seconds=timeout):
+            load_balancer_pool_info = self._get_load_balancer_pool_info(refresh=True)
+            #if load_balancer_info.get('state') in states:
+            if load_balancer_pool_info.get('created_at') is not None:
+                return load_balancer_pool_info
+            sleep(1)
+
+        # Timeout succeeded
+        if load_balancer_pool_info.get('name') is not None:
+            msg = "Timeout while waiting for a state change on load balancer %s to states %s. " \
+                  "Current state is %s." % (load_balancer_pool_info.get('name'), states, load_balancer_pool_info.get('state'))
+        else:
+            name_uuid = self._module.params.get('name') or self._module.params.get('uuid')
+            msg = 'Timeout while waiting to find the load balancer %s' % name_uuid
+
+        self._module.fail_json(msg=msg)
+
+    # Update LB Pool
     def _update_load_balancer_pool(self, load_balancer_pool_info):
 
         previous_state = load_balancer_pool_info.get('state')
 
         load_balancer_pool_info = self._update_param('name', load_balancer_pool_info)
-        # load_balancer_pool_info = self._update_param('flavor', load_balancer_pool_info, requires_stop=True)     # Not yet added to API
         load_balancer_pool_info = self._update_param('tags', load_balancer_pool_info)
 
         return load_balancer_pool_info
 
-    # Update LB parameters
+    # Update LB Pool parameters
     def _update_param(self, param_key, load_balancer_pool_info, requires_stop=False):
         param_value = self._module.params.get(param_key)
         if param_value is None:
@@ -185,7 +216,6 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
 
         return load_balancer_pool_info
 
-    # Modul state is absent
     def present_load_balancer_pool(self):
         load_balancer_pool_info = self._get_load_balancer_pool_info()
 
@@ -212,7 +242,7 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
 def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
-        state=dict(default='running', choices=ALLOWED_STATES),
+        state=dict(default='present', choices=ALLOWED_STATES),
         name=dict(),
         uuid=dict(),
         load_balancer=dict(),
