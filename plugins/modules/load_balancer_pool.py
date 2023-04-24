@@ -58,11 +58,71 @@ extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
+# Create a load balancer pool with algorithm: round_robin and protocol: tcp
+- name: Create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: cloudscale-loadbalancer-pool1
+    load_balancer: 3766c579-3012-4a85-8192-2bbb4ef85b5f
+    algorithm: round_robin
+    protocol: tcp
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  api_token: xxxxxx
 
+# Get load balancer pool facts by name
+- name: Get facts of a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: cloudscale-loadbalancer-pool1
+  api_token: xxxxxx
 '''
 
 RETURN = '''
-
+href:
+  description: API URL to get details about this load balancer
+  returned: success when not state == absent
+  type: str
+  sample: https://api.cloudscale.ch/v1/load-balancers/pools/
+uuid:
+  description: The unique identifier for this load balancer pool
+  returned: success
+  type: str
+  sample: 3766c579-3012-4a85-8192-2bbb4ef85b5f
+name:
+  description: The display name of the load balancer pool
+  returned: success
+  type: str
+  sample: web-lb-pool1
+created_at:
+  description: The creation date and time of the load balancer pool
+  returned: success when not state == absent
+  type: datetime
+  samle: 2023-02-07T15:32:02.308041Z
+load_balancer:
+  description: The load balancer this pool is connected to
+  returned: success when not state == absent
+  type: list
+  sample: {
+            "href": "https://api.cloudscale.ch/v1/load-balancers/15264769-ac69-4809-a8e4-4d73f8f92496", 
+            "uuid": "15264769-ac69-4809-a8e4-4d73f8f92496",
+            "name": "web-lb"
+          }
+algorithm:
+  description: The algorithm according to which the incoming traffic is distributed between the pool members
+  returned: success
+  type: str
+  sample: round_robin
+protocol:
+  description: The protocol used for traffic between the load balancer and the pool members
+  returned: success
+  type: str
+  sample: tcp
+tags:
+  description: Tags assosiated with the load balancer
+  returned: success
+  type: dict
+  sample: { 'project': 'my project' }
 '''
 
 from datetime import datetime, timedelta
