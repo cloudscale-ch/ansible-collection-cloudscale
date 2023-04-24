@@ -15,10 +15,6 @@ module: load_balancer
 short_description: Manages load balancers on the cloudscale.ch IaaS service
 description:
   - List, create, update, delete load balancers on the cloudscale.ch IaaS service.
-  - List, create, update, delete pools on the cloudscale.ch IaaS service.
-  - List, create, update, delete pool members on the cloudscale.ch IaaS service.
-  - List, create, update, delete load balancer listeners on the cloudscale.ch IaaS service.
-  - List, create, update, delete load balancer health monitors on the cloudscale.ch IaaS service.
 notes:
   - If I(uuid) option is provided, it takes precedence over I(name) for load balancer selection. This allows to update the load balancers's name.
   - If no I(uuid) option is provided, I(name) is used for load balancer selection. If more than one load balancer with this name exists, execution is aborted.
@@ -97,6 +93,12 @@ EXAMPLES = '''
     tags:
       project: my project
     api_token: xxxxxx
+
+# Get load balancer facts by name
+- name: Get facts of a load balancer
+  cloudscale_ch.cloud.load_balancer:
+    name: my-shiny-cloudscale-load-balancer
+  api_token: xxxxxx
 '''
 
 RETURN = '''
@@ -109,14 +111,14 @@ uuid:
   description: The unique identifier for this load balancer
   returned: success
   type: str
-  sample: cfde831a-4e87-4a75-960f-89b0148aa2cc$
+  sample: cfde831a-4e87-4a75-960f-89b0148aa2cc
 name:
   description: The display name of the load balancer
   returned: success
   type: str
   sample: web-lb
 created_at:
-  description: The creation date and time of the load balancer.
+  description: The creation date and time of the load balancer
   returned: success when not state == absent
   type: datetime
   samle: 2023-02-07T15:32:02.308041Z
@@ -163,7 +165,6 @@ from ..module_utils.api import (
 )
 
 ALLOWED_STATES = ('running',
-                  'stopped',
                   'absent',
                   )
 ALLOWED_LB_FLAVORS = ('lb-small',
