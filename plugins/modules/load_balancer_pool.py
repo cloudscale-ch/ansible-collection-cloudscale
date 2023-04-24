@@ -30,7 +30,7 @@ options:
   state:
     description:
       - State of the load balancer pool.
-    choices: [ running, absent ]
+    choices: [ present, absent ]
     default: running
     type: str
   name:
