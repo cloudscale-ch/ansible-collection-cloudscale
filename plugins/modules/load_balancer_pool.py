@@ -184,8 +184,8 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
                 if len(matching_load_balancer_pool) == 1:
                     self._info = self._transform_state(matching_load_balancer_pool[0])
                 elif len(matching_load_balancer_pool) > 1:
-                    self._module.fail_json(msg="More than one load balancer with name '%s' exists. "
-                                           "Use the 'uuid' parameter to identify the load balancer." % name)
+                    self._module.fail_json(msg="More than one pool with name '%s' exists. "
+                                           "Use the 'uuid' parameter to identify the pool." % name)
 
         return self._info
 
@@ -224,11 +224,11 @@ class AnsibleCloudscaleLoadBalancerPool(AnsibleCloudscaleBase):
 
         # Timeout succeeded
         if load_balancer_pool_info.get('name') is not None:
-            msg = "Timeout while waiting for a state change on load balancer %s to states %s. " \
+            msg = "Timeout while waiting for a state change on pool %s to states %s. " \
                   "Current state is %s." % (load_balancer_pool_info.get('name'), states, load_balancer_pool_info.get('state'))
         else:
             name_uuid = self._module.params.get('name') or self._module.params.get('uuid')
-            msg = 'Timeout while waiting to find the load balancer %s' % name_uuid
+            msg = 'Timeout while waiting to find the pool %s' % name_uuid
 
         self._module.fail_json(msg=msg)
 
