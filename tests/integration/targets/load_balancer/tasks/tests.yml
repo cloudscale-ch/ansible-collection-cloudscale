@@ -35,7 +35,7 @@
   assert:
     that:
       - load_balancer is changed
-      - load_balancer.state == 'running'
+      - load_balancer.status == 'running'
       - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
       - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
       - load_balancer.vip_addresses[0].subnet.uuid == '{{ snet.uuid }}'
@@ -60,7 +60,7 @@
   assert:
     that:
       - load_balancer is not changed
-      - load_balancer.state == 'running'
+      - load_balancer.status == 'running'
       - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
       - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
       - load_balancer.vip_addresses[0].subnet.uuid == '{{ snet.uuid }}'
@@ -105,7 +105,7 @@
   assert:
     that:
       - load_balancer is changed
-      - load_balancer.state == 'running'
+      - load_balancer.status == 'running'
       - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
 
 - name: Test update name and tags of a running load balancer
@@ -121,7 +121,7 @@
   assert:
     that:
       - load_balancer is changed
-      - load_balancer.state == 'running'
+      - load_balancer.status == 'running'
       - load_balancer.name == '{{ cloudscale_resource_prefix }}-test-renamed'
       - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
       - load_balancer.tags.project == 'ansible-test'
@@ -141,7 +141,7 @@
   assert:
     that:
       - load_balancer is not changed
-      - load_balancer.state == 'running'
+      - load_balancer.status == 'running'
       - load_balancer.name == '{{ cloudscale_resource_prefix }}-test-renamed'
       - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
       - load_balancer.tags.project == 'ansible-test'
@@ -149,17 +149,17 @@
       - load_balancer.tags.sla == '8-5'
 
 # Delete LB
-- name: Test running server deletion by name in check mode
+- name: Test running load balancer deletion by name in check mode
   cloudscale_ch.cloud.load_balancer:
     name: '{{ cloudscale_resource_prefix }}-test-renamed'
     state: absent
   register: load_balancer
   check_mode: yes
-- name: Verify running server deletion by name in check mode
+- name: Verify running load balancer deletion by name in check mode
   assert:
     that:
       - load_balancer is changed
-      - load_balancer.state == 'running'
+      - load_balancer.status == 'running'
 
 - name: Test running load balancer deletion by name
   cloudscale_ch.cloud.load_balancer:
