@@ -6,6 +6,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from datetime import datetime, timedelta
+from time import sleep
 from copy import deepcopy
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
@@ -261,6 +263,25 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
             resource = self.pre_transform(resource)
             resource['state'] = "present"
         return resource
+
+    def wait_for_state(self, check_parameter, allowed_states):
+        start = datetime.now()
+        timeout = self._module.params['api_timeout'] * 2
+        while datetime.now() - start < timedelta(seconds=timeout):
+            info = self.query()
+            if info.get(check_parameter) in allowed_states:
+                return info
+            sleep(1)
+
+        # Timeout succeeded
+        if info.get('name') is not None:
+            msg = "Timeout while waiting for a state change on load balancer %s to states %s. " \
+                    "Current state is %s." % (info.get('name'), allowed_states, info.get('state'))
+        else:
+            name_uuid = self._module.params.get('name') or self._module.params.get('uuid')
+            msg = 'Timeout while waiting to find the load balancer %s' % name_uuid
+
+        self._module.fail_json(msg=msg)
 
     def update(self, resource):
         updated = False
