@@ -26,7 +26,7 @@ options:
   state:
     description:
       - State of the load balancer.
-    choices: [ running, absent ]
+    choices: [ running, changing, absent ]
     default: running
     type: str
   name:
@@ -167,173 +167,26 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('running',
                   'absent',
                   )
-ALLOWED_LB_FLAVORS = ('lb-small',
-                      'lb-standard',
+ALLOWED_LB_FLAVORS = ('lb-standard',
                       )
 
 
 class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
 
-    def __init__(self, module):
-        super(AnsibleCloudscaleLoadBalancer, self).__init__(module)
-
-        # Initialize load balancer dictionary
-        self._info = {}
-
-    # Init
-    def _init_load_balancer_container(self):
-        return {
-            'uuid': self._module.params.get('uuid') or self._info.get('uuid'),
-            'name': self._module.params.get('name') or self._info.get('name'),
-            'state': 'absent',
-        }
-
-    # Get a LB by name/uuid
-    def _get_load_balancer_info(self, refresh=False):
-        if self._info and not refresh:
-            return self._info
-        self._info = self._init_load_balancer_container()
-
-        uuid = self._info.get('uuid')
-        if uuid is not None:
-            load_balancer_info = self._get('load-balancers/%s' % uuid)
-            if load_balancer_info:
-                self._info = self._transform_state(load_balancer_info)
-
-        else:
-            name = self._info.get('name')
-            if name is not None:
-                load_balancers = self._get('load-balancers') or []
-                matching_load_balancer = []
-                for load_balancer in load_balancers:
-                    if load_balancer['name'] == name:
-                        matching_load_balancer.append(load_balancer)
-
-                if len(matching_load_balancer) == 1:
-                    self._info = self._transform_state(matching_load_balancer[0])
-                elif len(matching_load_balancer) > 1:
-                    self._module.fail_json(msg="More than one load balancer with name '%s' exists. "
-                                           "Use the 'uuid' parameter to identify the load balancer." % name)
-
-        return self._info
-
-    @staticmethod
-    def _transform_state(load_balancer):
-        if 'status' in load_balancer:
-            load_balancer['state'] = load_balancer['status']
-            del load_balancer['status']
-        else:
-            load_balancer['state'] = 'absent'
-        return load_balancer
-
-    # Create LB
-    def _create_load_balancer(self, load_balancer_info):
-        self._result['changed'] = True
-
-        data = deepcopy(self._module.params)
-        for i in ('state', 'api_timeout', 'api_token', 'api_url'):
-            del data[i]
-
-        self._result['diff']['before'] = self._init_load_balancer_container()
-        self._result['diff']['after'] = deepcopy(data)
+    def create(self, resource, data=None):
+        super().create(resource)
         if not self._module.check_mode:
-            self._post('load-balancers', data)
-            load_balancer_info = self._wait_for_state(('running', ))
-        return load_balancer_info
-
-    # Wait for LB to be running
-    def _wait_for_state(self, states):
-        start = datetime.now()
-        timeout = self._module.params['api_timeout'] * 2
-        while datetime.now() - start < timedelta(seconds=timeout):
-            load_balancer_info = self._get_load_balancer_info(refresh=True)
-            if load_balancer_info.get('state') in states:
-                return load_balancer_info
-            sleep(1)
-
-        # Timeout succeeded
-        if load_balancer_info.get('name') is not None:
-            msg = "Timeout while waiting for a state change on load balancer %s to states %s. " \
-                  "Current state is %s." % (load_balancer_info.get('name'), states, load_balancer_info.get('state'))
-        else:
-            name_uuid = self._module.params.get('name') or self._module.params.get('uuid')
-            msg = 'Timeout while waiting to find the load balancer %s' % name_uuid
-
-        self._module.fail_json(msg=msg)
-
-    # Update LB
-    def _update_load_balancer(self, load_balancer_info):
-
-        previous_state = load_balancer_info.get('state')
-
-        load_balancer_info = self._update_param('name', load_balancer_info)
-        # load_balancer_info = self._update_param('flavor', load_balancer_info, requires_stop=True)     # Not yet added to API
-        load_balancer_info = self._update_param('tags', load_balancer_info)
-
-        return load_balancer_info
-
-    # Update LB parameters
-    def _update_param(self, param_key, load_balancer_info, requires_stop=False):
-        param_value = self._module.params.get(param_key)
-        if param_value is None:
-            return load_balancer_info
-
-        if 'slug' in load_balancer_info[param_key]:
-            load_balancer_v = load_balancer_info[param_key]['slug']
-        else:
-            load_balancer_v = load_balancer_info[param_key]
-
-        if load_balancer_v != param_value:
-            # Set the diff output
-            self._result['diff']['before'].update({param_key: load_balancer_v})
-            self._result['diff']['after'].update({param_key: param_value})
-
-            self._result['changed'] = True
-            if not self._module.check_mode:
-                patch_data = {
-                    param_key: param_value,
-                }
-
-                # Response is 204: No Content
-                self._patch('load-balancers/%s' % load_balancer_info['uuid'], patch_data)
-
-                # State changes to "changing" after update, waiting for stopped/running
-                load_balancer_info = self._wait_for_state(('running'))
-
-        return load_balancer_info
-
-    # Modul state is absent
-    def present_load_balancer(self):
-        load_balancer_info = self._get_load_balancer_info()
-
-        if load_balancer_info.get('state') != "absent":
-            load_balancer_info = self._update_load_balancer(load_balancer_info)
-        else:
-            load_balancer_info = self._create_load_balancer(load_balancer_info)
-
-        return load_balancer_info
-
-    # Modul state is present
-    def absent_load_balancer(self):
-        load_balancer_info = self._get_load_balancer_info()
-        if load_balancer_info.get('state') != "absent":
-            self._result['changed'] = True
-            self._result['diff']['before'] = deepcopy(load_balancer_info)
-            self._result['diff']['after'] = self._init_load_balancer_container()
-            if not self._module.check_mode:
-                self._delete('load-balancers/%s' % load_balancer_info['uuid'])
-                load_balancer_info = self._wait_for_state(('absent', ))
-        return load_balancer_info
+            resource = self.wait_for_state('status', ('running', ))
+        return resource
 
 
 def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
-        state=dict(default='running', choices=ALLOWED_STATES),
-        name=dict(),
-        uuid=dict(),
-        zone=dict(),
+        name=dict(type='str'),
+        uuid=dict(type='str'),
         flavor=dict(choices=ALLOWED_LB_FLAVORS),
+        zone=dict(type='str'),
         vip_addresses=dict(
             type='list',
             options=dict(
@@ -342,22 +195,40 @@ def main():
             ),
         ),
         tags=dict(type='dict'),
+        state=dict(default='running', choices=ALLOWED_STATES),
     ))
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=(),
         required_one_of=(('name', 'uuid'),),
+        required_if=(('state', 'running', ('name',),),),
         supports_check_mode=True,
     )
 
-    cloudscale_load_balancer = AnsibleCloudscaleLoadBalancer(module)
-    if module.params['state'] == "absent":
-        load_balancer = cloudscale_load_balancer.absent_load_balancer()
-    else:
-        load_balancer = cloudscale_load_balancer.present_load_balancer()
+    cloudscale_load_balancer = AnsibleCloudscaleLoadBalancer(
+        module,
+        resource_name='load-balancers',
+        resource_create_param_keys=[
+            'name',
+            'flavor',
+            'zone',
+            'vip_addresses',
+            'tags',
+        ],
+        resource_update_param_keys=[
+            'name',
+            'tags',
+        ],
+    )
+    cloudscale_load_balancer.query_constraint_keys = [
+        'zone',
+    ]
 
-    result = cloudscale_load_balancer.get_result(load_balancer)
+    if module.params['state'] == "absent":
+        result = cloudscale_load_balancer.absent()
+    else:
+        result = cloudscale_load_balancer.present()
     module.exit_json(**result)
 
 
