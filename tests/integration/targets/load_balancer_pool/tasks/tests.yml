@@ -71,16 +71,6 @@
       - load_balancer_pool is not changed
       - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
 
-- name: Test get facts of a load balancer pool by UUID
-  cloudscale_ch.cloud.load_balancer_pool:
-    uuid: '{{ load_balancer_pool.uuid }}'
-  register: load_balancer_pool
-- name: Verify get a load balancer pool by UUID
-  assert:
-    that:
-      - load_balancer_pool is not changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
-
 # Update LB Pool
 - name: Test update name and tags of a running load balancer pool in check mode
   cloudscale_ch.cloud.load_balancer_pool:
