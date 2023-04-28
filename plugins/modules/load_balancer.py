@@ -75,7 +75,7 @@ EXAMPLES = '''
 - name: Start cloudscale.ch load balancer
   cloudscale_ch.cloud.load_balancer:
     name: my-shiny-cloudscale-load-balancer
-    flavor: lb-small
+    flavor: lb-standard
     zone: rma1
     tags:
       project: my project
