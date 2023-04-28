@@ -60,7 +60,6 @@
     zone: '{{ cloudscale_test_zone }}'
   register: load_balancer
   ignore_errors: True
-- debug: var=load_balancer
 - name: Verify fail create a load balancer with wrong VIP address
   assert:
     that:
