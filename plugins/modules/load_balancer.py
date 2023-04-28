@@ -85,7 +85,7 @@ EXAMPLES = '''
 - name: Start cloudscale.ch load balancer
   cloudscale_ch.cloud.load_balancer:
     name: my-shiny-cloudscale-load-balancer
-    flavor: lb-small
+    flavor: lb-standard
     vip_addresses:
       - subnet: d7b82c9b-5900-436c-9296-e94dca01c7a0
         address: 172.25.12.1
