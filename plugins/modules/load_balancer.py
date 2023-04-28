@@ -26,8 +26,8 @@ options:
   state:
     description:
       - State of the load balancer.
-    choices: [ running, changing, absent ]
-    default: running
+    choices: [ present, absent ]
+    default: present
     type: str
   name:
     description:
@@ -127,6 +127,11 @@ status:
   returned: success
   type: str
   sample: running
+state:
+  description: The current state of the load balancer
+  returned: success
+  type: str
+  sample: present
 zone:
   description: The zone used for this load balancer
   returned: success when not state == absent
@@ -202,7 +207,7 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=(),
         required_one_of=(('name', 'uuid'),),
-        required_if=(('state', 'running', ('name',),),),
+        required_if=(('state', 'present', ('name',),),),
         supports_check_mode=True,
     )
 
