@@ -6,7 +6,8 @@
   always:
     - import_role:
         name: common
-        tasks_from: cleanup_networks.yml
+        tasks_from: cleanup_load_balancers.yml
     - import_role:
         name: common
-        tasks_from: cleanup_load_balancers.yml
+        tasks_from: cleanup_networks.yml
+    
