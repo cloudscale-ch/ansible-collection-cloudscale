@@ -160,8 +160,6 @@ tags:
 '''
 
 from datetime import datetime, timedelta
-from time import sleep
-from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.api import (
@@ -169,7 +167,7 @@ from ..module_utils.api import (
     cloudscale_argument_spec,
 )
 
-ALLOWED_STATES = ('running',
+ALLOWED_STATES = ('present',
                   'absent',
                   )
 ALLOWED_LB_FLAVORS = ('lb-standard',
@@ -200,7 +198,7 @@ def main():
             ),
         ),
         tags=dict(type='dict'),
-        state=dict(default='running', choices=ALLOWED_STATES),
+        state=dict(default='present', choices=ALLOWED_STATES),
     ))
 
     module = AnsibleModule(
