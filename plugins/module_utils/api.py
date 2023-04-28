@@ -275,7 +275,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         # Timeout succeeded
         if info.get('name') is not None:
-            msg = "Timeout while waiting for a state change on load balancer %s to states %s. " \
+            msg = "Timeout while waiting for a state change on resource %s to states %s. " \
                     "Current state is %s." % (info.get('name'), allowed_states, info.get('state'))
         else:
             name_uuid = self._module.params.get('name') or self._module.params.get('uuid')
