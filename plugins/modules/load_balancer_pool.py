@@ -114,6 +114,11 @@ protocol:
   returned: success
   type: str
   sample: tcp
+state:
+  description: The current state of the load balancer pool
+  returned: success
+  type: str
+  sample: present
 tags:
   description: Tags assosiated with the load balancer
   returned: success
