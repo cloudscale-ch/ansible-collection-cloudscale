@@ -65,13 +65,13 @@ EXAMPLES = '''
       project: ansible-test
       stage: production
       sla: 24-7
-  api_token: xxxxxx
+    api_token: xxxxxx
 
 # Get load balancer pool facts by name
 - name: Get facts of a load balancer pool
   cloudscale_ch.cloud.load_balancer_pool:
     name: cloudscale-loadbalancer-pool1
-  api_token: xxxxxx
+    api_token: xxxxxx
 '''
 
 RETURN = '''

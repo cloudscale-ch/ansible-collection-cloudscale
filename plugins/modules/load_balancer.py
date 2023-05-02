@@ -98,7 +98,7 @@ EXAMPLES = '''
 - name: Get facts of a load balancer
   cloudscale_ch.cloud.load_balancer:
     name: my-shiny-cloudscale-load-balancer
-  api_token: xxxxxx
+    api_token: xxxxxx
 '''
 
 RETURN = '''
