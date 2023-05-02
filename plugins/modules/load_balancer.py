@@ -121,7 +121,7 @@ created_at:
   description: The creation date and time of the load balancer
   returned: success when not state == absent
   type: datetime
-  samle: 2023-02-07T15:32:02.308041Z
+  sample: 2023-02-07T15:32:02.308041Z
 status:
   description: The current status of the load balancer
   returned: success
