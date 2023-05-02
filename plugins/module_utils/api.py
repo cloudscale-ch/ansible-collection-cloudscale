@@ -19,7 +19,7 @@ def cloudscale_argument_spec():
         api_url=dict(
             type='str',
             fallback=(env_fallback, ['CLOUDSCALE_API_URL']),
-            default='https://api.cloudscale.ch/v1',
+            default='https://lab-api.cloudscale.ch/v1',
         ),
         api_token=dict(
             type='str',
@@ -278,8 +278,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
             self._module.params.get('uuid')
 
         if name_uuid is not None:
-            msg = "Timeout while waiting for a state change for resource %s" \
-                  "to states %s" % name_uuid, allowed_states
+            msg = "Timeout while waiting for a state change for resource %s to states %s" % (name_uuid, allowed_states)
         else:
             msg = "Timeout while waiting to find resource %s" % name_uuid
 
