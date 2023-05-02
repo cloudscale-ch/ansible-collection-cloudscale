@@ -1,7 +1,7 @@
 ---
 - name: List all networks
   uri:
-    url: 'https://api.cloudscale.ch/v1/networks'
+    url: 'https://lab-api.cloudscale.ch/v1/networks'
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'
     status_code: 200
