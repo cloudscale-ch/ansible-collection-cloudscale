@@ -19,7 +19,7 @@ def cloudscale_argument_spec():
         api_url=dict(
             type='str',
             fallback=(env_fallback, ['CLOUDSCALE_API_URL']),
-            default='https://lab-api.cloudscale.ch/v1',
+            default='https://api.cloudscale.ch/v1',
         ),
         api_token=dict(
             type='str',
