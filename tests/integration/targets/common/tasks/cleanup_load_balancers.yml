@@ -1,7 +1,7 @@
 ---
 - name: List all load balancers
   uri:
-    url: 'https://lab-api.cloudscale.ch/v1/load-balancers'
+    url: 'https://api.cloudscale.ch/v1/load-balancers'
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'
     status_code: 200
