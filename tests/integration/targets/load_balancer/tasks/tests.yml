@@ -127,7 +127,7 @@
       stage: staging
       sla: 8-5
   register: load_balancer
-- name: Verify update name of a running load balancer
+- name: Verify update name of a running load balancer idempotence
   assert:
     that:
       - load_balancer is not changed
