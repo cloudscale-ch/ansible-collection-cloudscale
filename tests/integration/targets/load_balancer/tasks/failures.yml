@@ -50,18 +50,18 @@
       - load_balancer is failed
       - '"Must be a valid UUID." in load_balancer.fetch_url_info.body'
 
-- name: Fail create a running load balancer with wrong VIP address
+- name: Fail create a running load balancer with incorrect VIP address
   cloudscale_ch.cloud.load_balancer:
     name: '{{ cloudscale_resource_prefix }}-test'
     flavor: '{{ cloudscale_test_flavor_lb }}'
     vip_addresses:
       - subnet: '{{ snet.uuid }}'
-        address: '1.1.1.1'
+        address: '172.16.0.0'
     zone: '{{ cloudscale_test_zone }}'
   register: load_balancer
   ignore_errors: True
-- name: Verify fail create a load balancer with wrong VIP address
+- name: Verify fail create a load balancer with incorrect VIP address
   assert:
     that:
       - load_balancer is failed
-      - '"The address must be part of the subnet" in load_balancer.fetch_url_info.body'
+      - '"is not a valid IP for the specified subnet" in load_balancer.fetch_url_info.body'
