@@ -48,7 +48,8 @@ options:
     description:
       - VIP address through which incoming traffic is received.
       - Can either be allocated in a public network or in a subnet of a private network.
-      - If empty, a new public IPv4 and IPv6 will be created.
+      - If empty, a new public IPv4 and IPv6 will be allocated.
+      - See the [API documentation](https://www.cloudscale.ch/en/api/v1#vip_addresses-attribute-specification) for details about this parameter.
     type: list
     elements: dict
     suboptions:
