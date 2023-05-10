@@ -171,10 +171,6 @@ timeout_member_data_ms:
   description: Pool member inactivity timeout in milliseconds
   returned: success when not state == absent
   sample: 50000
-timeout_tcp_inspect_ms:
-  description: TCP inspect timeout in milliseconds
-  returned: success when not state == absent
-  sample: 0
 tags:
   description: Tags assosiated with the load balancer listener
   returned: success
