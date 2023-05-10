@@ -273,7 +273,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
                 return info
             sleep(1)
 
-        # Timeout succeeded
+        # Timeout reached
         name_uuid = info.get('name') or self._module.params.get('name') or \
             self._module.params.get('uuid')
 
