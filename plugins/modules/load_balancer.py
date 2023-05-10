@@ -125,7 +125,7 @@ created_at:
   type: datetime
   sample: 2023-02-07T15:32:02.308041Z
 status:
-  description: The current status of the load balancer
+  description: The current operational status of the load balancer
   returned: success
   type: str
   sample: running
