@@ -186,6 +186,27 @@ ALLOWED_ENABLED = ('true',
 
 class AnsibleCloudscaleLoadBalancerPoolMember(AnsibleCloudscaleBase):
 
+    def __init__(self, module):
+        super(AnsibleCloudscaleLoadBalancerPoolMember, self).__init__(
+            module,
+            resource_name='load-balancers/pools/%s/members' % module.params['load_balancer_pool'],
+            resource_create_param_keys=[
+                'name',
+                'load_balancer_pool',
+                'enabled',
+                'protocol_port',
+                'monitor_port',
+                'address',
+                'subnet',
+                'tags',
+            ],
+            resource_update_param_keys=[
+                'name',
+                'enabled',
+                'tags',
+            ],
+        )
+
     def create(self, resource, data=None):
         super().create(resource, data)
 
@@ -226,25 +247,7 @@ def main():
         supports_check_mode=True,
     )
 
-    cloudscale_load_balancer_pool_member = AnsibleCloudscaleLoadBalancerPoolMember(
-        module,
-        resource_name='load-balancers/pools/%s/members' % module.params['load_balancer_pool'],
-        resource_create_param_keys=[
-            'name',
-            'load_balancer_pool',
-            'enabled',
-            'protocol_port',
-            'monitor_port',
-            'address',
-            'subnet',
-            'tags',
-        ],
-        resource_update_param_keys=[
-            'name',
-            'enabled',
-            'tags',
-        ],
-    )
+    cloudscale_load_balancer_pool_member = AnsibleCloudscaleLoadBalancerPoolMember(module)
     cloudscale_load_balancer_pool_member.query_constraint_keys = []
 
     if module.params['state'] == "absent":
