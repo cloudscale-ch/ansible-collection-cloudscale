@@ -47,7 +47,7 @@ options:
   vip_addresses:
     description:
       - VIP address through which incoming traffic is received.
-      - Can either be allocated in the public network or in the subnet of a private network.
+      - Can either be allocated in a public network or in a subnet of a private network.
       - If empty, a new public IPv4 and IPv6 will be created.
     type: list
     elements: dict
