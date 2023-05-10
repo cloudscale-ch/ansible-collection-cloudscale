@@ -174,6 +174,23 @@ ALLOWED_STATES = ('present',
 
 class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
 
+    def __init__(self, module):
+        super(AnsibleCloudscaleLoadBalancer, self).__init__(
+            module,
+            resource_name='load-balancers',
+            resource_create_param_keys=[
+                'name',
+                'flavor',
+                'zone',
+                'vip_addresses',
+                'tags',
+            ],
+            resource_update_param_keys=[
+                'name',
+                'tags',
+            ],
+        )
+
     def create(self, resource, data=None):
         super().create(resource)
         if not self._module.check_mode:
@@ -207,21 +224,7 @@ def main():
         supports_check_mode=True,
     )
 
-    cloudscale_load_balancer = AnsibleCloudscaleLoadBalancer(
-        module,
-        resource_name='load-balancers',
-        resource_create_param_keys=[
-            'name',
-            'flavor',
-            'zone',
-            'vip_addresses',
-            'tags',
-        ],
-        resource_update_param_keys=[
-            'name',
-            'tags',
-        ],
-    )
+    cloudscale_load_balancer = AnsibleCloudscaleLoadBalancer(module)
     cloudscale_load_balancer.query_constraint_keys = [
         'zone',
     ]
