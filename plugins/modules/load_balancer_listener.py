@@ -14,9 +14,9 @@ DOCUMENTATION = '''
 module: load_balancer_listener
 short_description: Manages load balancer listeners on the cloudscale.ch IaaS service
 description:
-  - List, create, update, delete listeners on the cloudscale.ch IaaS service.
+  - Get, create, update, delete listeners on the cloudscale.ch IaaS service.
 notes:
-  - If I(uuid) option is provided, it takes precedence over I(name) for load balancer listener selection. This allows to update the load balancers's name.
+  - If I(uuid) option is provided, it takes precedence over I(name) for load balancer listener selection. This allows to update the listener's name.
   - If no I(uuid) option is provided, I(name) is used for load balancer listener selection. If more than one load balancer with this name exists, execution is aborted.
 author:
   - Gaudenz Steinlin (@gaudenz)
