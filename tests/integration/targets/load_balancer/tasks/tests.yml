@@ -69,6 +69,20 @@
       - load_balancer.tags.stage == 'production'
       - load_balancer.tags.sla == '24-7'
 
+- name: Test create a running load balancer with default flavor
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test2'
+    zone: '{{ cloudscale_test_zone }}'
+  register: load_balancer_default_flavor
+- name: Verify create a running load balancer with default flavor
+  assert:
+    that:
+      - load_balancer_default_flavor is changed
+      - load_balancer_default_flavor.status == 'running'
+      - load_balancer_default_flavor.name == '{{ cloudscale_resource_prefix }}-test2'
+      - load_balancer_default_flavor.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
+      - load_balancer_default_flavor.zone.slug == '{{ cloudscale_test_zone }}'
+
 # Get LB facts
 - name: Test get facts of a load balancer by name
   cloudscale_ch.cloud.load_balancer:

@@ -186,7 +186,7 @@ def main():
     argument_spec.update(dict(
         name=dict(type='str'),
         uuid=dict(type='str'),
-        flavor=dict(type='str'),
+        flavor=dict(type='str', default='lb-standard'),
         zone=dict(type='str'),
         vip_addresses=dict(
             type='list',
