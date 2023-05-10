@@ -41,7 +41,11 @@ options:
     type: str
   pool:
     description:
-      - The protocol used for receiving traffic.
+      - The pool of the listener.
+    type: str
+  protocol:
+    description:
+      -	The protocol used for receiving traffic.
     type: str
   protocol_port:
     description:
