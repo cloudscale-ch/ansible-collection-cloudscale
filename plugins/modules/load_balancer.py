@@ -168,8 +168,6 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('present',
                   'absent',
                   )
-ALLOWED_LB_FLAVORS = ('lb-standard',
-                      )
 
 
 class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
@@ -186,7 +184,7 @@ def main():
     argument_spec.update(dict(
         name=dict(type='str'),
         uuid=dict(type='str'),
-        flavor=dict(choices=ALLOWED_LB_FLAVORS),
+        flavor=dict(type='str'),
         zone=dict(type='str'),
         vip_addresses=dict(
             type='list',
