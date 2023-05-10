@@ -277,7 +277,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         name_uuid = info.get('name') or self._module.params.get('name') or \
             self._module.params.get('uuid')
 
-       msg = "Timeout while waiting for a state change for resource %s to states %s" % (name_uuid, allowed_states)
+        msg = "Timeout while waiting for a state change for resource %s to states %s" % (name_uuid, allowed_states)
 
         self._module.fail_json(msg=msg)
 
