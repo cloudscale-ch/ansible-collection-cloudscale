@@ -34,7 +34,7 @@
   assert:
     that:
       - load_balancer_listener is failed
-      - load_balancer_listener.msg.startswith('value of protocol must be one of')
+      - '"Expect one of" in load_balancer_listener.fetch_url_info.body'
 
 - name: Fail create a load balancer listener with invalid port
   cloudscale_ch.cloud.load_balancer_listener:

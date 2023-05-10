@@ -187,8 +187,6 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('present',
                   'absent',
                   )
-ALLOWED_PROTOCOLS = ('tcp',
-                     )
 
 
 def main():
@@ -197,7 +195,7 @@ def main():
         name=dict(type='str'),
         uuid=dict(type='str'),
         pool=dict(type='str'),
-        protocol=dict(type='str', choices=ALLOWED_PROTOCOLS),
+        protocol=dict(type='str'),
         protocol_port=dict(type='str'),
         allowed_cidrs=dict(type='list', elements='str'),
         timeout_client_data_ms=dict(type='str'),
