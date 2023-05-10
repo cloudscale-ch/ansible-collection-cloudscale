@@ -3,6 +3,7 @@
   cloudscale_ch.cloud.network:
     name: '{{ cloudscale_resource_prefix }}-lb-network'
     auto_create_ipv4_subnet: false
+    zone: '{{ cloudscale_test_zone }}'
     tags:
       project: ansible-test
       stage: production
