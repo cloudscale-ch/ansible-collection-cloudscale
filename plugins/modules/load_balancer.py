@@ -42,6 +42,7 @@ options:
   flavor:
     description:
       - Flavor of the load balancer.
+    default: lb-standard
     type: str
   vip_addresses:
     description:
