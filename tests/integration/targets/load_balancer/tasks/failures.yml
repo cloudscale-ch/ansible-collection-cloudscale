@@ -19,7 +19,7 @@
   assert:
     that:
       - load_balancer is failed
-      - load_balancer.msg.startswith('value of flavor must be one of')
+      - '"is not a valid choice" in load_balancer.fetch_url_info.body'
 
 - name: Fail create a running load balancer with non-existing zone
   cloudscale_ch.cloud.load_balancer:
