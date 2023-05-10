@@ -34,7 +34,7 @@
   assert:
     that:
       - load_balancer_pool is failed
-      - load_balancer_pool.msg.startswith('value of algorithm must be one of')
+      - '"Expect one of" in load_balancer_pool.fetch_url_info.body'
 
 - name: Fail create a load balancer pool with non-existing protocol
   cloudscale_ch.cloud.load_balancer_pool:
@@ -48,4 +48,4 @@
   assert:
     that:
       - load_balancer_pool is failed
-      - load_balancer_pool.msg.startswith('value of protocol must be one of')
+      - '"Expect one of" in load_balancer_pool.fetch_url_info.body'

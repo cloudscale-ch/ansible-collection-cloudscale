@@ -137,14 +137,6 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('present',
                   'absent',
                   )
-ALLOWED_POOL_ALGORITHMUS = ('round_robin',
-                            'least_connections',
-                            'source_ip',
-                            )
-ALLOWED_POOL_PROTOCOLS = ('tcp',
-                          'proxy',
-                          'proxyv2',
-                          )
 
 
 def main():
@@ -153,8 +145,8 @@ def main():
         name=dict(),
         uuid=dict(),
         load_balancer=dict(),
-        algorithm=dict(choices=ALLOWED_POOL_ALGORITHMUS),
-        protocol=dict(choices=ALLOWED_POOL_PROTOCOLS),
+        algorithm=dict(type='str'),
+        protocol=dict(type='str'),
         tags=dict(type='dict'),
         state=dict(default='present', choices=ALLOWED_STATES),
     ))
