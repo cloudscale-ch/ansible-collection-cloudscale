@@ -51,7 +51,7 @@ options:
     description:
       -	The port on which traffic is received.
     type: int
-  allowed_cidrs
+  allowed_cidrs:
     description:
       - Restrict the allowed source IPs for this listener.
       - [] means that any source IP is allowed. If the list is non-empty, traffic from source IPs not included is denied.
