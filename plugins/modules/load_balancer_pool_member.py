@@ -73,7 +73,7 @@ options:
 extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
-EXAMPLES = f'''
+EXAMPLES = '''
 # Create a pool member for a load balancer pool using registered variables
 - name: Create a load balancer pool
   cloudscale_ch.cloud.load_balancer_pool:
