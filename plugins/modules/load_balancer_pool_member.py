@@ -129,7 +129,7 @@ name:
 enabled:
   description: THe status of the load balancer pool member
   returned: success
-  type: str
+  type: bool
   sample: true
 created_at:
   description: The creation date and time of the load balancer pool member
@@ -243,7 +243,7 @@ def main():
         name=dict(),
         uuid=dict(),
         load_balancer_pool=dict(),
-        enabled=dict(default='true', choices=ALLOWED_ENABLED),
+        enabled=dict(type='bool', default=True),
         protocol_port=dict(),
         monitor_port=dict(),
         subnet=dict(),
