@@ -54,13 +54,39 @@ extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
+# Create a pool for a load balancer using registered variables
+- name: Create a running load balancer
+  cloudscale_ch.cloud.load_balancer:
+    name: 'lb1'
+    flavor: 'lb-standard'
+    zone: 'lpg1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+    api_token: xxxxxx
+  register: load_balancer
+
+- name: Create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: 'swimming-pool'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: 'round_robin'
+    protocol: 'tcp'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+    api_token: xxxxxx
+  register: load_balancer_pool
+
 # Create a load balancer pool with algorithm: round_robin and protocol: tcp
 - name: Create a load balancer pool
   cloudscale_ch.cloud.load_balancer_pool:
-    name: cloudscale-loadbalancer-pool1
-    load_balancer: 3766c579-3012-4a85-8192-2bbb4ef85b5f
-    algorithm: round_robin
-    protocol: tcp
+    name: 'cloudscale-loadbalancer-pool1'
+    load_balancer: '3766c579-3012-4a85-8192-2bbb4ef85b5f'
+    algorithm: 'round_robin'
+    protocol: 'tcp'
     tags:
       project: ansible-test
       stage: production
