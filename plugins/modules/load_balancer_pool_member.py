@@ -51,13 +51,13 @@ options:
   protocol_port:
     description:
       - The port to which actual traffic is sent.
-    type: str
+    type: int
   monitor_port:
     description:
       - The port to which health monitor checks are sent.
       - If not specified, protocol_port will be used. Default is null.
     default: null
-    type: str
+    type: int
   address:
     description:
       - The IP address to which traffic is sent.
@@ -93,8 +93,8 @@ EXAMPLES = f'''
     name: 'my-shiny-swimming-pool-member'
     load_balancer_pool: '{{ load_balancer_pool.uuid }}'
     enabled: true
-    protocol_port: '8080'
-    monitor_port: '8081'
+    protocol_port: 8080
+    monitor_port: 8081
     subnet: '70d282ab-2a01-4abb-ada5-34e56a5a7eee'
     address: '172.16.0.100'
     tags:
@@ -148,12 +148,12 @@ pool:
 protocol_port:
   description: The port to which actual traffic is sent
   returned: success
-  type: str
+  type: int
   sample: 8080
 monitor_port:
   description: The port to which health monitor checks are sent
   returned: success
-  type: str
+  type: int
   sample: 8081
 address:
   description: The IP address to which traffic is sent
@@ -202,7 +202,6 @@ class AnsibleCloudscaleLoadBalancerPoolMember(AnsibleCloudscaleBase):
             resource_name='load-balancers/pools/%s/members' % module.params['load_balancer_pool'],
             resource_create_param_keys=[
                 'name',
-                'load_balancer_pool',
                 'enabled',
                 'protocol_port',
                 'monitor_port',
@@ -217,21 +216,74 @@ class AnsibleCloudscaleLoadBalancerPoolMember(AnsibleCloudscaleBase):
             ],
         )
 
-    def create(self, resource, data=None):
-        super().create(resource, data)
+    def query(self):
+        # Initialize
+        self._resource_data = self.init_resource()
 
-        if not data:
-            data = dict()
-        data = AnsibleCloudscaleLoadBalancerPoolMember.remove_param(self, data)
+        # Query by UUID
+        uuid = self._module.params[self.resource_key_uuid]
+        if uuid is not None:
 
-        if not self._module.check_mode:
-            resource = self.wait_for_state('enabled', ('true', 'false'))
-        return resource, data
+            # network id case
+            if "/" in uuid:
+                uuid = uuid.split("/")[0]
 
-    def remove_param(self, data):
-        for param in self.resource_create_param_keys:
-            data[param] = self._module.params.get(param)
-        return data
+            resource = self._get('%s/%s' % (self.resource_name, uuid))
+            if resource:
+                self._resource_data = resource
+                self._resource_data['state'] = "present"
+
+        # Query by name
+        else:
+            name = self._module.params[self.resource_key_name]
+
+            # Resource has no name field, we use a defined tag as name
+            if self.use_tag_for_name:
+                resources = self._get('%s?tag:%s=%s' % (self.resource_name, self.resource_name_tag, name))
+            else:
+                resources = self._get('%s' % self.resource_name)
+
+            matching = []
+            if resources is None:
+                self._module.fail_json(
+                        msg="The load balancer pool %s does not exist." % (
+                                self.resource_name,
+                            )
+                    )
+            for resource in resources:
+                if self.use_tag_for_name:
+                    resource[self.resource_key_name] = resource['tags'].get(self.resource_name_tag)
+
+                # Skip resource if constraints is not given e.g. in case of floating_ip the ip_version differs
+                for constraint_key in self.query_constraint_keys:
+                    if self._module.params[constraint_key] is not None:
+                        if constraint_key == 'zone':
+                            resource_value = resource['zone']['slug']
+                        else:
+                            resource_value = resource[constraint_key]
+
+                        if resource_value != self._module.params[constraint_key]:
+                            break
+                else:
+                    if resource[self.resource_key_name] == name:
+                        matching.append(resource)
+
+            # Fail on more than one resource with identical name
+            if len(matching) > 1:
+                self._module.fail_json(
+                    msg="More than one %s resource with '%s' exists: %s. "
+                        "Use the '%s' parameter to identify the resource." % (
+                            self.resource_name,
+                            self.resource_key_name,
+                            name,
+                            self.resource_key_uuid
+                        )
+                )
+            elif len(matching) == 1:
+                self._resource_data = matching[0]
+                self._resource_data['state'] = "present"
+
+        return self.pre_transform(self._resource_data)
 
 
 def main():
@@ -239,12 +291,12 @@ def main():
     argument_spec.update(dict(
         name=dict(),
         uuid=dict(),
-        load_balancer_pool=dict(),
+        load_balancer_pool=dict(type='str'),
         enabled=dict(type='bool', default=True),
-        protocol_port=dict(),
-        monitor_port=dict(),
-        subnet=dict(),
-        address=dict(),
+        protocol_port=dict(type='int'),
+        monitor_port=dict(type='int'),
+        subnet=dict(type='str'),
+        address=dict(type='str'),
         tags=dict(type='dict'),
         state=dict(default='present', choices=ALLOWED_STATES),
     ))
@@ -252,8 +304,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=(),
-        required_one_of=(('name', 'uuid'), 'load_balancer_pool'),
-        required_if=(('state', 'present', ('name',),),),
+        required_one_of=(('name', 'uuid'),),
         supports_check_mode=True,
     )
 
