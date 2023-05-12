@@ -40,7 +40,7 @@ options:
   algorithm:
     description:
       - The algorithm according to which the incoming traffic is distributed between the pool members.
-      - Currently the following algorithms are supported: I(round_robin), I(least_connections), I(source_ip).
+      - See the [API documentation](https://www.cloudscale.ch/en/api/v1#pool-algorithms) for supported distribution algorithms.
     type: str
   protocol:
     description:
