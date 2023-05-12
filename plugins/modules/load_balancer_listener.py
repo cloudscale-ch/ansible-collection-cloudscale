@@ -198,9 +198,9 @@ def main():
         protocol=dict(type='str'),
         protocol_port=dict(type='str'),
         allowed_cidrs=dict(type='list', elements='str'),
-        timeout_client_data_ms=dict(type='str'),
-        timeout_member_connect_ms=dict(type='str'),
-        timeout_member_data_ms=dict(type='str'),
+        timeout_client_data_ms=dict(type='int'),
+        timeout_member_connect_ms=dict(type='int'),
+        timeout_member_data_ms=dict(type='int'),
         tags=dict(type='dict'),
         state=dict(default='present', choices=ALLOWED_STATES),
     ))
@@ -222,6 +222,9 @@ def main():
             'protocol',
             'protocol_port',
             'allowed_cidrs',
+            'timeout_client_data_ms',
+            'timeout_member_connect_ms',
+            'timeout_member_data_ms',
             'tags',
         ],
         resource_update_param_keys=[
