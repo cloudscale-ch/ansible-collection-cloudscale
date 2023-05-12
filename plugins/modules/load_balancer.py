@@ -46,9 +46,6 @@ options:
     type: str
   vip_addresses:
     description:
-      - VIP address through which incoming traffic is received.
-      - Can either be allocated in a public network or in a subnet of a private network.
-      - If empty, a new public IPv4 and IPv6 will be allocated.
       - See the [API documentation](https://www.cloudscale.ch/en/api/v1#vip_addresses-attribute-specification) for details about this parameter.
     type: list
     elements: dict
@@ -56,11 +53,13 @@ options:
       subnet:
         description:
           - Create a VIP address on the subnet identified by this UUID.
+        type: str
       address:
         description:
           - Use this address.
           - Must be in the same range as subnet.
           - If empty, a radom address will be used.
+        type: str
   zone:
     description:
       - Zone in which the load balancer resides (e.g. C(lpg1) or C(rma1)).
@@ -122,7 +121,7 @@ name:
 created_at:
   description: The creation date and time of the load balancer
   returned: success when not state == absent
-  type: datetime
+  type: str
   sample: 2023-02-07T15:32:02.308041Z
 status:
   description: The current operational status of the load balancer
@@ -147,7 +146,7 @@ flavor:
 vip_addresses:
   description: List of vip_addresses for this load balancer
   returned: success when not state == absent
-  type: list
+  type: dict
   sample: [ {"version": "4", "address": "192.0.2.110",
             "subnet": [
                 "href": "https://api.cloudscale.ch/v1/subnets/92c70b2f-99cb-4811-8823-3d46572006e4",
@@ -213,7 +212,7 @@ def main():
             ),
         ),
         tags=dict(type='dict'),
-        state=dict(default='present', choices=ALLOWED_STATES),
+        state=dict(type='str', default='present', choices=ALLOWED_STATES),
     ))
 
     module = AnsibleModule(

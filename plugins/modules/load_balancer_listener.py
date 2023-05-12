@@ -212,7 +212,7 @@ def main():
         timeout_member_connect_ms=dict(type='int'),
         timeout_member_data_ms=dict(type='int'),
         tags=dict(type='dict'),
-        state=dict(default='present', choices=ALLOWED_STATES),
+        state=dict(type='str', default='present', choices=ALLOWED_STATES),
     ))
 
     module = AnsibleModule(
