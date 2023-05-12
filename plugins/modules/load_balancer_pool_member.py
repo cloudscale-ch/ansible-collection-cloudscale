@@ -73,12 +73,25 @@ options:
 extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
-EXAMPLES = '''
-# Create a pool member for a load balancer pool
+EXAMPLES = f'''
+# Create a pool member for a load balancer pool using registered variables
+- name: Create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: 'swimming-pool'
+    load_balancer: '514064c2-cfd4-4b0c-8a4b-c68c552ff84f'
+    algorithm: 'round_robin'
+    protocol: 'tcp'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+    api_token: xxxxxx
+  register: load_balancer_pool
+
 - name: Create a load balancer pool member
   cloudscale_ch.cloud.load_balancer_pool_member:
     name: 'my-shiny-swimming-pool-member'
-    load_balancer_pool: '20a7eb11-3e17-4177-b46d-36e13b101d1c'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
     enabled: true
     protocol_port: '8080'
     monitor_port: '8081'
