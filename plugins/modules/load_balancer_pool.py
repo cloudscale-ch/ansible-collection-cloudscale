@@ -27,7 +27,7 @@ options:
     description:
       - State of the load balancer pool.
     choices: [ present, absent ]
-    default: running
+    default: present
     type: str
   name:
     description:
