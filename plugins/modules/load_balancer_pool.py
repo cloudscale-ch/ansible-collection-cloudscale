@@ -33,6 +33,11 @@ options:
     description:
       - Name of the load balancer pool.
     type: str
+  uuid:
+    description:
+      - UUID of the load balancer pool.
+      - Either I(name) or I(uuid) are required.
+    type: str
   load_balancer:
     description:
       - UUID of the load balancer for this pool.
@@ -46,6 +51,7 @@ options:
     description:
       - The protocol used for traffic between the load balancer and the pool members.
       - See the [API documentation](https://www.cloudscale.ch/en/api/v1#pool-protocols) for supported protocols.
+    type: str
   tags:
     description:
       - Tags assosiated with the load balancer. Set this to C({}) to clear any tags.
