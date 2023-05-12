@@ -192,9 +192,6 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('present',
                   'absent',
                   )
-ALLOWED_ENABLED = ('true',
-                   'false',
-                   )
 
 
 class AnsibleCloudscaleLoadBalancerPoolMember(AnsibleCloudscaleBase):
