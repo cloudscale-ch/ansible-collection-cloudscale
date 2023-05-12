@@ -80,17 +80,27 @@ extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
-# Create a load balancer listener for a pool
+# Create a load balancer listener for a pool using registered variables
+- name: Create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: 'swimming-pool'
+    load_balancer: '3d41b118-f95c-4897-ad74-2260fea783fc'
+    algorithm: 'round_robin'
+    protocol: 'tcp'
+    api_token: xxxxxx
+  register: load_balancer_pool
+
 - name: Create a load balancer listener
   cloudscale_ch.cloud.load_balancer_listener:
-    name: 'new-listener1'
-    pool: '618a6cc8-d757-4fab-aa10-d49dc47e667b'
+    name: 'swimming-pool-listener'
+    pool: '{{ load_balancer_pool.uuid }}'
     protocol: 'tcp'
     protocol_port: 8080
     tags:
       project: ansible-test
       stage: production
       sla: 24-7
+    api_token: xxxxxx
 
 # Create a load balancer listener for a pool with restriction
 - name: Create a load balancer listener with ip restriction
