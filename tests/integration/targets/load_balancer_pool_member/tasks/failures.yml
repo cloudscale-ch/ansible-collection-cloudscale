@@ -1,1 +1,68 @@
 ---
+- name: Fail missing params
+  cloudscale_ch.cloud.load_balancer_pool_member:
+  register: load_balancer_pool_member
+  ignore_errors: True
+- name: 'VERIFY: Fail name and UUID'
+  assert:
+    that:
+      - load_balancer_pool_member is failed
+
+- name: Fail create a load balancer pool member with non-existing status
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: 'enableme'
+  register: load_balancer_pool_member
+  ignore_errors: True
+- name: Verify fail create a load balancer pool member with non-existing status
+  assert:
+    that:
+      - load_balancer_pool_member is failed
+      - '"is not a valid boolean" in load_balancer_pool_member.msg'
+
+- name: Fail create a load balancer pool member with non-existing load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '15264769-ac69-4809-a8e4-4d73f8f92496'
+  register: load_balancer_pool_member
+  ignore_errors: True
+- name: Verify fail create a load balancer pool member with non-existing load balancer pool
+  assert:
+    that:
+      - load_balancer_pool_member is failed
+      - '"does not exist" in load_balancer_pool_member.msg'
+
+#- name: Fail create a load balancer pool member with non-existing subnet
+#  cloudscale_ch.cloud.load_balancer_pool_member:
+#    name: '{{ cloudscale_resource_prefix }}-test'
+#    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+#    enabled: '{{ cloudscale_test_enabled_lb_member }}'
+#    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+#    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+#    subnet: '15264769-ac69-4809-a8e4-4d73f8f92496'
+#    address: '172.16.0.100'
+#  register: load_balancer_pool_member
+#  ignore_errors: True
+#- name: Verify fail create a load balancer pool member with non-existing subnet
+#  assert:
+#    that:
+#      - load_balancer_pool_member is failed
+#      - '"Expect one of" in load_balancer_pool_member.fetch_url_info.body'
+
+#- name: Fail create a load balancer pool member with non-existing address
+#  cloudscale_ch.cloud.load_balancer_pool_member:
+#    name: '{{ cloudscale_resource_prefix }}-test'
+#    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+#    enabled: '{{ cloudscale_test_enabled_lb_member }}'
+#    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+#    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+#    subnet: '{{ snet.uuid }}'
+#    address: '1.1.1.1'
+#  register: load_balancer_pool_member
+#  ignore_errors: True
+#- name: Verify fail create a load balancer pool member with non-existing address
+#  assert:
+#    that:
+#      - load_balancer_pool_member is failed
+#      - '"Expect one of" in load_balancer_pool_member.fetch_url_info.body'
