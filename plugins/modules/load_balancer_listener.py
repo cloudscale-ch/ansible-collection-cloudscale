@@ -236,7 +236,6 @@ def main():
             'tags',
         ],
     )
-    cloudscale_load_balancer_listener.query_constraint_keys = []
 
     if module.params['state'] == "absent":
         result = cloudscale_load_balancer_listener.absent()
