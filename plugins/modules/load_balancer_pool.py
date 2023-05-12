@@ -45,7 +45,7 @@ options:
   protocol:
     description:
       - The protocol used for traffic between the load balancer and the pool members.
-      - Currently the following protocols are supported: I(tcp), I(proxy), I(proxyv2).
+      - See the [API documentation](https://www.cloudscale.ch/en/api/v1#pool-protocols) for supported protocols.
   tags:
     description:
       - Tags assosiated with the load balancer. Set this to C({}) to clear any tags.
