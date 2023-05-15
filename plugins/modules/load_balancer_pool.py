@@ -126,7 +126,7 @@ created_at:
   description: The creation date and time of the load balancer pool
   returned: success when not state == absent
   type: str
-  samle: 2023-02-07T15:32:02.308041Z
+  samle: "2023-02-07T15:32:02.308041Z"
 load_balancer:
   description: The load balancer this pool is connected to
   returned: success when not state == absent

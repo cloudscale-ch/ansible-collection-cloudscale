@@ -146,7 +146,7 @@ created_at:
   description: The creation date and time of the load balancer listener
   returned: success when not state == absent
   type: str
-  sample: 2023-02-07T15:32:02.308041Z
+  sample: "2023-02-07T15:32:02.308041Z"
 pool:
   description: The pool of the load balancer listener
   returned: success when not state == absent
