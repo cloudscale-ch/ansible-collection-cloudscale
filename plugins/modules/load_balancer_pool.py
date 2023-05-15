@@ -132,7 +132,7 @@ load_balancer:
   returned: success when not state == absent
   type: list
   sample: {
-            "href": "https://api.cloudscale.ch/v1/load-balancers/15264769-ac69-4809-a8e4-4d73f8f92496", 
+            "href": "https://api.cloudscale.ch/v1/load-balancers/15264769-ac69-4809-a8e4-4d73f8f92496",
             "uuid": "15264769-ac69-4809-a8e4-4d73f8f92496",
             "name": "web-lb"
           }
