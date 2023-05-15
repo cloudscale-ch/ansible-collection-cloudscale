@@ -50,7 +50,7 @@ options:
     type: str
   protocol_port:
     description:
-      -	The port on which traffic is received.
+      - The port on which traffic is received.
     type: int
   allowed_cidrs:
     description:
@@ -65,7 +65,7 @@ options:
     type: int
   timeout_member_connect_ms:
     description:
-      -	Pool member connection timeout in milliseconds.
+      - Pool member connection timeout in milliseconds.
     default: 5000
     type: int
   timeout_member_data_ms:
