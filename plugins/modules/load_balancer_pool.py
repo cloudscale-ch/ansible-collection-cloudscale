@@ -158,8 +158,6 @@ tags:
   sample: { 'project': 'my project' }
 '''
 
-from datetime import datetime, timedelta
-
 from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.api import (
     AnsibleCloudscaleBase,
