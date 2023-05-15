@@ -151,11 +151,22 @@ pool:
   description: The pool of the load balancer listener
   returned: success when not state == absent
   type: complex
-  sample: {
-            "href": "https://api.cloudscale.ch/v1/load-balancers/pools/618a6cc8-d757-4fab-aa10-d49dc47e667b",
-            "uuid": "618a6cc8-d757-4fab-aa10-d49dc47e667b",
-            "name": "web-lb-pool"
-           }
+  contains:
+    href:
+      description: API URL to get details about the pool.
+      returned: success
+      type: str
+      sample: https://api.cloudscale.ch/v1/load-balancers/pools/618a6cc8-d757-4fab-aa10-d49dc47e667b
+    uuid:
+      description: The unique identifier for the pool.
+      returned: success
+      type: str
+      sample: 618a6cc8-d757-4fab-aa10-d49dc47e667b
+    name:
+      description: The name of the pool.
+      returned: success
+      type: str
+      sample: new-listener
 protocol:
   description: The protocol used for receiving traffic
   returned: success when not state == absent
@@ -169,7 +180,7 @@ protocol_port:
 allowed_cidrs:
   description: Restrict the allowed source IPs for this listener
   returned: success when not state == absent
-  type: complex
+  type: list
   sample: ["192.168.3.0/24", "2001:db8:85a3:8d3::/64"]
 timeout_client_data_ms:
   description: Client inactivity timeout in milliseconds
