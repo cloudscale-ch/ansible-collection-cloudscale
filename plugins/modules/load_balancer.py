@@ -122,7 +122,7 @@ created_at:
   description: The creation date and time of the load balancer
   returned: success when not state == absent
   type: str
-  sample: 2023-02-07T15:32:02.308041Z
+  sample: "2023-02-07T15:32:02.308041Z"
 status:
   description: The current operational status of the load balancer
   returned: success
@@ -206,6 +206,7 @@ def main():
         zone=dict(type='str'),
         vip_addresses=dict(
             type='list',
+            elements='dict',
             options=dict(
                 subnet=dict(type='str'),
                 address=dict(type='str'),
