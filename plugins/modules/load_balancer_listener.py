@@ -145,11 +145,12 @@ name:
 created_at:
   description: The creation date and time of the load balancer listener
   returned: success when not state == absent
-  type: datetime
+  type: str
   sample: 2023-02-07T15:32:02.308041Z
 pool:
   description: The pool of the load balancer listener
   returned: success when not state == absent
+  type: complex
   sample: {
             "href": "https://api.cloudscale.ch/v1/load-balancers/pools/618a6cc8-d757-4fab-aa10-d49dc47e667b",
             "uuid": "618a6cc8-d757-4fab-aa10-d49dc47e667b",
@@ -158,29 +159,32 @@ pool:
 protocol:
   description: The protocol used for receiving traffic
   returned: success when not state == absent
+  type: str
   sample: tcp
 protocol_port:
   description: The port on which traffic is received
   returned: success when not state == absent
+  type: int
   sample: 8080
 allowed_cidrs:
   description: Restrict the allowed source IPs for this listener
   returned: success when not state == absent
-  sample: [
-            "192.168.3.0/24",
-            "2001:db8:85a3:8d3::/64"
-           ]
+  type: complex
+  sample: ["192.168.3.0/24", "2001:db8:85a3:8d3::/64"]
 timeout_client_data_ms:
   description: Client inactivity timeout in milliseconds
   returned: success when not state == absent
+  type: int
   sample: 50000
 timeout_member_connect_ms:
   description: Pool member connection timeout in milliseconds
   returned: success when not state == absent
+  type: int
   sample: 50000
 timeout_member_data_ms:
   description: Pool member inactivity timeout in milliseconds
   returned: success when not state == absent
+  type: int
   sample: 50000
 tags:
   description: Tags assosiated with the load balancer listener

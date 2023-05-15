@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: load_balancer
+module: load_balancer_pool_member
 short_description: Manages load balancer pool members on the cloudscale.ch IaaS service
 description:
   - Get, create, update, delete pool members on the cloudscale.ch IaaS service.
@@ -134,7 +134,7 @@ enabled:
 created_at:
   description: The creation date and time of the load balancer pool member
   returned: success when not state == absent
-  type: datetime
+  type: str
   sample: 2023-02-07T15:32:02.308041Z
 pool:
   description: The pool of the pool member
