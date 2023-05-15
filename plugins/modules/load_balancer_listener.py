@@ -61,17 +61,14 @@ options:
   timeout_client_data_ms:
     description:
       - Client inactivity timeout in milliseconds.
-    default: 50000
     type: int
   timeout_member_connect_ms:
     description:
       - Pool member connection timeout in milliseconds.
-    default: 5000
     type: int
   timeout_member_data_ms:
     description:
       - Pool member inactivity timeout in milliseconds.
-    default: 50000
     type: int
   tags:
     description:
@@ -224,9 +221,9 @@ def main():
         protocol=dict(type='str'),
         protocol_port=dict(type='int'),
         allowed_cidrs=dict(type='list', elements='str'),
-        timeout_client_data_ms=dict(type='int', default='50000'),
-        timeout_member_connect_ms=dict(type='int', default='5000'),
-        timeout_member_data_ms=dict(type='int', default='50000'),
+        timeout_client_data_ms=dict(type='int'),
+        timeout_member_connect_ms=dict(type='int'),
+        timeout_member_data_ms=dict(type='int'),
         tags=dict(type='dict'),
         state=dict(type='str', default='present', choices=ALLOWED_STATES),
     ))
