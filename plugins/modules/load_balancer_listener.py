@@ -18,7 +18,7 @@ description:
 notes:
   - If I(uuid) option is provided, it takes precedence over I(name) for load balancer listener selection. This allows to update the listener's name.
   - If no I(uuid) option is provided, I(name) is used for load balancer listener selection.
-    If more than one load balancer with this name exists, execution is aborted.
+  - If more than one load balancer with this name exists, execution is aborted.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Kenneth Joss (@k-304)
@@ -56,7 +56,6 @@ options:
     description:
       - Restrict the allowed source IPs for this listener.
       - [] means that any source IP is allowed. If the list is non-empty, traffic from source IPs not included is denied.
-    default: []
     type: list
   timeout_client_data_ms:
     description:
