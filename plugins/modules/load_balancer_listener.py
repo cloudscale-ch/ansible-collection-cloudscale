@@ -46,7 +46,7 @@ options:
     type: str
   protocol:
     description:
-      -	The protocol used for receiving traffic.
+      - The protocol used for receiving traffic.
     type: str
   protocol_port:
     description:
@@ -57,6 +57,7 @@ options:
       - Restrict the allowed source IPs for this listener.
       - [] means that any source IP is allowed. If the list is non-empty, traffic from source IPs not included is denied.
     type: list
+    elements: str
   timeout_client_data_ms:
     description:
       - Client inactivity timeout in milliseconds.
