@@ -17,7 +17,8 @@ description:
   - Get, create, update, delete listeners on the cloudscale.ch IaaS service.
 notes:
   - If I(uuid) option is provided, it takes precedence over I(name) for load balancer listener selection. This allows to update the listener's name.
-  - If no I(uuid) option is provided, I(name) is used for load balancer listener selection. If more than one load balancer with this name exists, execution is aborted.
+  - If no I(uuid) option is provided, I(name) is used for load balancer listener selection.
+    If more than one load balancer with this name exists, execution is aborted.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Kenneth Joss (@k-304)

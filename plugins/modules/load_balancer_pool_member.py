@@ -246,10 +246,9 @@ class AnsibleCloudscaleLoadBalancerPoolMember(AnsibleCloudscaleBase):
             matching = []
             if resources is None:
                 self._module.fail_json(
-                        msg="The load balancer pool %s does not exist." % (
-                                self.resource_name,
-                            )
-                    )
+                    msg="The load balancer pool %s does not exist."
+                        % (self.resource_name,)
+                )
             for resource in resources:
                 if self.use_tag_for_name:
                     resource[self.resource_key_name] = resource['tags'].get(self.resource_name_tag)
