@@ -1,0 +1,9 @@
+---
+cloudscale_test_flavor_lb: lb-standard
+cloudscale_test_algorithm_lb_pool: round_robin
+cloudscale_test_protocol_lb_pool: tcp
+
+cloudscale_test_delay_lb_monitor: 2
+cloudscale_test_timeout_lb_monitor: 1
+cloudscale_test_up_threshold_lb_monitor: 3
+cloudscale_test_down_threshold_lb_monitor: 4
