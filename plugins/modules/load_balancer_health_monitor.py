@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: load_balancer
+module: load_balancer_health_monitor
 short_description: Manages load balancers on the cloudscale.ch IaaS service
 description:
   - Get, create, update, delete health monitors on the cloudscale.ch IaaS service.
@@ -25,30 +25,120 @@ version_added: "2.3.0"
 options:
   state:
     description:
-      - State of the load balancer.
+      - State of the load balancer health monitor.
     choices: [ present, absent ]
     default: present
     type: str
-  name:
-    description:
-      - Name of the load balancer.
-      - Either I(name) or I(uuid) are required.
-    type: str
   uuid:
     description:
-      - UUID of the load balancer.
-      - Either I(name) or I(uuid) are required.
+      - UUID of the load balancer health monitor.
     type: str
-
-
-
-
-
+  pool:
+    description:
+      - The pool of the health monitor.
+    type: str
+  delay_s:
+    description:
+      - The delay between two successive checks in seconds.
+    type: int
+  timeout_s:
+    description:
+      - The maximum time allowed for an individual check in seconds.
+    type: int
+  up_threshold:
+    description:
+      - 	The number of checks that need to be successful before the monitor_status of a pool member changes to "up".
+    type: int
+  down_threshold:
+    description:
+      - The number of checks that need to fail before the monitor_status of a pool member changes to "down".
+    type: int
+  type:
+    description:
+      - The type of the health monitor.
+    type: str
+  http:
+    description:
+      - Advanced options for health monitors with type "http" or "https".
+    type: list
+    elements: dict
+    suboptions:
+      expected_codes:
+        description:
+          - The HTTP status codes allowed for a check to be considered successful.
+          - See the [API documentation](https://www.cloudscale.ch/en/api/v1#http-attribute-specification) for details.
+        type: list
+      method:
+        description:
+          - The HTTP method used for the check.
+        type: str
+      url_path:
+        description:
+          - The URL used for the check.
+        type: str
+      version:
+        description:
+          - The HTTP version used for the check.
+        type: str
+      host:
+        description:
+          - The server name in the HTTP Host: header used for the check.
+          - Requires version to be set to "1.1".
+        type: str
+  tags:
+    description:
+      - Tags assosiated with the load balancer. Set this to C({}) to clear any tags.
+    type: dict
 extends_documentation_fragment: cloudscale_ch.cloud.api_parameters
 '''
 
 EXAMPLES = '''
+# Create a simple health monitor for a pool
+- name: Create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: 'swimming-pool'
+    load_balancer: '3d41b118-f95c-4897-ad74-2260fea783fc'
+    algorithm: 'round_robin'
+    protocol: 'tcp'
+    api_token: xxxxxx
+  register: load_balancer_pool
 
+- name: Create a load balancer health monitor (ping)
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool.uuid }}'
+    type: 'ping'
+    api_token: xxxxxx
+  register: load_balancer_health_monitor
+
+# Get load balancer health monitor facts by UUID
+- name: Get facts of a load balancer health monitor by UUID
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    api_token: xxxxxx
+
+# Update a health monitor
+- name: Update HTTP method of a load balancer health monitor from GET to CONNECT
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor_http.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    type: 'http'
+    http:
+      expected_codes:
+        - 200
+        - 202
+      method: 'CONNECT'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+    api_token: xxxxxx
+  register: load_balancer_health_monitor
 '''
 
 RETURN = '''
