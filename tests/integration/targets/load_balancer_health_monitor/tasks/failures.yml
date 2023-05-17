@@ -52,6 +52,7 @@
       stage: production
       sla: 24-7
   register: load_balancer_health_monitor
+  ignore_errors: True
 - name: Verify fail create a load balancer health monitor with invalid version/host combination
   assert:
     that:

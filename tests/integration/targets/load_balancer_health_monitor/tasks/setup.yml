@@ -21,3 +21,15 @@
       stage: production
       sla: 24-7
   register: load_balancer_pool
+
+- name: Test create a 2nd load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-ping'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_ping

@@ -1,5 +1,62 @@
 ---
 # Create LB health monitor
+- name: Test create a load balancer health monitor (PING) in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool_ping.uuid }}'
+    type: 'ping'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify create a load balancer healtch monitor (PING) in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'absent'
+
+- name: Test create a load balancer health monitor (PING)
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool_ping.uuid }}'
+    type: 'ping'
+
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify create a load balancer healtch monitor (PING)
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool_ping.uuid }}'
+      - load_balancer_health_monitor.type == 'ping'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test create a load balancer health monitor (PING) idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool_ping.uuid }}'
+    type: 'ping'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify create a load balancer health monitor (PING) idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool_ping.uuid }}'
+      - load_balancer_health_monitor.type == 'ping'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
 - name: Test create a load balancer health monitor (HTTP) in check mode
   cloudscale_ch.cloud.load_balancer_health_monitor:
     pool: '{{ load_balancer_pool.uuid }}'
@@ -91,7 +148,6 @@
       stage: production
       sla: 24-7
   register: load_balancer_health_monitor
-
 - name: Verify create a load balancer health monitor (HTTP) idempotence
   assert:
     that:
@@ -113,11 +169,11 @@
       - load_balancer_health_monitor.tags.sla == '24-7'
 
 # Get LB health monitor facts
-- name: Test get facts of a load balancer health monitor by name
+- name: Test get facts of a load balancer health monitor by UUID
   cloudscale_ch.cloud.load_balancer_health_monitor:
     uuid: '{{ load_balancer_health_monitor.uuid }}'
   register: load_balancer_health_monitor_facts
-- name: Verify get a load balancer health monitor by name
+- name: Verify get a load balancer health monitor by UUID
   assert:
     that:
       - load_balancer_health_monitor_facts is not changed
