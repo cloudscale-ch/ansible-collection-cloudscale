@@ -91,6 +91,7 @@
       stage: production
       sla: 24-7
   register: load_balancer_health_monitor
+
 - name: Verify create a load balancer health monitor (HTTP) idempotence
   assert:
     that:
@@ -228,7 +229,6 @@
       sla: 24-7
   register: load_balancer_health_monitor
   check_mode: yes
-- debug: var=load_balancer_health_monitor
 - name: Verify update HTTP method of a load balancer healtch monitor in check mode
   assert:
     that:
@@ -240,10 +240,10 @@
 - name: Test update HTTP method of a load balancer health monitor
   cloudscale_ch.cloud.load_balancer_health_monitor:
     uuid: '{{ load_balancer_health_monitor.uuid }}'
-    delay_s: '{{ cloudscale_test_delay_lb_monitor }}'
-    timeout_s: '{{ cloudscale_test_timeout_lb_monitor }}'
-    up_threshold: '{{ cloudscale_test_up_threshold_lb_monitor }}'
-    down_threshold: '{{ cloudscale_test_down_threshold_lb_monitor }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
     type: 'http'
     http:
       expected_codes: 
@@ -258,7 +258,6 @@
       stage: production
       sla: 24-7
   register: load_balancer_health_monitor
-- debug: var=load_balancer_health_monitor
 - name: Verify update HTTP method of a load balancer healtch monitor
   assert:
     that:
@@ -272,7 +271,7 @@
       - load_balancer_health_monitor.type == 'http'
       - '"200" in load_balancer_health_monitor.http.expected_codes'
       - '"202" in load_balancer_health_monitor.http.expected_codes'
-      - load_balancer_health_monitor.http.method == 'GET'
+      - load_balancer_health_monitor.http.method == 'CONNECT'
       - load_balancer_health_monitor.http.url_path == '/'
       - load_balancer_health_monitor.http.version == '1.1'
       - load_balancer_health_monitor.http.host == 'host1'
