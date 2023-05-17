@@ -278,3 +278,80 @@
       - load_balancer_health_monitor.tags.project == 'ansible-test'
       - load_balancer_health_monitor.tags.stage == 'production'
       - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test update HTTP method of a load balancer health monitor idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'CONNECT'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify update HTTP method of a load balancer healtch monitor idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == 2
+      - load_balancer_health_monitor.timeout_s == 1
+      - load_balancer_health_monitor.up_threshold == 2
+      - load_balancer_health_monitor.down_threshold == 3
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'CONNECT'
+      - load_balancer_health_monitor.http.url_path == '/'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+# Delete LB health monitor
+- name: Test load balancer health monitor deletion by UUID in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    state: absent
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify load balancer health monitor deletion by UUID in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.uuid == '{{ load_balancer_health_monitor.uuid }}'
+
+- name: Test load balancer health monitor deletion by UUID
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    state: absent
+  register: load_balancer_health_monitor
+- name: Verify load balancer health monitor deletion by UUID
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'absent'
+
+- name: Test load balancer health monitor deletion by UUID idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    state: absent
+  register: load_balancer_health_monitor
+- name: Verify load balancer health monitor deletion by UUID idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'absent'

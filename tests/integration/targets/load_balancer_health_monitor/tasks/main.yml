@@ -4,9 +4,6 @@
     - import_tasks: failures.yml
     - import_tasks: tests.yml
   always:
-    #- import_role:
-    #    name: common
-    #    tasks_from: cleanup_load_balancer_health_monitors.yml
     - import_role:
         name: common
         tasks_from: cleanup_load_balancer_pools.yml
