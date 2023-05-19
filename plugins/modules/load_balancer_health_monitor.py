@@ -56,6 +56,7 @@ options:
   type:
     description:
       - The type of the health monitor.
+      - See the [API documentation](https://www.cloudscale.ch/en/api/v1#create-a-health-monitor) for allowed options.
     type: str
   http:
     description:
@@ -154,12 +155,6 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('present',
                   'absent',
                   )
-ALLOWED_TYPES = ('ping',
-                 'tcp',
-                 'http',
-                 'https',
-                 'tls-hello',
-                 )
 
 
 class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
@@ -217,9 +212,9 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
             if len(matching) > 1:
                 self._module.fail_json(
                     msg="More than one %s resource for pool '%s' exists." % (
-                            self.resource_name,
-                            resource_key_pool
-                        )
+                        self.resource_name,
+                        resource_key_pool
+                    )
                 )
             elif len(matching) == 1:
                 self._resource_data = matching[0]
@@ -245,8 +240,6 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         if key in ["expected_codes", "host", "method", "url_path"] and self._module.params.get('http') is not None:
             param_http = self._module.params.get('http')
             param = param_http[key]
-            #if key == 'method' and param == "CONNECT":
-            #self._module.fail_json(msg=param)
 
             if param is None:
                 return False
@@ -254,7 +247,6 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
             if not resource or key not in resource['http']:
                 return False
 
-            # Key = method, param = "CONNECT"
             is_different = self.find_difference(key, resource, param)
 
             if is_different:
@@ -316,9 +308,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         if key in ["expected_codes", "host", "method", "url_path"]:
             is_different = False
 
-            # Key = method, param = "CONNECT"
             if param != resource['http'][key]:
-                #self._module.fail_json(msg="param: %s, res %s" % (param, resource['http'][key]))
                 is_different = True
 
             return is_different
@@ -346,7 +336,7 @@ def main():
         timeout_s=dict(type='int'),
         up_threshold=dict(type='int'),
         down_threshold=dict(type='int'),
-        type=dict(type='str', choices=ALLOWED_TYPES),
+        type=dict(type='str'),
         http=dict(
             type='dict',
             options=dict(
