@@ -67,7 +67,7 @@ options:
         description:
           - The HTTP status codes allowed for a check to be considered successful.
           - See the [API documentation](https://www.cloudscale.ch/en/api/v1#http-attribute-specification) for details.
-        type: str
+        type: list
       method:
         description:
           - The HTTP method used for the check.
@@ -82,8 +82,7 @@ options:
         type: str
       host:
         description:
-          - The server name in the HTTP Host: header used for the check.
-          - Requires version to be set to "1.1".
+          - The server name in the HTTP Host: header used for the check. Requires version to be set to "1.1".
         type: str
   tags:
     description:
