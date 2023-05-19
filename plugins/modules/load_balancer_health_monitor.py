@@ -143,7 +143,72 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-
+href:
+  description: API URL to get details about this load balancer health monitor
+  returned: success when not state == absent
+  type: str
+  sample: https://api.cloudscale.ch/v1/load-balancers/health-monitors/ee4952d4-2eba-4dec-8957-7911b3ce245b
+uuid:
+  description: The unique identifier for this load balancer health monitor
+  returned: success
+  type: str
+  sample: ee4952d4-2eba-4dec-8957-7911b3ce245b
+created_at:
+  description: The creation date and time of the load balancer health monitor
+  returned: success when not state == absent
+  type: str
+  sample: "2023-02-22T09:55:38.285018Z"
+pool:
+  description: The pool of the health monitor
+  returned: success when not state == absent
+  type: dict
+  sample: [
+            "href": "https://api.cloudscale.ch/v1/load-balancers/pools/618a6cc8-d757-4fab-aa10-d49dc47e667b",
+            "uuid": "618a6cc8-d757-4fab-aa10-d49dc47e667b",
+            "name": "swimming pool"
+          ]
+delay_s:
+  description: The delay between two successive checks in seconds
+  returned: success when not state == absent
+  type: int
+  sample: 2
+timeout_s:
+  description: The maximum time allowed for an individual check in seconds
+  returned: success when not state == absent
+  type: int
+  sample: 1
+up_threshold:
+  description: The number of checks that need to be successful before the monitor_status of a pool member changes to "up"
+  returned: success when not state == absent
+  type: int
+  sample: 2
+down_threshold:
+  description: The number of checks that need to fail before the monitor_status of a pool member changes to "down"
+  returned: success when not state == absent
+  type: int
+  sample: 3
+type:
+  description: The type of the health monitor
+  returned: success when not state == absent
+  type: str
+http:
+  description: Advanced options for health monitors with type "http" or "https"
+  returned: success when not state == absent
+  type: dict
+  sample: [ {
+                "expected_codes": [
+                    "200"
+                ],
+                "method": "GET",
+                "url_path": "/",
+                "version": "1.0",
+                "host": null
+            } ]
+tags:
+  description: Tags assosiated with the load balancer
+  returned: success
+  type: dict
+  sample: { 'project': 'my project' }
 '''
 
 from ansible.module_utils.basic import AnsibleModule
