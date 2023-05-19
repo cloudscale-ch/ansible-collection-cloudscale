@@ -61,14 +61,13 @@ options:
   http:
     description:
       - Advanced options for health monitors with type "http" or "https".
-    type: list
-    elements: dict
+    type: dict
     suboptions:
       expected_codes:
         description:
           - The HTTP status codes allowed for a check to be considered successful.
           - See the [API documentation](https://www.cloudscale.ch/en/api/v1#http-attribute-specification) for details.
-        type: list
+        type: str
       method:
         description:
           - The HTTP method used for the check.
