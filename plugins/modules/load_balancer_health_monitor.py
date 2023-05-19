@@ -68,6 +68,7 @@ options:
           - The HTTP status codes allowed for a check to be considered successful.
           - See the [API documentation](https://www.cloudscale.ch/en/api/v1#http-attribute-specification) for details.
         type: list
+        elements: str
       method:
         description:
           - The HTTP method used for the check.
@@ -393,7 +394,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
 def main():
     argument_spec = cloudscale_argument_spec()
     argument_spec.update(dict(
-        uuid=dict(type='str', aliases=['name']),
+        uuid=dict(type='str'),
         pool=dict(type='str'),
         delay_s=dict(type='int'),
         timeout_s=dict(type='int'),
