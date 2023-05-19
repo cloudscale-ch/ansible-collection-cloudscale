@@ -83,7 +83,8 @@ options:
         type: str
       host:
         description:
-          - The server name in the HTTP Host: header used for the check. Requires version to be set to "1.1".
+          - The server name in the HTTP Host header used for the check.
+          - Requires version to be set to "1.1".
         type: str
   tags:
     description:
