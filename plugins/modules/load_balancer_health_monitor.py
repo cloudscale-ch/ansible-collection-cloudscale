@@ -47,7 +47,7 @@ options:
     type: int
   up_threshold:
     description:
-      - 	The number of checks that need to be successful before the monitor_status of a pool member changes to "up".
+      - The number of checks that need to be successful before the monitor_status of a pool member changes to "up".
     type: int
   down_threshold:
     description:
