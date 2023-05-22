@@ -85,7 +85,7 @@ options:
   use_ipv6:
     description:
       - Enable IPv6 on the public network interface.
-    default: yes
+    default: true
     type: bool
   interfaces:
     description:
@@ -127,7 +127,7 @@ options:
   force:
     description:
       - Allow to stop the running server for updating if necessary.
-    default: no
+    default: false
     type: bool
   tags:
     description:
@@ -147,7 +147,7 @@ EXAMPLES = '''
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
     server_groups: shiny-group
     zone: lpg1
-    use_private_network: True
+    use_private_network: true
     bulk_volume_size_gb: 100
     api_token: xxxxxx
 
@@ -169,10 +169,10 @@ EXAMPLES = '''
     name: my-shiny-cloudscale-server
     image: debian-10
     flavor: flex-8-2
-    force: yes
+    force: true
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
-    use_private_network: True
+    use_private_network: true
     bulk_volume_size_gb: 100
     api_token: xxxxxx
   register: server1
@@ -453,7 +453,7 @@ class AnsibleCloudscaleServer(AnsibleCloudscaleBase):
             if server_info.get('state') == "running":
                 if requires_stop and not self._module.params.get('force'):
                     self._module.warn("Some changes won't be applied to running servers. "
-                                      "Use force=yes to allow the server '%s' to be stopped/started." % server_info['name'])
+                                      "Use force=true to allow the server '%s' to be stopped/started." % server_info['name'])
                     return server_info
 
             # Either the server is stopped or change is forced

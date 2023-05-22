@@ -29,7 +29,7 @@ options:
     description:
       - Retry the image import even if a failed import using the same name and
         URL already exists. This is necessary to recover from download errors.
-    default: no
+    default: false
     type: bool
   name:
     description:
