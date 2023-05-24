@@ -426,12 +426,6 @@ def main():
 
     cloudscale_load_balancer_health_monitor = AnsibleCloudscaleLoadBalancerHealthMonitor(module)
     cloudscale_load_balancer_health_monitor.query_constraint_keys = []
-    cloudscale_load_balancer_health_monitor.http_options = [
-        'expected_codes',
-        'method',
-        'url_path',
-        'host',
-    ]
 
     if module.params['state'] == "absent":
         result = cloudscale_load_balancer_health_monitor.absent()
