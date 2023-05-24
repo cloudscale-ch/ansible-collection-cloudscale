@@ -20,7 +20,6 @@
   cloudscale_ch.cloud.load_balancer_health_monitor:
     pool: '{{ load_balancer_pool_ping.uuid }}'
     type: 'ping'
-
     tags:
       project: ansible-test
       stage: production
