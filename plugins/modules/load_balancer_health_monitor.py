@@ -220,6 +220,10 @@ from ..module_utils.api import (
 ALLOWED_STATES = ('present',
                   'absent',
                   )
+ALLOWED_HTTP_POST_PARAMS = ('expected_codes',
+                            'host',
+                            'method',
+                            'url_path')
 
 
 class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
@@ -291,7 +295,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         updated = False
         for param in self.resource_update_param_keys:
             if param == 'http':
-                for subparam in ["expected_codes", "host", "method", "url_path"]:
+                for subparam in ALLOWED_HTTP_POST_PARAMS:
                     updated = self._param_updated(subparam, resource) or updated
             else:
                 updated = self._param_updated(param, resource) or updated
@@ -302,7 +306,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         return resource
 
     def _param_updated(self, key, resource):
-        if key in ["expected_codes", "host", "method", "url_path"] and self._module.params.get('http') is not None:
+        if key in ALLOWED_HTTP_POST_PARAMS and self._module.params.get('http') is not None:
             param_http = self._module.params.get('http')
             param = param_http[key]
 
@@ -370,7 +374,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
             return False
 
     def find_difference(self, key, resource, param):
-        if key in ["expected_codes", "host", "method", "url_path"]:
+        if key in ALLOWED_HTTP_POST_PARAMS:
             is_different = False
 
             if param != resource['http'][key]:
