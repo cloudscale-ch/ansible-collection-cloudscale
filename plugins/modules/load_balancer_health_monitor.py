@@ -16,8 +16,7 @@ short_description: Manages load balancers on the cloudscale.ch IaaS service
 description:
   - Get, create, update, delete health monitors on the cloudscale.ch IaaS service.
 notes:
-  - If I(uuid) option is provided, it takes precedence over I(name) for load balancer health monitor selection. This allows to update the health monitor's name.
-  - If no I(uuid) option is provided, I(name) is used for load balancer selection. If more than one load balancer with this name exists, execution is aborted.
+  - Health monitors do not have names. I(uuid)'s are used to reference a health monitors.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Kenneth Joss (@k-304)
