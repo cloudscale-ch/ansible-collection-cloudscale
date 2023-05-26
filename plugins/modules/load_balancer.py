@@ -191,7 +191,7 @@ class AnsibleCloudscaleLoadBalancer(AnsibleCloudscaleBase):
         )
 
     def create(self, resource, data=None):
-        super(type(self), self).create(resource)
+        super().create(resource)
         if not self._module.check_mode:
             resource = self.wait_for_state('status', ('running', ))
         return resource
