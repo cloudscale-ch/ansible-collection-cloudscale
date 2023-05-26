@@ -264,7 +264,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         # Either search by given health monitor's UUID or
         # search the health monitor by its acossiated pool UUID (1:1)
         if uuid is not None:
-            super(type(self), self).query()
+            super().query()
         else:
             pool = self._module.params[resource_key_pool]
             if pool is not None:
