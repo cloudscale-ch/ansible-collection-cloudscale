@@ -293,11 +293,11 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
     def update(self, resource):
         updated = False
         for param in self.resource_update_param_keys:
-            if param == 'http':
+            if param == 'http' and self._module.params.get('http') is not None:
                 for subparam in ALLOWED_HTTP_POST_PARAMS:
                     updated = self._param_updated(subparam, resource) or updated
             else:
-                updated = self._param_updated(param, resource) or updated
+                updated = super()._param_updated(param, resource) or updated
 
         # Refresh if resource was updated in live mode
         if updated and not self._module.check_mode:
@@ -305,72 +305,43 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         return resource
 
     def _param_updated(self, key, resource):
-        if key in ALLOWED_HTTP_POST_PARAMS and self._module.params.get('http') is not None:
-            param_http = self._module.params.get('http')
-            param = param_http[key]
+        param_http = self._module.params.get('http')
+        param = param_http[key]
 
-            if param is None:
-                return False
-
-            if not resource or key not in resource['http']:
-                return False
-
-            is_different = self.find_difference(key, resource, param)
-
-            if is_different:
-                self._result['changed'] = True
-
-                patch_data = {
-                    'http': {
-                        key: param
-                    }
-                }
-
-                before_data = {
-                    'http': {
-                        key: resource['http'][key]
-                    }
-                }
-
-                self._result['diff']['before'].update(before_data)
-                self._result['diff']['after'].update(patch_data)
-
-                if not self._module.check_mode:
-                    href = resource.get('href')
-                    if not href:
-                        self._module.fail_json(msg='Unable to update %s, no href found.' % key)
-
-                    self._patch(href, patch_data)
-                    return True
+        if param is None:
             return False
-        else:
-            param = self._module.params.get(key)
-            if param is None:
-                return False
 
-            if not resource or key not in resource:
-                return False
+        if not resource or key not in resource['http']:
+            return False
 
-            is_different = self.find_difference(key, resource, param)
+        is_different = self.find_difference(key, resource, param)
 
-            if is_different:
-                self._result['changed'] = True
+        if is_different:
+            self._result['changed'] = True
 
-                patch_data = {
+            patch_data = {
+                'http': {
                     key: param
                 }
+            }
 
-                self._result['diff']['before'].update({key: resource[key]})
-                self._result['diff']['after'].update(patch_data)
+            before_data = {
+                'http': {
+                    key: resource['http'][key]
+                }
+            }
 
-                if not self._module.check_mode:
-                    href = resource.get('href')
-                    if not href:
-                        self._module.fail_json(msg='Unable to update %s, no href found.' % key)
+            self._result['diff']['before'].update(before_data)
+            self._result['diff']['after'].update(patch_data)
 
-                    self._patch(href, patch_data)
-                    return True
-            return False
+            if not self._module.check_mode:
+                href = resource.get('href')
+                if not href:
+                    self._module.fail_json(msg='Unable to update %s, no href found.' % key)
+
+                self._patch(href, patch_data)
+                return True
+        return False
 
     def find_difference(self, key, resource, param):
         if key in ALLOWED_HTTP_POST_PARAMS:
@@ -378,21 +349,10 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
 
             if param != resource['http'][key]:
                 is_different = True
-
-            return is_different
         else:
-            is_different = False
+            is_different = super().find_difference(key, resource, param)
 
-            # If it looks like a stub
-            if isinstance(resource[key], dict) and 'href' in resource[key]:
-                uuid = resource[key].get('href', '').split('/')[-1]
-                if param != uuid:
-                    is_different = True
-
-            elif param != resource[key]:
-                is_different = True
-
-            return is_different
+        return is_different
 
 
 def main():
