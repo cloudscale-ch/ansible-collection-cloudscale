@@ -295,16 +295,16 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         for param in self.resource_update_param_keys:
             if param == 'http' and self._module.params.get('http') is not None:
                 for subparam in ALLOWED_HTTP_POST_PARAMS:
-                    updated = self._param_updated(subparam, resource) or updated
+                    updated = self._http_param_updated(subparam, resource) or updated
             else:
-                updated = super()._param_updated(param, resource) or updated
+                updated = self._param_updated(param, resource) or updated
 
         # Refresh if resource was updated in live mode
         if updated and not self._module.check_mode:
             resource = self.query()
         return resource
 
-    def _param_updated(self, key, resource):
+    def _http_param_updated(self, key, resource):
         param_http = self._module.params.get('http')
         param = param_http[key]
 
