@@ -314,7 +314,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
         if not resource or key not in resource['http']:
             return False
 
-        is_different = self.find_difference(key, resource, param)
+        is_different = self.find_http_difference(key, resource, param)
 
         if is_different:
             self._result['changed'] = True
@@ -343,14 +343,11 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
                 return True
         return False
 
-    def find_difference(self, key, resource, param):
-        if key in ALLOWED_HTTP_POST_PARAMS:
-            is_different = False
+    def find_http_difference(self, key, resource, param):
+        is_different = False
 
-            if param != resource['http'][key]:
-                is_different = True
-        else:
-            is_different = super().find_difference(key, resource, param)
+        if param != resource['http'][key]:
+            is_different = True
 
         return is_different
 
