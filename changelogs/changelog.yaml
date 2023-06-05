@@ -114,3 +114,26 @@ releases:
     fragments:
     - add-uefi-option.yml
     release_date: '2023-01-04'
+  2.3.0:
+    changes:
+      major_changes:
+      - Bump minimum required Ansible version to 2.13.0
+    fragments:
+    - ansible_version_bump.yml
+    modules:
+    - description: Manages load balancers on the cloudscale.ch IaaS service
+      name: load_balancer
+      namespace: ''
+    - description: Manages load balancers on the cloudscale.ch IaaS service
+      name: load_balancer_health_monitor
+      namespace: ''
+    - description: Manages load balancer listeners on the cloudscale.ch IaaS service
+      name: load_balancer_listener
+      namespace: ''
+    - description: Manages load balancer pools on the cloudscale.ch IaaS service
+      name: load_balancer_pool
+      namespace: ''
+    - description: Manages load balancer pool members on the cloudscale.ch IaaS service
+      name: load_balancer_pool_member
+      namespace: ''
+    release_date: '2023-06-05'

@@ -5,6 +5,23 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.3.0
+======
+
+Major Changes
+-------------
+
+- Bump minimum required Ansible version to 2.13.0
+
+New Modules
+-----------
+
+- load_balancer - Manages load balancers on the cloudscale.ch IaaS service
+- load_balancer_health_monitor - Manages load balancers on the cloudscale.ch IaaS service
+- load_balancer_listener - Manages load balancer listeners on the cloudscale.ch IaaS service
+- load_balancer_pool - Manages load balancer pools on the cloudscale.ch IaaS service
+- load_balancer_pool_member - Manages load balancer pool members on the cloudscale.ch IaaS service
+
 v2.2.4
 ======
 
