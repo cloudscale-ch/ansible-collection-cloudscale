@@ -1,0 +1,60 @@
+---
+- name: Fail create a load balancer health monitor with missing params
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+  register: load_balancer_health_monitor
+  ignore_errors: True
+- name: Verify fail create a load balancer health monitor with missing params
+  assert:
+    that:
+      - load_balancer_health_monitor is failed
+      - '"This field is required" in load_balancer_health_monitor.fetch_url_info.body'
+
+- name: Fail create a load balancer health monitor with missing type
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool.uuid }}'
+  register: load_balancer_health_monitor
+  ignore_errors: True
+- name: Verify fail create a load balancer health monitor with missing type
+  assert:
+    that:
+      - load_balancer_health_monitor is failed
+      - '"This field is required" in load_balancer_health_monitor.fetch_url_info.body'
+
+- name: Fail create a load balancer health monitor with non-existing load balancer pool
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '15264769-ac69-4809-a8e4-4d73f8f92496'
+  register: load_balancer_health_monitor
+  ignore_errors: True
+- name: Verify fail create a load balancer listener with non-existing load balancer
+  assert:
+    that:
+      - load_balancer_health_monitor is failed
+      - '"This field is required" in load_balancer_health_monitor.fetch_url_info.body'
+
+- name: Fail create a load balancer health monitor with invalid version/host combination
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool.uuid }}'
+    delay_s: '{{ cloudscale_test_delay_lb_monitor }}'
+    timeout_s: '{{ cloudscale_test_timeout_lb_monitor }}'
+    up_threshold: '{{ cloudscale_test_up_threshold_lb_monitor }}'
+    down_threshold: '{{ cloudscale_test_down_threshold_lb_monitor }}'
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'GET'
+      url_path: '/'
+      version: '1.0'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+  ignore_errors: True
+- name: Verify fail create a load balancer health monitor with invalid version/host combination
+  assert:
+    that:
+      - load_balancer_health_monitor is failed
+      - '"The host argument can not be used with HTTP version 1.0" in load_balancer_health_monitor.fetch_url_info.body'

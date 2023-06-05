@@ -1,0 +1,35 @@
+---
+- name: Test create a running load balancer
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer
+
+- name: Test create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool
+
+- name: Test create a 2nd load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-ping'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_ping

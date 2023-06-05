@@ -1,0 +1,51 @@
+---
+- name: Fail missing params
+  cloudscale_ch.cloud.load_balancer_pool:
+  register: load_balancer_pool
+  ignore_errors: True
+- name: 'VERIFY: Fail name and UUID'
+  assert:
+    that:
+      - load_balancer_pool is failed
+
+- name: Fail create a load balancer pool with non-existing load balancer
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '15264769-ac69-4809-a8e4-4d73f8f92496'
+    algorithm: 'round_robin'
+    protocol: 'tcp'
+  register: load_balancer_pool
+  ignore_errors: True
+- name: Verify fail create a load balancer pool with non-existing load balancer
+  assert:
+    that:
+      - load_balancer_pool is failed
+      - '"Not found" in load_balancer_pool.fetch_url_info.body'
+
+- name: Fail create a load balancer pool with non-existing algorithm
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: 'robin_round'
+    protocol: 'tcp'
+  register: load_balancer_pool
+  ignore_errors: True
+- name: Verify fail create a load balancer pool with non-existing algorithm
+  assert:
+    that:
+      - load_balancer_pool is failed
+      - '"Expect one of" in load_balancer_pool.fetch_url_info.body'
+
+- name: Fail create a load balancer pool with non-existing protocol
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: 'round_robin'
+    protocol: 'pct'
+  register: load_balancer_pool
+  ignore_errors: True
+- name: Verify fail create a load balancer pool with non-existing protocol
+  assert:
+    that:
+      - load_balancer_pool is failed
+      - '"Expect one of" in load_balancer_pool.fetch_url_info.body'

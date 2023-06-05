@@ -1,0 +1,306 @@
+---
+# Create LB pool member
+- name: Test create a load balancer pool member in check mode
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: '{{ cloudscale_test_enabled_lb_member }}'
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+  check_mode: yes
+- name: Verify create a load balancer pool member in check mode
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.state == 'absent'
+
+- name: Test create a load balancer pool member
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: '{{ cloudscale_test_enabled_lb_member }}'
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+- name: Verify create a load balancer pool member
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == {{ cloudscale_test_enabled_lb_member }}
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+- name: Test create a load balancer pool member idempotence
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: '{{ cloudscale_test_enabled_lb_member }}'
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+- name: Verify create a load balancer pool member idempotence
+  assert:
+    that:
+      - load_balancer_pool_member is not changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == {{ cloudscale_test_enabled_lb_member }}
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+# Get LB pool member facts
+- name: Test get facts of a load balancer pool member by name
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+  register: load_balancer_pool_member
+- name: Verify get a load balancer pool member by name
+  assert:
+    that:
+      - load_balancer_pool_member is not changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+
+- name: Test get facts of a load balancer pool member by UUID
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    uuid: '{{ load_balancer_pool_member.uuid }}'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+  register: load_balancer_pool_member
+- name: Verify get a load balancer pool member by UUID
+  assert:
+    that:
+      - load_balancer_pool_member is not changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+
+# Update LB pool member
+- name: Test update disable a load balancer pool member in check mode
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: false
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+  check_mode: yes
+- name: Verify update disable a load balancer pool member in check mode
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == {{ cloudscale_test_enabled_lb_member }}
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+- name: Test update disable a load balancer pool member
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: false
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+- name: Verify update disable a load balancer pool member
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == false
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+- name: Test update disable a load balancer pool member idempotence
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: false
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+- name: Verify update disable a load balancer pool member idempotence
+  assert:
+    that:
+      - load_balancer_pool_member is not changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == false
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+- name: Test update name of a load balancer pool member in check mode
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    uuid: '{{ load_balancer_pool_member.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: false
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+  check_mode: yes
+- debug: var=load_balancer_pool_member
+- name: Verify update name of a load balancer pool member in check mode
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == false
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+- name: Test update name of a load balancer pool member
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    uuid: '{{ load_balancer_pool_member.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: false
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+- name: Verify update name of a load balancer pool member
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == false
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+- name: Test update name of a load balancer pool member idempotence
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    uuid: '{{ load_balancer_pool_member.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    enabled: false
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool_member
+- name: Verify update name of a load balancer pool member idempotence
+  assert:
+    that:
+      - load_balancer_pool_member is not changed
+      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool_member.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_pool_member.enabled == false
+      - load_balancer_pool_member.protocol_port == {{ cloudscale_test_protocol_port_lb_member }}
+      - load_balancer_pool_member.monitor_port == {{ cloudscale_test_monitor_port_lb_member }}
+      - load_balancer_pool_member.tags.project == 'ansible-test'
+      - load_balancer_pool_member.tags.stage == 'production'
+      - load_balancer_pool_member.tags.sla == '24-7'
+
+# Delete LB pool member
+- name: Test load balancer pool member deletion by name in check mode
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    state: absent
+  register: load_balancer_pool_member
+  check_mode: yes
+- name: Verify load balancer pool member deletion by name in check mode
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.state == 'present'
+
+- name: Test load balancer pool member deletion by name
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    state: absent
+  register: load_balancer_pool_member
+- name: Verify load balancer pool member deletion by name
+  assert:
+    that:
+      - load_balancer_pool_member is changed
+      - load_balancer_pool_member.state == 'absent'
+
+- name: Test load balancer pool member deletion by name idempotence
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    load_balancer_pool: '{{ load_balancer_pool.uuid }}'
+    state: absent
+  register: load_balancer_pool_member
+- name: Verify load balancer pool member deletion by name idempotence
+  assert:
+    that:
+      - load_balancer_pool_member is not changed
+      - load_balancer_pool_member.state == 'absent'

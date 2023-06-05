@@ -1,0 +1,8 @@
+---
+cloudscale_test_flavor_lb: lb-standard
+cloudscale_test_algorithm_lb_pool: round_robin
+cloudscale_test_protocol_lb_pool: tcp
+
+cloudscale_test_enabled_lb_member: true
+cloudscale_test_protocol_port_lb_member: 8080
+cloudscale_test_monitor_port_lb_member: 8181

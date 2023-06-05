@@ -1,0 +1,412 @@
+---
+# Create LB health monitor
+- name: Test create a load balancer health monitor (PING) in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool_ping.uuid }}'
+    type: 'ping'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify create a load balancer healtch monitor (PING) in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'absent'
+
+- name: Test create a load balancer health monitor (PING)
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool_ping.uuid }}'
+    type: 'ping'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify create a load balancer healtch monitor (PING)
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool_ping.uuid }}'
+      - load_balancer_health_monitor.type == 'ping'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test create a load balancer health monitor (PING) idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool_ping.uuid }}'
+    type: 'ping'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify create a load balancer health monitor (PING) idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool_ping.uuid }}'
+      - load_balancer_health_monitor.type == 'ping'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test create a load balancer health monitor (HTTP) in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool.uuid }}'
+    delay_s: '{{ cloudscale_test_delay_lb_monitor }}'
+    timeout_s: '{{ cloudscale_test_timeout_lb_monitor }}'
+    up_threshold: '{{ cloudscale_test_up_threshold_lb_monitor }}'
+    down_threshold: '{{ cloudscale_test_down_threshold_lb_monitor }}'
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'GET'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify create a load balancer healtch monitor (HTTP) in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'absent'
+
+- name: Test create a load balancer health monitor (HTTP)
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool.uuid }}'
+    delay_s: '{{ cloudscale_test_delay_lb_monitor }}'
+    timeout_s: '{{ cloudscale_test_timeout_lb_monitor }}'
+    up_threshold: '{{ cloudscale_test_up_threshold_lb_monitor }}'
+    down_threshold: '{{ cloudscale_test_down_threshold_lb_monitor }}'
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'GET'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify create a load balancer healtch monitor (HTTP)
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == {{ cloudscale_test_delay_lb_monitor }}
+      - load_balancer_health_monitor.timeout_s == {{ cloudscale_test_timeout_lb_monitor }}
+      - load_balancer_health_monitor.up_threshold == {{ cloudscale_test_up_threshold_lb_monitor }}
+      - load_balancer_health_monitor.down_threshold == {{ cloudscale_test_down_threshold_lb_monitor }}
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'GET'
+      - load_balancer_health_monitor.http.url_path == '/'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test create a load balancer health monitor (HTTP) idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ load_balancer_pool.uuid }}'
+    delay_s: '{{ cloudscale_test_delay_lb_monitor }}'
+    timeout_s: '{{ cloudscale_test_timeout_lb_monitor }}'
+    up_threshold: '{{ cloudscale_test_up_threshold_lb_monitor }}'
+    down_threshold: '{{ cloudscale_test_down_threshold_lb_monitor }}'
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'GET'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify create a load balancer health monitor (HTTP) idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == {{ cloudscale_test_delay_lb_monitor }}
+      - load_balancer_health_monitor.timeout_s == {{ cloudscale_test_timeout_lb_monitor }}
+      - load_balancer_health_monitor.up_threshold == {{ cloudscale_test_up_threshold_lb_monitor }}
+      - load_balancer_health_monitor.down_threshold == {{ cloudscale_test_down_threshold_lb_monitor }}
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'GET'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+# Get LB health monitor facts
+- name: Test get facts of a load balancer health monitor by UUID
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+  register: load_balancer_health_monitor_facts
+- name: Verify get a load balancer health monitor by UUID
+  assert:
+    that:
+      - load_balancer_health_monitor_facts is not changed
+
+# Update LB health monitor
+- name: Test update timeouts for a load balancer health monitor in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify update timeouts for a load balancer health monitor in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == {{ cloudscale_test_delay_lb_monitor }}
+      - load_balancer_health_monitor.timeout_s == {{ cloudscale_test_timeout_lb_monitor }}
+      - load_balancer_health_monitor.up_threshold == {{ cloudscale_test_up_threshold_lb_monitor }}
+      - load_balancer_health_monitor.down_threshold == {{ cloudscale_test_down_threshold_lb_monitor }}
+
+- name: Test update timeouts for a load balancer health monitor
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify update timeouts for a load balancer health monitor
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == 2
+      - load_balancer_health_monitor.timeout_s == 1
+      - load_balancer_health_monitor.up_threshold == 2
+      - load_balancer_health_monitor.down_threshold == 3
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'GET'
+      - load_balancer_health_monitor.http.url_path == '/'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test update timeouts for a load balancer health monitor idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify update timeouts for a load balancer health monitor idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == 2
+      - load_balancer_health_monitor.timeout_s == 1
+      - load_balancer_health_monitor.up_threshold == 2
+      - load_balancer_health_monitor.down_threshold == 3
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'GET'
+      - load_balancer_health_monitor.http.url_path == '/'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test update HTTP method of a load balancer health monitor in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    type: 'http'
+    http:
+      method: 'CONNECT'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify update HTTP method of a load balancer healtch monitor in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.http.method == 'GET'
+
+- name: Test update HTTP method of a load balancer health monitor
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'CONNECT'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify update HTTP method of a load balancer healtch monitor
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == 2
+      - load_balancer_health_monitor.timeout_s == 1
+      - load_balancer_health_monitor.up_threshold == 2
+      - load_balancer_health_monitor.down_threshold == 3
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'CONNECT'
+      - load_balancer_health_monitor.http.url_path == '/'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+- name: Test update HTTP method of a load balancer health monitor idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    delay_s: 2
+    timeout_s: 1
+    up_threshold: 2
+    down_threshold: 3
+    type: 'http'
+    http:
+      expected_codes: 
+        - 200
+        - 202
+      method: 'CONNECT'
+      url_path: '/'
+      version: '1.1'
+      host: 'host1'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_health_monitor
+- name: Verify update HTTP method of a load balancer healtch monitor idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'present'
+      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.delay_s == 2
+      - load_balancer_health_monitor.timeout_s == 1
+      - load_balancer_health_monitor.up_threshold == 2
+      - load_balancer_health_monitor.down_threshold == 3
+      - load_balancer_health_monitor.type == 'http'
+      - '"200" in load_balancer_health_monitor.http.expected_codes'
+      - '"202" in load_balancer_health_monitor.http.expected_codes'
+      - load_balancer_health_monitor.http.method == 'CONNECT'
+      - load_balancer_health_monitor.http.url_path == '/'
+      - load_balancer_health_monitor.http.version == '1.1'
+      - load_balancer_health_monitor.http.host == 'host1'
+      - load_balancer_health_monitor.tags.project == 'ansible-test'
+      - load_balancer_health_monitor.tags.stage == 'production'
+      - load_balancer_health_monitor.tags.sla == '24-7'
+
+# Delete LB health monitor
+- name: Test load balancer health monitor deletion by UUID in check mode
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    state: absent
+  register: load_balancer_health_monitor
+  check_mode: yes
+- name: Verify load balancer health monitor deletion by UUID in check mode
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.uuid == '{{ load_balancer_health_monitor.uuid }}'
+
+- name: Test load balancer health monitor deletion by UUID
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    state: absent
+  register: load_balancer_health_monitor
+- name: Verify load balancer health monitor deletion by UUID
+  assert:
+    that:
+      - load_balancer_health_monitor is changed
+      - load_balancer_health_monitor.state == 'absent'
+
+- name: Test load balancer health monitor deletion by UUID idempotence
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    uuid: '{{ load_balancer_health_monitor.uuid }}'
+    state: absent
+  register: load_balancer_health_monitor
+- name: Verify load balancer health monitor deletion by UUID idempotence
+  assert:
+    that:
+      - load_balancer_health_monitor is not changed
+      - load_balancer_health_monitor.state == 'absent'

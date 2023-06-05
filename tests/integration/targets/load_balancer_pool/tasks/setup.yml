@@ -1,0 +1,11 @@
+---
+- name: Test create a running load balancer
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer

@@ -1,0 +1,160 @@
+---
+# Create LB Pool
+- name: Test create a load balancer pool in check mode
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool
+  check_mode: yes
+- name: Verify create a load balancer pool in check mode
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.state == 'absent'
+
+- name: Test create a load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool
+- name: Verify create a load balancer pool
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool.load_balancer.uuid == '{{ load_balancer.uuid }}'
+      - load_balancer_pool.tags.project == 'ansible-test'
+      - load_balancer_pool.tags.stage == 'production'
+      - load_balancer_pool.tags.sla == '24-7'
+
+- name: Test create a load balancer pool idempotence
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: '{{ cloudscale_test_protocol_lb_pool }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_pool
+- name: Verify create a load balancer pool idempotence
+  assert:
+    that:
+      - load_balancer_pool is not changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool.load_balancer.uuid == '{{ load_balancer.uuid }}'
+      - load_balancer_pool.tags.project == 'ansible-test'
+      - load_balancer_pool.tags.stage == 'production'
+      - load_balancer_pool.tags.sla == '24-7'
+
+# Get LB Pool facts
+- name: Test get facts of a load balancer pool by name
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test'
+  register: load_balancer_pool
+- name: Verify get a load balancer pool by name
+  assert:
+    that:
+      - load_balancer_pool is not changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+
+# Update LB Pool
+- name: Test update name and tags of a running load balancer pool in check mode
+  cloudscale_ch.cloud.load_balancer_pool:
+    uuid: '{{ load_balancer_pool.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer_pool
+  check_mode: yes
+- name: Verify update name and tags of a running load balancer pool in check mode
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+
+- name: Test update name and tags of a running load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    uuid: '{{ load_balancer_pool.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer_pool
+- name: Verify update name of a running load balancer pool
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool.tags.project == 'ansible-test'
+      - load_balancer_pool.tags.stage == 'staging'
+      - load_balancer_pool.tags.sla == '8-5'
+
+- name: Test update name of a load balancer pool idempotence
+  cloudscale_ch.cloud.load_balancer_pool:
+    uuid: '{{ load_balancer_pool.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer_pool
+- name: Verify update name of a load balancer pool idempotence
+  assert:
+    that:
+      - load_balancer_pool is not changed
+      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool.tags.project == 'ansible-test'
+      - load_balancer_pool.tags.stage == 'staging'
+      - load_balancer_pool.tags.sla == '8-5'
+
+# Delete LB Pool
+- name: Test load balancer pool deletion by name in check mode
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer_pool
+  check_mode: yes
+- name: Verify load balancer pool deletion by name in check mode
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.state == 'present'
+
+- name: Test load balancer pool deletion by name
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer_pool
+- name: Verify load balancer pool deletion by name
+  assert:
+    that:
+      - load_balancer_pool is changed
+      - load_balancer_pool.state == 'absent'
+
+- name: Test load balancer pool deletion by name idempotence
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer_pool
+- name: Verify load balancer pool deletion by name idempotence
+  assert:
+    that:
+      - load_balancer_pool is not changed
+      - load_balancer_pool.state == 'absent'

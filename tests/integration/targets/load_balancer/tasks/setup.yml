@@ -1,0 +1,19 @@
+---
+- name: Ensure network exists
+  cloudscale_ch.cloud.network:
+    name: '{{ cloudscale_resource_prefix }}-lb-network'
+    zone: '{{ cloudscale_test_zone }}'
+    auto_create_ipv4_subnet: false
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: net
+
+- name: Ensure subnet exists
+  cloudscale_ch.cloud.subnet:
+    cidr: 172.16.0.0/24
+    network:
+      uuid: '{{ net.uuid }}'
+      zone: '{{ cloudscale_test_zone }}'
+  register: snet

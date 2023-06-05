@@ -1,0 +1,69 @@
+---
+- name: Fail missing params
+  cloudscale_ch.cloud.load_balancer_listener:
+  register: load_balancer_listener
+  ignore_errors: True
+- name: 'VERIFY: Fail name and UUID'
+  assert:
+    that:
+      - load_balancer_listener is failed
+
+- name: Fail create a load balancer listener with non-existing load balancer pool
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '15264769-ac69-4809-a8e4-4d73f8f92496'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+  register: load_balancer_listener
+  ignore_errors: True
+- name: Verify fail create a load balancer listener with non-existing load balancer
+  assert:
+    that:
+      - load_balancer_listener is failed
+      - '"Not found" in load_balancer_listener.fetch_url_info.body'
+
+- name: Fail create a load balancer listener with non-existing protocol
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: pct'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+  register: load_balancer_listener
+  ignore_errors: True
+- name: Verify fail create a load balancer listener with non-existing protocol
+  assert:
+    that:
+      - load_balancer_listener is failed
+      - '"Expect one of" in load_balancer_listener.fetch_url_info.body'
+
+- name: Fail create a load balancer listener with invalid port
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: 11111111
+  register: load_balancer_listener
+  ignore_errors: True
+- debug: var=load_balancer_listener
+- name: Verify fail create a load balancer listener with invalid port
+  assert:
+    that:
+      - load_balancer_listener is failed
+      - '"The protocol_port must be between" in load_balancer_listener.fetch_url_info.body'
+
+- name: Fail create a load balancer listener with invalid cidr
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '1.1.1.1'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+  register: load_balancer_listener
+  ignore_errors: True
+- name: Verify fail create a load balancer listener with invalid cidr
+  assert:
+    that:
+      - load_balancer_listener is failed
+      - '"Enter a valid network address in CIDR notation" in load_balancer_listener.fetch_url_info.body'

@@ -1,0 +1,4 @@
+---
+cloudscale_test_flavor_lb: lb-standard
+cloudscale_test_algorithm_lb_pool: round_robin
+cloudscale_test_protocol_lb_pool: tcp

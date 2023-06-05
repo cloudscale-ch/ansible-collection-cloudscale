@@ -1,0 +1,248 @@
+---
+# Create LB listener
+- name: Test create a load balancer listener in check mode
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '{{ cloudscale_test_allowed_cidr_v4 }}'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+    timeout_client_data_ms: '{{ cloudscale_test_timeout_client_data_ms }}'
+    timeout_member_connect_ms: '{{ cloudscale_test_timeout_member_connect_ms }}'
+    timeout_member_data_ms: '{{ cloudscale_test_timeout_member_data_ms }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_listener
+  check_mode: yes
+- name: Verify create a load balancer listener in check mode
+  assert:
+    that:
+      - load_balancer_listener is changed
+      - load_balancer_listener.state == 'absent'
+
+- name: Test create a load balancer listener
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '{{ cloudscale_test_allowed_cidr_v4 }}'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+    timeout_client_data_ms: '{{ cloudscale_test_timeout_client_data_ms }}'
+    timeout_member_connect_ms: '{{ cloudscale_test_timeout_member_connect_ms }}'
+    timeout_member_data_ms: '{{ cloudscale_test_timeout_member_data_ms }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_listener
+- name: Verify create a load balancer listener
+  assert:
+    that:
+      - load_balancer_listener is changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
+      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
+      - "'{{ cloudscale_test_allowed_cidr_v4 }}' in load_balancer_listener.allowed_cidrs"
+      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.timeout_client_data_ms == {{ cloudscale_test_timeout_client_data_ms }}
+      - load_balancer_listener.timeout_member_connect_ms == {{ cloudscale_test_timeout_member_connect_ms }}
+      - load_balancer_listener.timeout_member_data_ms == {{ cloudscale_test_timeout_member_data_ms }}
+      - load_balancer_listener.tags.project == 'ansible-test'
+      - load_balancer_listener.tags.stage == 'production'
+      - load_balancer_listener.tags.sla == '24-7'
+
+- name: Test create a load balancer listener idempotence
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '{{ cloudscale_test_allowed_cidr_v4 }}'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+    timeout_client_data_ms: '{{ cloudscale_test_timeout_client_data_ms }}'
+    timeout_member_connect_ms: '{{ cloudscale_test_timeout_member_connect_ms }}'
+    timeout_member_data_ms: '{{ cloudscale_test_timeout_member_data_ms }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer_listener
+- name: Verify create a load balancer listener idempotence
+  assert:
+    that:
+      - load_balancer_listener is not changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
+      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
+      - "'{{ cloudscale_test_allowed_cidr_v4 }}' in load_balancer_listener.allowed_cidrs"
+      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.timeout_client_data_ms == {{ cloudscale_test_timeout_client_data_ms }}
+      - load_balancer_listener.timeout_member_connect_ms == {{ cloudscale_test_timeout_member_connect_ms }}
+      - load_balancer_listener.timeout_member_data_ms == {{ cloudscale_test_timeout_member_data_ms }}
+      - load_balancer_listener.tags.project == 'ansible-test'
+      - load_balancer_listener.tags.stage == 'production'
+      - load_balancer_listener.tags.sla == '24-7'
+
+# Get LB listener facts
+- name: Test get facts of a load balancer listener by name
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test'
+  register: load_balancer_listener
+- name: Verify get a load balancer listener by name
+  assert:
+    that:
+      - load_balancer_listener is not changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
+
+# Update an existing LB listener
+- name: Test update a load balancer listener in check mode
+  cloudscale_ch.cloud.load_balancer_listener:
+    uuid: '{{ load_balancer_listener.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '192.168.1.0/24'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+    timeout_client_data_ms: 40001
+    timeout_member_connect_ms: 4001
+    timeout_member_data_ms: 40001
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer_listener
+  check_mode: yes
+- name: Verify update a load balancer listener in check mode
+  assert:
+    that:
+      - load_balancer_listener is changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
+      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
+      - "'{{ cloudscale_test_allowed_cidr_v4 }}' in load_balancer_listener.allowed_cidrs"
+      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.timeout_client_data_ms == {{ cloudscale_test_timeout_client_data_ms }}
+      - load_balancer_listener.timeout_member_connect_ms == {{ cloudscale_test_timeout_member_connect_ms }}
+      - load_balancer_listener.timeout_member_data_ms == {{ cloudscale_test_timeout_member_data_ms }}
+      - load_balancer_listener.tags.project == 'ansible-test'
+      - load_balancer_listener.tags.stage == 'production'
+      - load_balancer_listener.tags.sla == '24-7'
+
+- name: Test update a load balancer listener
+  cloudscale_ch.cloud.load_balancer_listener:
+    uuid: '{{ load_balancer_listener.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '192.168.1.0/24'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+    timeout_client_data_ms: 40001
+    timeout_member_connect_ms: 4001
+    timeout_member_data_ms: 40001
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer_listener
+- name: Verify update a load balancer listener
+  assert:
+    that:
+      - load_balancer_listener is changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
+      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
+      - "'{{ cloudscale_test_allowed_cidr_v4 }}' not in load_balancer_listener.allowed_cidrs"
+      - "'192.168.1.0/24' in load_balancer_listener.allowed_cidrs"
+      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.timeout_client_data_ms == 40001
+      - load_balancer_listener.timeout_member_connect_ms == 4001
+      - load_balancer_listener.timeout_member_data_ms == 40001
+      - load_balancer_listener.tags.project == 'ansible-test'
+      - load_balancer_listener.tags.stage == 'staging'
+      - load_balancer_listener.tags.sla == '8-5'
+
+- name: Test update a load balancer listener idempotence
+  cloudscale_ch.cloud.load_balancer_listener:
+    uuid: '{{ load_balancer_listener.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    pool: '{{ load_balancer_pool.uuid }}'
+    protocol: '{{ cloudscale_test_listener_protocol }}'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+    allowed_cidrs:
+      - '192.168.1.0/24'
+      - '{{ cloudscale_test_allowed_cidr_v6 }}'
+    timeout_client_data_ms: 40001
+    timeout_member_connect_ms: 4001
+    timeout_member_data_ms: 40001
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer_listener
+- name: Verify update a load balancer listener idempotence
+  assert:
+    that:
+      - load_balancer_listener is not changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
+      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
+      - "'{{ cloudscale_test_allowed_cidr_v4 }}' not in load_balancer_listener.allowed_cidrs"
+      - "'192.168.1.0/24' in load_balancer_listener.allowed_cidrs"
+      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.timeout_client_data_ms == 40001
+      - load_balancer_listener.timeout_member_connect_ms == 4001
+      - load_balancer_listener.timeout_member_data_ms == 40001
+      - load_balancer_listener.tags.project == 'ansible-test'
+      - load_balancer_listener.tags.stage == 'staging'
+      - load_balancer_listener.tags.sla == '8-5'
+
+# Delete LB listener
+- name: Test load balancer listener deletion by name in check mode
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer_listener
+  check_mode: yes
+- name: Verify load balancer listener deletion by name in check mode
+  assert:
+    that:
+      - load_balancer_listener is changed
+      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+
+- name: Test load balancer listener deletion by name
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer_listener
+- name: Verify load balancer listener deletion by name
+  assert:
+    that:
+      - load_balancer_listener is changed
+      - load_balancer_listener.state == 'absent'
+
+- name: Test load balancer listener deletion by name idempotence
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer_listener
+- name: Verify load balancer listener deletion by name idempotence
+  assert:
+    that:
+      - load_balancer_listener is not changed
+      - load_balancer_listener.state == 'absent'

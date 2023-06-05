@@ -1,0 +1,188 @@
+---
+# Create LB
+- name: Test create a running load balancer in check mode
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    vip_addresses:
+      - subnet: '{{ snet.uuid }}'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer
+  check_mode: yes
+- name: Verify create a load balancer in check mode
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.state == 'absent'
+
+- name: Test create a running load balancer
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    vip_addresses:
+      - subnet: '{{ snet.uuid }}'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer
+- name: Verify create a running load balancer
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.status == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
+      - load_balancer.vip_addresses[0].subnet.uuid == '{{ snet.uuid }}'
+      - load_balancer.zone.slug == '{{ cloudscale_test_zone }}'
+      - load_balancer.tags.project == 'ansible-test'
+      - load_balancer.tags.stage == 'production'
+      - load_balancer.tags.sla == '24-7'
+
+- name: Test create a running load balancer idempotence
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    vip_addresses:
+      - subnet: '{{ snet.uuid }}'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: load_balancer
+- name: Verify create a running load balancer idempotence
+  assert:
+    that:
+      - load_balancer is not changed
+      - load_balancer.status == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
+      - load_balancer.vip_addresses[0].subnet.uuid == '{{ snet.uuid }}'
+      - load_balancer.zone.slug == '{{ cloudscale_test_zone }}'
+      - load_balancer.tags.project == 'ansible-test'
+      - load_balancer.tags.stage == 'production'
+      - load_balancer.tags.sla == '24-7'
+
+- name: Test create a running load balancer with default flavor
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test2'
+    zone: '{{ cloudscale_test_zone }}'
+  register: load_balancer_default_flavor
+- name: Verify create a running load balancer with default flavor
+  assert:
+    that:
+      - load_balancer_default_flavor is changed
+      - load_balancer_default_flavor.status == 'running'
+      - load_balancer_default_flavor.name == '{{ cloudscale_resource_prefix }}-test2'
+      - load_balancer_default_flavor.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
+      - load_balancer_default_flavor.zone.slug == '{{ cloudscale_test_zone }}'
+
+# Get LB facts
+- name: Test get facts of a load balancer by name
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ load_balancer.name }}'
+  register: load_balancer
+- name: Verify get a load balancer
+  assert:
+    that:
+      - load_balancer is not changed
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
+
+# Update running LB
+- name: Test update name and tags of a running load balancer in check mode
+  cloudscale_ch.cloud.load_balancer:
+    uuid: '{{ load_balancer.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer
+  check_mode: yes
+- name: Verify update name and tags of a running load balancer in check mode
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.status == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-test'
+
+- name: Test update name and tags of a running load balancer
+  cloudscale_ch.cloud.load_balancer:
+    uuid: '{{ load_balancer.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer
+- name: Verify update name of a running load balancer
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.status == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
+      - load_balancer.tags.project == 'ansible-test'
+      - load_balancer.tags.stage == 'staging'
+      - load_balancer.tags.sla == '8-5'
+
+- name: Test update name of a running load balancer idempotence
+  cloudscale_ch.cloud.load_balancer:
+    uuid: '{{ load_balancer.uuid }}'
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    tags:
+      project: ansible-test
+      stage: staging
+      sla: 8-5
+  register: load_balancer
+- name: Verify update name of a running load balancer idempotence
+  assert:
+    that:
+      - load_balancer is not changed
+      - load_balancer.status == 'running'
+      - load_balancer.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer.flavor.slug == '{{ cloudscale_test_flavor_lb }}'
+      - load_balancer.tags.project == 'ansible-test'
+      - load_balancer.tags.stage == 'staging'
+      - load_balancer.tags.sla == '8-5'
+
+# Delete LB
+- name: Test running load balancer deletion by name in check mode
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer
+  check_mode: yes
+- name: Verify running load balancer deletion by name in check mode
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.status == 'running'
+
+- name: Test running load balancer deletion by name
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer
+- name: Verify running load balancer deletion by name
+  assert:
+    that:
+      - load_balancer is changed
+      - load_balancer.state == 'absent'
+
+- name: Test running load balancer deletion by name idempotence
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test-renamed'
+    state: absent
+  register: load_balancer
+- name: Verify running load balancer deletion by name idempotence
+  assert:
+    that:
+      - load_balancer is not changed
+      - load_balancer.state == 'absent'

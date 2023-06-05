@@ -1,0 +1,67 @@
+---
+- name: Fail missing params
+  cloudscale_ch.cloud.load_balancer:
+  register: load_balancer
+  ignore_errors: True
+- name: 'VERIFY: Fail name and UUID'
+  assert:
+    that:
+      - load_balancer is failed
+
+- name: Fail create a running load balancer with non-existing flavor
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}-non-existent'
+    zone: '{{ cloudscale_test_zone }}'
+  register: load_balancer
+  ignore_errors: True
+- name: Verify fail create a load balancer with non-existing flavor
+  assert:
+    that:
+      - load_balancer is failed
+      - '"is not a valid choice" in load_balancer.fetch_url_info.body'
+
+- name: Fail create a running load balancer with non-existing zone
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    zone: '{{ cloudscale_test_zone }}-non-existent'
+  register: load_balancer
+  ignore_errors: True
+- name: Verify fail create a load balancer with non-existing zone
+  assert:
+    that:
+      - load_balancer is failed
+      - '"is not a valid choice. Choose one of" in load_balancer.fetch_url_info.body'
+
+- name: Fail create a running load balancer with non-existing VIP UUID
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    vip_addresses:
+      - subnet: '00000-00000-00000-00000'
+    zone: '{{ cloudscale_test_zone }}'
+  register: load_balancer
+  ignore_errors: True
+- debug: var=load_balancer
+- name: Verify fail create a load balancer with non-existing VIP UUID
+  assert:
+    that:
+      - load_balancer is failed
+      - '"Must be a valid UUID." in load_balancer.fetch_url_info.body'
+
+- name: Fail create a running load balancer with incorrect VIP address
+  cloudscale_ch.cloud.load_balancer:
+    name: '{{ cloudscale_resource_prefix }}-test'
+    flavor: '{{ cloudscale_test_flavor_lb }}'
+    vip_addresses:
+      - subnet: '{{ snet.uuid }}'
+        address: '172.16.0.0'
+    zone: '{{ cloudscale_test_zone }}'
+  register: load_balancer
+  ignore_errors: True
+- name: Verify fail create a load balancer with incorrect VIP address
+  assert:
+    that:
+      - load_balancer is failed
+      - '"is not a valid IP for the specified subnet" in load_balancer.fetch_url_info.body'

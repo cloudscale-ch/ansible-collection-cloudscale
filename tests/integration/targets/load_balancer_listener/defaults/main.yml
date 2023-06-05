@@ -1,0 +1,12 @@
+---
+cloudscale_test_flavor_lb: lb-standard
+cloudscale_test_algorithm_lb_pool: round_robin
+cloudscale_test_protocol_lb_pool: tcp
+
+cloudscale_test_listener_protocol: tcp
+cloudscale_test_protocol_port: 8080
+cloudscale_test_allowed_cidr_v4: 192.168.3.0/24
+cloudscale_test_allowed_cidr_v6: 2001:db8:85a3:8d3::/64
+cloudscale_test_timeout_client_data_ms: 40000
+cloudscale_test_timeout_member_connect_ms: 4000
+cloudscale_test_timeout_member_data_ms: 40000
