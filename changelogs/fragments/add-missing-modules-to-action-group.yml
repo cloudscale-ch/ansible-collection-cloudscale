@@ -1,0 +1,2 @@
+bugfixes:
+  - Add missing modules to the "cloudscale_ch.cloud.cloudscale" action group.
