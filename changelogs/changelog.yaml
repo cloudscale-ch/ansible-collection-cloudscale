@@ -137,3 +137,12 @@ releases:
       name: load_balancer_pool_member
       namespace: ''
     release_date: '2023-06-05'
+  2.3.1:
+    changes:
+      bugfixes:
+      - Add missing modules to the "cloudscale_ch.cloud.cloudscale" action group.
+      - Remove outdated Ansible version requirement from the README.
+    fragments:
+    - add-missing-modules-to-action-group.yml
+    - fix-version-requirement-readme.yml
+    release_date: '2023-06-06'
