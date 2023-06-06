@@ -7,10 +7,6 @@
 
 This collection provides a series of Ansible modules and plugins for interacting with the [cloudscale.ch](https://www.cloudscale.ch) Cloud.
 
-## Requirements
-
-- ansible version >= 2.9
-
 ## Installation
 
 To install the collection hosted in Galaxy:
