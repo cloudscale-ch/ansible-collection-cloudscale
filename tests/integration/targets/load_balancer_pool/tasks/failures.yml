@@ -20,7 +20,7 @@
   assert:
     that:
       - load_balancer_pool is failed
-      - '"Not found" in load_balancer_pool.fetch_url_info.body'
+      - '"does not exist" in load_balancer_pool.fetch_url_info.body'
 
 - name: Fail create a load balancer pool with non-existing algorithm
   cloudscale_ch.cloud.load_balancer_pool:

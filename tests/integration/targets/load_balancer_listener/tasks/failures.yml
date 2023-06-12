@@ -20,7 +20,7 @@
   assert:
     that:
       - load_balancer_listener is failed
-      - '"Not found" in load_balancer_listener.fetch_url_info.body'
+      - '"does not exist" in load_balancer_listener.fetch_url_info.body'
 
 - name: Fail create a load balancer listener with non-existing protocol
   cloudscale_ch.cloud.load_balancer_listener:
