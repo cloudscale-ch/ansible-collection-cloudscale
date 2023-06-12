@@ -5,6 +5,15 @@ Ansible Collection cloudscale.ch Release Notes
 .. contents:: Topics
 
 
+v2.3.1
+======
+
+Bugfixes
+--------
+
+- Add missing modules to the "cloudscale_ch.cloud.cloudscale" action group.
+- Remove outdated Ansible version requirement from the README.
+
 v2.3.0
 ======
 

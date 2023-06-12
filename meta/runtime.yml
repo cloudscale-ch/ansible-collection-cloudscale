@@ -1,7 +1,13 @@
 requires_ansible: '>=2.13.0'
 action_groups:
   cloudscale:
+  - custom_image
   - floating_ip
+  - load_balancer
+  - load_balancer_health_monitor
+  - loaad_balancer_listener
+  - load_balancer_pool
+  - load_balancer_pool_member
   - network
   - objects_user
   - server_group
