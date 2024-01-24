@@ -33,8 +33,8 @@
   assert:
     that:
       - load_balancer_pool is changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
-      - load_balancer_pool.load_balancer.uuid == '{{ load_balancer.uuid }}'
+      - load_balancer_pool.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool.load_balancer.uuid == load_balancer.uuid
       - load_balancer_pool.tags.project == 'ansible-test'
       - load_balancer_pool.tags.stage == 'production'
       - load_balancer_pool.tags.sla == '24-7'
@@ -54,8 +54,8 @@
   assert:
     that:
       - load_balancer_pool is not changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
-      - load_balancer_pool.load_balancer.uuid == '{{ load_balancer.uuid }}'
+      - load_balancer_pool.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool.load_balancer.uuid == load_balancer.uuid
       - load_balancer_pool.tags.project == 'ansible-test'
       - load_balancer_pool.tags.stage == 'production'
       - load_balancer_pool.tags.sla == '24-7'
@@ -69,7 +69,7 @@
   assert:
     that:
       - load_balancer_pool is not changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool.name == {{ cloudscale_resource_prefix }} + "-test"'
 
 # Update LB Pool
 - name: Test update name and tags of a running load balancer pool in check mode
@@ -86,7 +86,7 @@
   assert:
     that:
       - load_balancer_pool is changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_pool.name == {{ cloudscale_resource_prefix }} + "-test"
 
 - name: Test update name and tags of a running load balancer pool
   cloudscale_ch.cloud.load_balancer_pool:
@@ -101,7 +101,7 @@
   assert:
     that:
       - load_balancer_pool is changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool.name == cloudscale_resource_prefix + "-test-renamed"
       - load_balancer_pool.tags.project == 'ansible-test'
       - load_balancer_pool.tags.stage == 'staging'
       - load_balancer_pool.tags.sla == '8-5'
@@ -119,7 +119,7 @@
   assert:
     that:
       - load_balancer_pool is not changed
-      - load_balancer_pool.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool.name == cloudscale_resource_prefix + "-test-renamed"
       - load_balancer_pool.tags.project == 'ansible-test'
       - load_balancer_pool.tags.stage == 'staging'
       - load_balancer_pool.tags.sla == '8-5'
