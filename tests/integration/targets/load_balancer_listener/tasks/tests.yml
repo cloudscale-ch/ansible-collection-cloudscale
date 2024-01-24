@@ -45,15 +45,15 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
-      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
-      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
-      - "'{{ cloudscale_test_allowed_cidr_v4 }}' in load_balancer_listener.allowed_cidrs"
-      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
-      - load_balancer_listener.timeout_client_data_ms == {{ cloudscale_test_timeout_client_data_ms }}
-      - load_balancer_listener.timeout_member_connect_ms == {{ cloudscale_test_timeout_member_connect_ms }}
-      - load_balancer_listener.timeout_member_data_ms == {{ cloudscale_test_timeout_member_data_ms }}
+      - load_balancer_listener.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_listener.protocol == cloudscale_test_listener_protocol
+      - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
+      - cloudscale_test_allowed_cidr_v4 in load_balancer_listener.allowed_cidrs
+      - cloudscale_test_allowed_cidr_v6 in load_balancer_listener.allowed_cidrs
+      - load_balancer_listener.timeout_client_data_ms == cloudscale_test_timeout_client_data_ms
+      - load_balancer_listener.timeout_member_connect_ms == cloudscale_test_timeout_member_connect_ms
+      - load_balancer_listener.timeout_member_data_ms == cloudscale_test_timeout_member_data_ms
       - load_balancer_listener.tags.project == 'ansible-test'
       - load_balancer_listener.tags.stage == 'production'
       - load_balancer_listener.tags.sla == '24-7'
@@ -79,15 +79,15 @@
   assert:
     that:
       - load_balancer_listener is not changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
-      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
-      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
-      - "'{{ cloudscale_test_allowed_cidr_v4 }}' in load_balancer_listener.allowed_cidrs"
-      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
-      - load_balancer_listener.timeout_client_data_ms == {{ cloudscale_test_timeout_client_data_ms }}
-      - load_balancer_listener.timeout_member_connect_ms == {{ cloudscale_test_timeout_member_connect_ms }}
-      - load_balancer_listener.timeout_member_data_ms == {{ cloudscale_test_timeout_member_data_ms }}
+      - load_balancer_listener.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_listener.protocol == cloudscale_test_listener_protocol
+      - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
+      - cloudscale_test_allowed_cidr_v4 in load_balancer_listener.allowed_cidrs
+      - cloudscale_test_allowed_cidr_v6 in load_balancer_listener.allowed_cidrs
+      - load_balancer_listener.timeout_client_data_ms == cloudscale_test_timeout_client_data_ms
+      - load_balancer_listener.timeout_member_connect_ms == cloudscale_test_timeout_member_connect_ms
+      - load_balancer_listener.timeout_member_data_ms == cloudscale_test_timeout_member_data_ms
       - load_balancer_listener.tags.project == 'ansible-test'
       - load_balancer_listener.tags.stage == 'production'
       - load_balancer_listener.tags.sla == '24-7'
@@ -127,15 +127,15 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
-      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
-      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
-      - "'{{ cloudscale_test_allowed_cidr_v4 }}' in load_balancer_listener.allowed_cidrs"
-      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
-      - load_balancer_listener.timeout_client_data_ms == {{ cloudscale_test_timeout_client_data_ms }}
-      - load_balancer_listener.timeout_member_connect_ms == {{ cloudscale_test_timeout_member_connect_ms }}
-      - load_balancer_listener.timeout_member_data_ms == {{ cloudscale_test_timeout_member_data_ms }}
+      - load_balancer_listener.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_listener.protocol == cloudscale_test_listener_protocol
+      - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
+      - cloudscale_test_allowed_cidr_v4 in load_balancer_listener.allowed_cidrs
+      - cloudscale_test_allowed_cidr_v6 in load_balancer_listener.allowed_cidrs
+      - load_balancer_listener.timeout_client_data_ms == cloudscale_test_timeout_client_data_ms
+      - load_balancer_listener.timeout_member_connect_ms == cloudscale_test_timeout_member_connect_ms
+      - load_balancer_listener.timeout_member_data_ms == cloudscale_test_timeout_member_data_ms
       - load_balancer_listener.tags.project == 'ansible-test'
       - load_balancer_listener.tags.stage == 'production'
       - load_balancer_listener.tags.sla == '24-7'
@@ -162,13 +162,13 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test-renamed'
-      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
-      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
-      - "'{{ cloudscale_test_allowed_cidr_v4 }}' not in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_listener.protocol == cloudscale_test_listener_protocol
+      - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
+      - cloudscale_test_allowed_cidr_v4 not in load_balancer_listener.allowed_cidrs
       - "'192.168.1.0/24' in load_balancer_listener.allowed_cidrs"
-      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - cloudscale_test_allowed_cidr_v6 in load_balancer_listener.allowed_cidrs
       - load_balancer_listener.timeout_client_data_ms == 40001
       - load_balancer_listener.timeout_member_connect_ms == 4001
       - load_balancer_listener.timeout_member_data_ms == 40001
@@ -198,13 +198,13 @@
   assert:
     that:
       - load_balancer_listener is not changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test-renamed'
-      - load_balancer_listener.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_listener.protocol == '{{ cloudscale_test_listener_protocol }}'
-      - load_balancer_listener.protocol_port == {{ cloudscale_test_protocol_port }}
-      - "'{{ cloudscale_test_allowed_cidr_v4 }}' not in load_balancer_listener.allowed_cidrs"
+      - load_balancer_listener.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_listener.protocol == cloudscale_test_listener_protocol
+      - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
+      - cloudscale_test_allowed_cidr_v4 not in load_balancer_listener.allowed_cidrs
       - "'192.168.1.0/24' in load_balancer_listener.allowed_cidrs"
-      - "'{{ cloudscale_test_allowed_cidr_v6 }}' in load_balancer_listener.allowed_cidrs"
+      - cloudscale_test_allowed_cidr_v6 in load_balancer_listener.allowed_cidrs
       - load_balancer_listener.timeout_client_data_ms == 40001
       - load_balancer_listener.timeout_member_connect_ms == 4001
       - load_balancer_listener.timeout_member_data_ms == 40001
@@ -223,7 +223,7 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_listener.name == cloudscale_resource_prefix + "-test-renamed"
 
 - name: Test load balancer listener deletion by name
   cloudscale_ch.cloud.load_balancer_listener:
