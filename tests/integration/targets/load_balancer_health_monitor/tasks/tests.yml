@@ -30,7 +30,7 @@
     that:
       - load_balancer_health_monitor is changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool_ping.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool_ping.uuid
       - load_balancer_health_monitor.type == 'ping'
       - load_balancer_health_monitor.tags.project == 'ansible-test'
       - load_balancer_health_monitor.tags.stage == 'production'
@@ -50,7 +50,7 @@
     that:
       - load_balancer_health_monitor is not changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool_ping.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool_ping.uuid
       - load_balancer_health_monitor.type == 'ping'
       - load_balancer_health_monitor.tags.project == 'ansible-test'
       - load_balancer_health_monitor.tags.stage == 'production'
@@ -110,11 +110,11 @@
     that:
       - load_balancer_health_monitor is changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_health_monitor.delay_s == {{ cloudscale_test_delay_lb_monitor }}
-      - load_balancer_health_monitor.timeout_s == {{ cloudscale_test_timeout_lb_monitor }}
-      - load_balancer_health_monitor.up_threshold == {{ cloudscale_test_up_threshold_lb_monitor }}
-      - load_balancer_health_monitor.down_threshold == {{ cloudscale_test_down_threshold_lb_monitor }}
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_health_monitor.delay_s == cloudscale_test_delay_lb_monitor
+      - load_balancer_health_monitor.timeout_s == cloudscale_test_timeout_lb_monitor
+      - load_balancer_health_monitor.up_threshold == cloudscale_test_up_threshold_lb_monitor
+      - load_balancer_health_monitor.down_threshold == cloudscale_test_down_threshold_lb_monitor
       - load_balancer_health_monitor.type == 'http'
       - '"200" in load_balancer_health_monitor.http.expected_codes'
       - '"202" in load_balancer_health_monitor.http.expected_codes'
@@ -152,11 +152,11 @@
     that:
       - load_balancer_health_monitor is not changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_health_monitor.delay_s == {{ cloudscale_test_delay_lb_monitor }}
-      - load_balancer_health_monitor.timeout_s == {{ cloudscale_test_timeout_lb_monitor }}
-      - load_balancer_health_monitor.up_threshold == {{ cloudscale_test_up_threshold_lb_monitor }}
-      - load_balancer_health_monitor.down_threshold == {{ cloudscale_test_down_threshold_lb_monitor }}
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_health_monitor.delay_s == cloudscale_test_delay_lb_monitor
+      - load_balancer_health_monitor.timeout_s == cloudscale_test_timeout_lb_monitor
+      - load_balancer_health_monitor.up_threshold == cloudscale_test_up_threshold_lb_monitor
+      - load_balancer_health_monitor.down_threshold == cloudscale_test_down_threshold_lb_monitor
       - load_balancer_health_monitor.type == 'http'
       - '"200" in load_balancer_health_monitor.http.expected_codes'
       - '"202" in load_balancer_health_monitor.http.expected_codes'
@@ -196,11 +196,11 @@
     that:
       - load_balancer_health_monitor is changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
-      - load_balancer_health_monitor.delay_s == {{ cloudscale_test_delay_lb_monitor }}
-      - load_balancer_health_monitor.timeout_s == {{ cloudscale_test_timeout_lb_monitor }}
-      - load_balancer_health_monitor.up_threshold == {{ cloudscale_test_up_threshold_lb_monitor }}
-      - load_balancer_health_monitor.down_threshold == {{ cloudscale_test_down_threshold_lb_monitor }}
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
+      - load_balancer_health_monitor.delay_s == cloudscale_test_delay_lb_monitor
+      - load_balancer_health_monitor.timeout_s == cloudscale_test_timeout_lb_monitor
+      - load_balancer_health_monitor.up_threshold == cloudscale_test_up_threshold_lb_monitor
+      - load_balancer_health_monitor.down_threshold == cloudscale_test_down_threshold_lb_monitor
 
 - name: Test update timeouts for a load balancer health monitor
   cloudscale_ch.cloud.load_balancer_health_monitor:
@@ -219,7 +219,7 @@
     that:
       - load_balancer_health_monitor is changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
       - load_balancer_health_monitor.delay_s == 2
       - load_balancer_health_monitor.timeout_s == 1
       - load_balancer_health_monitor.up_threshold == 2
@@ -252,7 +252,7 @@
     that:
       - load_balancer_health_monitor is not changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
       - load_balancer_health_monitor.delay_s == 2
       - load_balancer_health_monitor.timeout_s == 1
       - load_balancer_health_monitor.up_threshold == 2
@@ -289,7 +289,7 @@
     that:
       - load_balancer_health_monitor is changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
       - load_balancer_health_monitor.http.method == 'GET'
 
 - name: Test update HTTP method of a load balancer health monitor
@@ -318,7 +318,7 @@
     that:
       - load_balancer_health_monitor is changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
       - load_balancer_health_monitor.delay_s == 2
       - load_balancer_health_monitor.timeout_s == 1
       - load_balancer_health_monitor.up_threshold == 2
@@ -360,7 +360,7 @@
     that:
       - load_balancer_health_monitor is not changed
       - load_balancer_health_monitor.state == 'present'
-      - load_balancer_health_monitor.pool.uuid == '{{ load_balancer_pool.uuid }}'
+      - load_balancer_health_monitor.pool.uuid == load_balancer_pool.uuid
       - load_balancer_health_monitor.delay_s == 2
       - load_balancer_health_monitor.timeout_s == 1
       - load_balancer_health_monitor.up_threshold == 2
@@ -387,7 +387,7 @@
   assert:
     that:
       - load_balancer_health_monitor is changed
-      - load_balancer_health_monitor.uuid == '{{ load_balancer_health_monitor.uuid }}'
+      - load_balancer_health_monitor.uuid == load_balancer_health_monitor.uuid
 
 - name: Test load balancer health monitor deletion by UUID
   cloudscale_ch.cloud.load_balancer_health_monitor:
