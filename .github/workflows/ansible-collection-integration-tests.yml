@@ -1,4 +1,4 @@
-name: Collection Integration tests
+name: Ansible Collection Integration Tests
 
 on:
   schedule:
