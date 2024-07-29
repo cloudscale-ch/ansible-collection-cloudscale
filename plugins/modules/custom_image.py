@@ -59,9 +59,10 @@ options:
     elements: str
   source_format:
     description:
-      - The file format of the image referenced in the url. Currently only raw
-        is supported.
+      - The file format of the image referenced in the url.
     type: str
+    choices: [ raw, qcow2 ]
+    default: raw
   firmware_type:
     description:
       - The firmware type that will be used for servers created
@@ -424,7 +425,8 @@ def main():
         state=dict(type='str', default='present',
                    choices=('present', 'absent')),
         zones=dict(type='list', elements='str'),
-        source_format=dict(type='str'),
+        source_format=dict(type='str', default='raw',
+                           choices=('raw', 'qcow2')),
     ))
 
     module = AnsibleModule(
