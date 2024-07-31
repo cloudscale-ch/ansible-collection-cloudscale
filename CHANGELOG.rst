@@ -4,6 +4,13 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.4.0
+======
+
+Minor Changes
+-------------
+
+- Update source_format of custom images with actually available choices.
 
 v2.3.1
 ======
