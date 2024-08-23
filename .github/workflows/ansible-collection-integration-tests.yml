@@ -33,7 +33,7 @@ jobs:
             python: 3.9
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/cloudscale_ch/cloud
 
