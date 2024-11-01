@@ -56,7 +56,9 @@ options:
     type: str
   volume_size_gb:
     description:
-      - Size of the root volume in GB.
+      - Initial size of the root volume in GB.
+      - This parameter has no effect on existing servers.
+      - Use the volume module to change the size of the root volume.
     default: 10
     type: int
   bulk_volume_size_gb:
