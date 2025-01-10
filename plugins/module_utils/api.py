@@ -44,6 +44,9 @@ class AnsibleCloudscaleApi(object):
         if not self._api_url.endswith('/'):
             self._api_url = self._api_url + '/'
 
+        if not module.params['api_token'].isalnum():
+            self._module.fail_json(msg='Invalid API Token')
+
         self._auth_header = {'Authorization': 'Bearer %s' % module.params['api_token']}
 
     def _get(self, api_call):
