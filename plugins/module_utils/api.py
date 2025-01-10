@@ -6,12 +6,17 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import re
+
 from datetime import datetime, timedelta
 from time import sleep
 from copy import deepcopy
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
+
+
+VALID_TOKEN = re.compile(r'^[a-zA-Z0-9-._]+\Z')
 
 
 def cloudscale_argument_spec():
@@ -44,7 +49,11 @@ class AnsibleCloudscaleApi(object):
         if not self._api_url.endswith('/'):
             self._api_url = self._api_url + '/'
 
-        self._auth_header = {'Authorization': 'Bearer %s' % module.params['api_token']}
+        api_token = module.params['api_token'].strip()
+        if not VALID_TOKEN.match(api_token):
+            self._module.fail_json(msg='Invalid API Token')
+        else:
+            self._auth_header = {'Authorization': 'Bearer %s' % api_token}
 
     def _get(self, api_call):
         resp, info = fetch_url(self._module, self._api_url + api_call,
