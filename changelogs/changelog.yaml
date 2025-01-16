@@ -153,3 +153,11 @@ releases:
     fragments:
     - source-format-for-custom-images.yml
     release_date: '2024-07-31'
+  2.4.1:
+    changes:
+      security_fixes:
+      - Validate API tokens before passing them to Ansible, to ensure that a badly
+        formed one (i.e., one with newlines) is not accidentally logged.
+    fragments:
+    - 107-validate-api-token.yml
+    release_date: '2025-01-16'

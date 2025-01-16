@@ -4,6 +4,14 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.4.1
+======
+
+Security Fixes
+--------------
+
+- Validate API tokens before passing them to Ansible, to ensure that a badly formed one (i.e., one with newlines) is not accidentally logged.
+
 v2.4.0
 ======
 
