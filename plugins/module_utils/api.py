@@ -278,7 +278,10 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         timeout = self._module.params['api_timeout'] * 2
         while datetime.now() - start < timedelta(seconds=timeout):
             info = self.query()
-            if info.get(check_parameter) in allowed_states:
+            if not allowed_states:
+                if not info.get(check_parameter):
+                    return info
+            elif info.get(check_parameter) in allowed_states:
                 return info
             sleep(1)
 
