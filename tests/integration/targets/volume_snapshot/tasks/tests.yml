@@ -1,0 +1,150 @@
+---
+- name: Try delete unexisting volume snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ cloudscale_resource_prefix }}-not-existing'
+    state: 'absent'
+  register: volume_snapshot
+- name: 'VERIFY: Try delete unexisting volume snapshot'
+  assert:
+    that:
+      - volume_snapshot is not changed
+
+- name: Create volume snapshot in check mode
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-test-volume-snapshot'
+    source_volume: '{{ test_volume.uuid }}'
+    tags:
+      project: ansible-test
+      stage: production
+  check_mode: yes
+  register: volume_snapshot
+- name: 'VERIFY: Create volume snapshot in check mode'
+  assert:
+    that:
+      - volume_snapshot is changed
+      - volume_snapshot.state == 'absent'
+
+- name: Try access volume snapshot created in check mode
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-test-volume-snapshot'
+  register: volume_snapshot
+  ignore_errors: True
+- name: 'VERIFY: Try access volume snapshot created in check mode'
+  assert:
+    that:
+      - volume_snapshot is failed
+
+- name: Create volume snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-test-volume-snapshot'
+    source_volume: '{{ test_volume.uuid }}'
+    tags:
+      project: ansible-test
+      stage: production
+  register: volume_snapshot
+- name: 'VERIFY: Create volume snapshot'
+  assert:
+    that:
+      - volume_snapshot is changed
+      - volume_snapshot.state == 'present'
+      - volume_snapshot.tags.project == 'ansible-test'
+      - volume_snapshot.tags.stage == 'production'
+
+- name: Create volume snapshot (idempotency)
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-test-volume-snapshot'
+    source_volume: '{{ test_volume.uuid }}'
+    tags:
+      project: ansible-test
+      stage: production
+  register: volume_snapshot_idempotency
+- name: 'VERIFY: Create volume snapshot (idempotency)'
+  assert:
+    that:
+      - volume_snapshot_idempotency is not changed
+      - volume_snapshot_idempotency.name == cloudscale_resource_prefix + '-test-volume-snapshot'
+      - volume_snapshot_idempotency.uuid == volume_snapshot.uuid
+
+- name: Update volume snapshot in check mode
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+    tags:
+      stage: marked-for-deletion
+  register: volume_snapshot
+  check_mode: True
+- name: 'VERIFY: Update volume snapshot in check mode'
+  assert:
+    that:
+      - volume_snapshot is changed
+      - volume_snapshot.tags.project == 'ansible-test'
+      - volume_snapshot.tags.stage == 'production'
+
+- name: Update volume snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+    tags:
+      stage: marked-for-deletion
+  register: volume_snapshot
+- name: 'VERIFY: Update volume snapshot'
+  assert:
+    that:
+      - volume_snapshot is changed
+      - volume_snapshot.tags.project is undefined
+      - volume_snapshot.tags.stage == 'marked-for-deletion'
+
+- name: Update volume snapshot (idempotency)
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+    tags:
+      stage: marked-for-deletion
+  register: volume_snapshot
+  check_mode: True
+- name: 'VERIFY: Update volume snapshot (idempotency)'
+  assert:
+    that:
+      - volume_snapshot is not changed
+      - volume_snapshot.tags.project is undefined
+      - volume_snapshot.tags.stage == 'marked-for-deletion'
+
+- name: Get updated volume snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+  register: volume_snapshot
+- name: 'VERIFY: Update volume snapshot'
+  assert:
+    that:
+      - volume_snapshot.tags == 'stage: marked-for-deletion'
+
+- name: Delete volume snapshot (check_mode)
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+    state: absent
+  check_mode: True
+  register: volume_snapshot
+- name: 'VERIFY: Delete volume snapshot (check_mode)'
+  assert:
+    that:
+      - volume_snapshot is changed
+      - volume_snapshot.state == 'present'
+
+- name: Delete volume snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+    state: absent
+  register: volume_snapshot
+- name: 'VERIFY: Delete volume snapshot'
+  assert:
+    that:
+      - volume_snapshot is changed
+      - volume_snapshot.state == 'absent'
+
+- name: Delete a deleted volume snapshot (idempotency)
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ volume_snapshot.uuid }}'
+    state: absent
+  register: volume_snapshot
+- name: 'VERIFY: Delete volume snapshot'
+  assert:
+    that:
+      - volume_snapshot is not changed
+      - volume_snapshot.state == 'absent'

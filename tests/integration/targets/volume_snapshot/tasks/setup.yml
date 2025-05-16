@@ -1,0 +1,11 @@
+---
+- name: Create test volume
+  cloudscale_ch.cloud.volume:
+    name: '{{ cloudscale_resource_prefix }}-test-volume'
+    zone: '{{ cloudscale_test_zone }}'
+    size_gb: 50
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: test_volume
