@@ -231,7 +231,7 @@
   assert:
     that:
       - image is changed
-      - image.tags == "project: luna"
+      - image.tags.project == "luna"
 
 - name: Update user_data_handling of a custom image
   cloudscale_ch.cloud.custom_image:
@@ -266,7 +266,7 @@
     that:
       - image is changed
       - image.slug == "yet-another-slug"
-      - image.tags == "project: jupiter"
+      - image.tags.project == "jupiter"
       - image.user_data_handling == "pass-through"
 
 - name: List all custom images, there should be two

@@ -32,7 +32,7 @@
       - grp.type == 'anti-affinity'
       - grp.name == '{{ cloudscale_resource_prefix }}-grp'
       - grp.zone.slug == '{{ cloudscale_test_zone }}'
-      - grp.uuid
+      - grp.uuid is defined
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'production'
       - grp.tags.sla == '24-7'
