@@ -46,8 +46,8 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
-      - server.zone.slug == '{{ cloudscale_test_zone }}'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
+      - server.zone.slug == cloudscale_test_zone
       - server.tags.project == 'ansible-test'
       - server.tags.stage == 'production'
       - server.tags.sla == '24-7'
@@ -71,8 +71,8 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
-      - server.zone.slug == '{{ cloudscale_test_zone }}'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
+      - server.zone.slug == cloudscale_test_zone
       - server.tags.project == 'ansible-test'
       - server.tags.stage == 'production'
       - server.tags.sla == '24-7'
@@ -96,7 +96,7 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
       - server.tags.project == 'ansible-test'
       - server.tags.stage == 'production'
       - server.tags.sla == '24-7'
@@ -119,7 +119,7 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
       - server.tags.project == 'ansible-test'
       - server.tags.stage == 'staging'
       - server.tags.sla == '8-5'
@@ -142,7 +142,7 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
       - server.tags.project == 'ansible-test'
       - server.tags.stage == 'staging'
       - server.tags.sla == '8-5'
@@ -161,7 +161,7 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
       - server.tags.project == 'ansible-test'
       - server.tags.stage == 'staging'
       - server.tags.sla == '8-5'
@@ -181,7 +181,7 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
       - not server.tags
 
 - name: Test delete tags idempotence
@@ -199,7 +199,7 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
       - not server.tags
 
 - name: Test update flavor of a running server without force in check mode
@@ -217,8 +217,8 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
 
 - name: Test update flavor of a running server without force
   cloudscale_ch.cloud.server:
@@ -234,8 +234,8 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
 
 - name: Test update flavor of a running server without force idempotence
   cloudscale_ch.cloud.server:
@@ -251,8 +251,8 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
 
 - name: Test update flavor and name of a running server without force in check mode
   cloudscale_ch.cloud.server:
@@ -270,8 +270,8 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.name == cloudscale_resource_prefix + '-test'
 
 - name: Test update flavor and name of a running server without force
   cloudscale_ch.cloud.server:
@@ -288,8 +288,8 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Test update flavor and name of a running server without force idempotence
   cloudscale_ch.cloud.server:
@@ -306,8 +306,8 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Test update flavor of a running server with force in check mode
   cloudscale_ch.cloud.server:
@@ -324,8 +324,8 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Test update flavor of a running server with force
   cloudscale_ch.cloud.server:
@@ -341,8 +341,8 @@
     that:
       - server is changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor_2 }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - server.flavor.slug == cloudscale_test_flavor_2
+      - server.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Test update a running server with force idempotence
   cloudscale_ch.cloud.server:
@@ -358,8 +358,8 @@
     that:
       - server is not changed
       - server.state == 'running'
-      - server.flavor.slug == '{{ cloudscale_test_flavor_2 }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - server.flavor.slug == cloudscale_test_flavor_2
+      - server.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Remember uuid of running server for anti affinity
   set_fact:
@@ -403,10 +403,10 @@
     that:
       - server_stopped is changed
       - server_stopped.state == 'stopped'
-      - server_stopped.zone.slug == '{{ cloudscale_test_zone }}'
+      - server_stopped.zone.slug == cloudscale_test_zone
       - server_stopped.anti_affinity_with.0.uuid == running_server_uuid
       - server_stopped.interfaces.0.type == 'private'
-      - server_stopped.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server_stopped.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
 
 - name: Test create server stopped in anti affinity and private network only idempotence
   cloudscale_ch.cloud.server:
@@ -426,10 +426,10 @@
     that:
       - server_stopped is not changed
       - server_stopped.state == 'stopped'
-      - server_stopped.zone.slug == '{{ cloudscale_test_zone }}'
+      - server_stopped.zone.slug == cloudscale_test_zone
       - server_stopped.anti_affinity_with.0.uuid == running_server_uuid
       - server_stopped.interfaces.0.type == 'private'
-      - server_stopped.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server_stopped.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
 
 - name: Test change server group not changed
   cloudscale_ch.cloud.server:
@@ -448,10 +448,10 @@
     that:
       - server_stopped is not changed
       - server_stopped.state == 'stopped'
-      - server_stopped.zone.slug == '{{ cloudscale_test_zone }}'
+      - server_stopped.zone.slug == cloudscale_test_zone
       - server_stopped.anti_affinity_with.0.uuid == running_server_uuid
       - server_stopped.interfaces.0.type == 'private'
-      - server_stopped.server_groups.0.name == '{{ cloudscale_resource_prefix }}-group-1'
+      - server_stopped.server_groups.0.name == cloudscale_resource_prefix + '-group-1'
 
 - name: Test create server with password in check mode
   cloudscale_ch.cloud.server:
@@ -559,8 +559,8 @@
     that:
       - server is changed
       - server.state == 'stopped'
-      - server.flavor.slug == '{{ cloudscale_test_flavor_2 }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - server.flavor.slug == cloudscale_test_flavor_2
+      - server.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Test update a stopped server without force
   cloudscale_ch.cloud.server:
@@ -577,8 +577,8 @@
     that:
       - server is changed
       - server.state == 'stopped'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.name == cloudscale_resource_prefix + '-test'
 
 - name: Test update a stopped server idempotence
   cloudscale_ch.cloud.server:
@@ -595,8 +595,8 @@
     that:
       - server is not changed
       - server.state == 'stopped'
-      - server.flavor.slug == '{{ cloudscale_test_flavor }}'
-      - server.name == '{{ cloudscale_resource_prefix }}-test'
+      - server.flavor.slug == cloudscale_test_flavor
+      - server.name == cloudscale_resource_prefix + '-test'
 
 - name: Test server running in check mode
   cloudscale_ch.cloud.server:
@@ -750,7 +750,7 @@
     that:
       - server.changed == True
       - server.state == 'running'
-      - server.interfaces.0.network.name == '{{ cloudscale_resource_prefix }}-test-interface-network'
+      - server.interfaces.0.network.name == cloudscale_resource_prefix + '-test-interface-network'
 
 - name: Create server in specific private network idempotency
   cloudscale_ch.cloud.server:
@@ -769,7 +769,7 @@
     that:
       - server.changed == False
       - server.state == 'running'
-      - server.interfaces.0.network.name == '{{ cloudscale_resource_prefix }}-test-interface-network'
+      - server.interfaces.0.network.name == cloudscale_resource_prefix + '-test-interface-network'
 
 - name: Remove private IP and add public network from server in check mode
   cloudscale_ch.cloud.server:
@@ -784,7 +784,7 @@
   assert:
     that:
       - server.changed == True
-      - server.interfaces.0.network.name == '{{ cloudscale_resource_prefix }}-test-interface-network'
+      - server.interfaces.0.network.name == cloudscale_resource_prefix + '-test-interface-network'
 
 - name: Remove private IP and add public network from server
   cloudscale_ch.cloud.server:

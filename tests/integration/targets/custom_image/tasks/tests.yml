@@ -57,7 +57,7 @@
   assert:
     that:
       - image1.import_status == 'success'
-      - image1.name == "{{ cloudscale_resource_prefix }}-test-image"
+      - image1.name == cloudscale_resource_prefix + '-test-image'
 
 - name: Import a custom image (idempotency)
   cloudscale_ch.cloud.custom_image:
@@ -75,7 +75,7 @@
   assert:
     that:
       - image is not changed
-      - image.name == "{{ cloudscale_resource_prefix }}-test-image"
+      - image.name == cloudscale_resource_prefix + '-test-image'
       - image.uuid == image1.uuid
 
 - name: Import a custom image with bad url
@@ -163,7 +163,7 @@
   assert:
     that:
       - image2 is changed
-      - image2.name == "{{ cloudscale_resource_prefix }}-test-image2"
+      - image2.name == cloudscale_resource_prefix + '-test-image2'
       - image2.uuid != image1.uuid
 
 - name: Wait for import
@@ -178,7 +178,7 @@
   assert:
     that:
       - import_status is not changed
-      - import_status.name == "{{ cloudscale_resource_prefix }}-test-image2"
+      - import_status.name == cloudscale_resource_prefix + '-test-image2'
 
 - name: Get image by name
   cloudscale_ch.cloud.custom_image:
@@ -198,7 +198,7 @@
 - name: Verify Change the name of an image
   assert:
     that:
-      - change_name.name == "{{ cloudscale_resource_prefix }}-test-image-with-a-new-name"
+      - change_name.name == cloudscale_resource_prefix + '-test-image-with-a-new-name'
       - change_name is changed
 
 - name: Update slug of a custom image
@@ -219,7 +219,7 @@
 - name: Verify update slug of a custom image
   assert:
     that:
-      - image.slug == "ansible-image-slug"
+      - image.slug == 'ansible-image-slug'
 
 - name: Update tags of a custom image
   cloudscale_ch.cloud.custom_image:
@@ -231,7 +231,7 @@
   assert:
     that:
       - image is changed
-      - image.tags == "project: luna"
+      - image.tags.project == 'luna'
 
 - name: Update user_data_handling of a custom image
   cloudscale_ch.cloud.custom_image:
@@ -251,7 +251,7 @@
 - name: Verify update user_data_handling of a custom image
   assert:
     that:
-      - image.user_data_handling == "extend-cloud-config"
+      - image.user_data_handling == 'extend-cloud-config'
 
 - name: Update slug, tags and user_data_handling of a custom image
   cloudscale_ch.cloud.custom_image:
@@ -265,9 +265,9 @@
   assert:
     that:
       - image is changed
-      - image.slug == "yet-another-slug"
-      - image.tags == "project: jupiter"
-      - image.user_data_handling == "pass-through"
+      - image.slug == 'yet-another-slug'
+      - image.tags.project == 'jupiter'
+      - image.user_data_handling == 'pass-through'
 
 - name: List all custom images, there should be two
   uri:
@@ -279,7 +279,7 @@
 - name: Verify that two custom images are created by this test run
   assert:
     that:
-      - image_list.json | selectattr("name","search", "{{ cloudscale_resource_prefix }}" ) | list | length == 2
+      - image_list.json | selectattr("name","search", cloudscale_resource_prefix) | list | length == 2
 
 - name: Delete image by uuid
   cloudscale_ch.cloud.custom_image:
@@ -312,7 +312,7 @@
 - name: Verify that the two custom images of this test run are deleted
   assert:
     that:
-      - image_list.json | selectattr("name","search", "{{ cloudscale_resource_prefix }}" ) | list | length == 0
+      - image_list.json | selectattr("name","search", cloudscale_resource_prefix) | list | length == 0
 
 - name: Import a custom image
   cloudscale_ch.cloud.custom_image:
@@ -395,7 +395,7 @@
   assert:
     that:
       - image1_uefi.import_status == 'success'
-      - image1_uefi.name == "{{ cloudscale_resource_prefix }}-test-image-uefi"
+      - image1_uefi.name == cloudscale_resource_prefix + '-test-image-uefi'
 
 - name: Fail changing the firmware type of an already imported image from uefi to bios
   cloudscale_ch.cloud.custom_image:

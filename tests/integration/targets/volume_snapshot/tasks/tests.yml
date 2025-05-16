@@ -113,7 +113,7 @@
 - name: 'VERIFY: Update volume snapshot'
   assert:
     that:
-      - volume_snapshot.tags == 'stage: marked-for-deletion'
+      - volume_snapshot.tags.stage == 'marked-for-deletion'
 
 - name: Delete volume snapshot (check_mode)
   cloudscale_ch.cloud.volume_snapshot:

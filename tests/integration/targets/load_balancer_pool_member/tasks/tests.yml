@@ -39,7 +39,7 @@
   assert:
     that:
       - load_balancer_pool_member is changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == cloudscale_test_enabled_lb_member
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -66,7 +66,7 @@
   assert:
     that:
       - load_balancer_pool_member is not changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == cloudscale_test_enabled_lb_member
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -85,7 +85,7 @@
   assert:
     that:
       - load_balancer_pool_member is not changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
 
 - name: Test get facts of a load balancer pool member by UUID
   cloudscale_ch.cloud.load_balancer_pool_member:
@@ -96,7 +96,7 @@
   assert:
     that:
       - load_balancer_pool_member is not changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
 
 # Update LB pool member
 - name: Test update disable a load balancer pool member in check mode
@@ -118,7 +118,7 @@
   assert:
     that:
       - load_balancer_pool_member is changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == cloudscale_test_enabled_lb_member
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -145,7 +145,7 @@
   assert:
     that:
       - load_balancer_pool_member is changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == false
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -172,7 +172,7 @@
   assert:
     that:
       - load_balancer_pool_member is not changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == false
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -202,7 +202,7 @@
   assert:
     that:
       - load_balancer_pool_member is changed
-      - load_balancer_pool_member.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == false
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -230,7 +230,7 @@
   assert:
     that:
       - load_balancer_pool_member is changed
-      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test-renamed'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == false
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
@@ -258,7 +258,7 @@
   assert:
     that:
       - load_balancer_pool_member is not changed
-      - load_balancer_pool_member.name == '{{ cloudscale_resource_prefix }}-test-renamed'
+      - load_balancer_pool_member.name == cloudscale_resource_prefix + '-test-renamed'
       - load_balancer_pool_member.pool.uuid == load_balancer_pool.uuid
       - load_balancer_pool_member.enabled == false
       - load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member

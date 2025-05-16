@@ -13,7 +13,7 @@
   assert:
     that:
       - grp is changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp'
+      - grp.name == cloudscale_resource_prefix + '-grp'
       - not grp.uuid
 
 - name: Create server group
@@ -30,9 +30,9 @@
     that:
       - grp is changed
       - grp.type == 'anti-affinity'
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp'
-      - grp.zone.slug == '{{ cloudscale_test_zone }}'
-      - grp.uuid
+      - grp.name == cloudscale_resource_prefix + '-grp'
+      - grp.zone.slug == cloudscale_test_zone
+      - grp.uuid is defined
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'production'
       - grp.tags.sla == '24-7'
@@ -54,8 +54,8 @@
   assert:
     that:
       - grp is not changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp'
-      - grp.zone.slug == '{{ cloudscale_test_zone }}'
+      - grp.name == cloudscale_resource_prefix + '-grp'
+      - grp.zone.slug == cloudscale_test_zone
       - grp.uuid == server_group_uuid
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'production'
@@ -74,8 +74,8 @@
   assert:
     that:
       - grp is changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp'
-      - grp.zone.slug == '{{ cloudscale_test_alt_zone }}'
+      - grp.name == cloudscale_resource_prefix + '-grp'
+      - grp.zone.slug == cloudscale_test_alt_zone
       - grp.uuid != server_group_uuid
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'production'
@@ -95,9 +95,9 @@
   assert:
     that:
       - grp is changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp'
+      - grp.name == cloudscale_resource_prefix + '-grp'
       - grp.uuid == server_group_uuid
-      - grp.zone.slug == '{{ cloudscale_test_zone }}'
+      - grp.zone.slug == cloudscale_test_zone
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'production'
       - grp.tags.sla == '24-7'
@@ -115,9 +115,9 @@
   assert:
     that:
       - grp is changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp2'
+      - grp.name == cloudscale_resource_prefix + '-grp2'
       - grp.uuid == server_group_uuid
-      - grp.zone.slug == '{{ cloudscale_test_zone }}'
+      - grp.zone.slug == cloudscale_test_zone
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'staging'
       - grp.tags.sla == '8-5'
@@ -135,9 +135,9 @@
   assert:
     that:
       - grp is not changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp2'
+      - grp.name == cloudscale_resource_prefix + '-grp2'
       - grp.uuid == server_group_uuid
-      - grp.zone.slug == '{{ cloudscale_test_zone }}'
+      - grp.zone.slug == cloudscale_test_zone
       - grp.tags.project == 'ansible-test'
       - grp.tags.stage == 'staging'
       - grp.tags.sla == '8-5'
@@ -152,7 +152,7 @@
   assert:
     that:
       - grp is changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp2'
+      - grp.name == cloudscale_resource_prefix + '-grp2'
       - grp.uuid == server_group_uuid
 
 - name: Delete server group
@@ -164,7 +164,7 @@
   assert:
     that:
       - grp is changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp2'
+      - grp.name == cloudscale_resource_prefix + '-grp2'
       - grp.uuid == server_group_uuid
 
 - name: Delete server group idempotence
@@ -176,5 +176,5 @@
   assert:
     that:
       - grp is not changed
-      - grp.name == '{{ cloudscale_resource_prefix }}-grp2'
+      - grp.name == cloudscale_resource_prefix + '-grp2'
       - not grp.uuid
