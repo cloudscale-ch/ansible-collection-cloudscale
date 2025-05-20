@@ -45,7 +45,7 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test'
       - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
       - load_balancer_listener.protocol == cloudscale_test_listener_protocol
       - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
@@ -79,7 +79,7 @@
   assert:
     that:
       - load_balancer_listener is not changed
-      - load_balancer_listener.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test'
       - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
       - load_balancer_listener.protocol == cloudscale_test_listener_protocol
       - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
@@ -101,7 +101,7 @@
   assert:
     that:
       - load_balancer_listener is not changed
-      - load_balancer_listener.name == '{{ cloudscale_resource_prefix }}-test'
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test'
 
 # Update an existing LB listener
 - name: Test update a load balancer listener in check mode
@@ -127,7 +127,7 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == cloudscale_resource_prefix + "-test"
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test'
       - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
       - load_balancer_listener.protocol == cloudscale_test_listener_protocol
       - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
@@ -162,7 +162,7 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test-renamed'
       - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
       - load_balancer_listener.protocol == cloudscale_test_listener_protocol
       - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
@@ -198,7 +198,7 @@
   assert:
     that:
       - load_balancer_listener is not changed
-      - load_balancer_listener.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test-renamed'
       - load_balancer_listener.pool.uuid == load_balancer_pool.uuid
       - load_balancer_listener.protocol == cloudscale_test_listener_protocol
       - load_balancer_listener.protocol_port == cloudscale_test_protocol_port
@@ -223,7 +223,7 @@
   assert:
     that:
       - load_balancer_listener is changed
-      - load_balancer_listener.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer_listener.name == cloudscale_resource_prefix + '-test-renamed'
 
 - name: Test load balancer listener deletion by name
   cloudscale_ch.cloud.load_balancer_listener:
