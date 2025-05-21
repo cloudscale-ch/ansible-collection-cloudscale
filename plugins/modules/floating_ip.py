@@ -256,7 +256,7 @@ def main():
     argument_spec.update(dict(
         name=dict(type='str'),
         state=dict(default='present', choices=('present', 'absent'), type='str'),
-        network=dict(aliases=('ip',), type='str'),
+        network=dict(aliases=['ip'], type='str'),
         ip_version=dict(choices=(4, 6), type='int'),
         server=dict(type='str'),
         type=dict(type='str', choices=('regional', 'global'), default='regional'),

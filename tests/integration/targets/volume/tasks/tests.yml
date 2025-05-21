@@ -61,6 +61,24 @@
       - vol.tags.stage == 'production'
       - vol.tags.sla == '24-7'
 
+- name: Create volume snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-vol-snap'
+    source_volume: '{{ vol.uuid }}'
+  register: vol_snap_first
+
+- name: Revert volume to snapshot
+  cloudscale_ch.cloud.volume:
+    uuid: '{{ vol.uuid }}'
+    revert: '{{ vol_snap_first.uuid }}'
+  register: revert
+- name: 'VERIFY: Revert volume to snapshot'
+  assert:
+    that:
+      - revert is successful
+      - revert is changed
+      - vol_snap_first.uuid == revert.revert
+
 - name: Attach existing volume by name to server in check mode
   cloudscale_ch.cloud.volume:
     name: '{{ cloudscale_resource_prefix }}-vol'
@@ -100,6 +118,22 @@
       - vol is successful
       - vol is not changed
       - server.uuid in vol.servers | map(attribute="uuid")
+
+- name: Fail revert attached volume to snapshot
+  cloudscale_ch.cloud.volume:
+    uuid: '{{ vol.uuid }}'
+    revert: '{{ vol_snap_first.uuid }}'
+  register: revert
+  ignore_errors: True
+- name: 'VERIFY: Fail revert attached volume to snapshot'
+  assert:
+    that:
+      - revert is failed
+
+- name: Delete snapshot
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '{{ vol_snap_first.uuid }}'
+    state: absent
 
 - name: Resize attached volume by UUID in check mode
   cloudscale_ch.cloud.volume:

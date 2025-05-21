@@ -1,0 +1,79 @@
+---
+- name: Fail missing params
+  cloudscale_ch.cloud.volume_snapshot:
+  register: volume_snapshot
+  ignore_errors: True
+- name: 'VERIFY: Fail name or UUID'
+  assert:
+    that:
+      - volume_snapshot is failed
+
+- name: Fail unexisting source_volume
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-snapshot'
+    source_volume: '{{ cloudscale_resource_prefix }}-unexisting-volume'
+  register: volume_snapshot
+  ignore_errors: True
+- name: 'VERIFY: Fail unexisting source_volume'
+  assert:
+    that:
+      - volume_snapshot is failed
+
+- name: Delete a non existent volume snapshot by uuid
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: '415caea5-da7c-4aaa-aaaa-ececd38fb8ea'
+    state: absent
+  register: delete
+- name: Verify Delete a non existent custom image by uuid
+  assert:
+    that:
+      - delete is not changed
+      - delete is not failed
+
+- name: Fail delete a non existent volume snapshot by name
+  cloudscale_ch.cloud.volume_snapshot:
+    name: this-volume-snapshot-is-non-existent
+    state: absent
+  register: delete
+  ignore_errors: True
+- name: Verify Fail delete a non existend custom image by name
+  assert:
+    that:
+      - delete is failed
+
+- name: Create two volume-snapshots with the same name
+  uri:
+    url: 'https://api.cloudscale.ch/v1/volume-snapshots'
+    method: POST
+    headers:
+      Authorization: 'Bearer {{ cloudscale_api_token }}'
+    body:
+      name: '{{ cloudscale_resource_prefix }}-snapshot-duplicate'
+      source_volume: '{{ test_volume.uuid }}'
+    body_format: json
+    status_code: 201
+  register: duplicate
+  with_sequence: count=2
+
+- name: Try access to duplicate name
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-snapshot-duplicate'
+  register: volume_snapshot
+  ignore_errors: True
+- name: 'VERIFY: Try access to duplicate name'
+  assert:
+    that:
+      - volume_snapshot is failed
+
+- name: Fail volume snapshot creation with UUID
+  cloudscale_ch.cloud.volume_snapshot:
+    uuid: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
+    name: '{{ cloudscale_resource_prefix }}-snapshot-inexistent'
+    source_volume: '{{ test_volume.uuid }}'
+  register: volume_snapshot
+  ignore_errors: True
+- name: 'VERIFY: Fail volume creation with UUID'
+  assert:
+    that:
+      - volume_snapshot is failed
+      - volume_snapshot.msg.startswith("The resource with UUID 'ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48' was not found")

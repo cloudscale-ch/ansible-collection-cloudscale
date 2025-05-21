@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 module: volume
 short_description: Manages volumes on the cloudscale.ch IaaS service.
 description:
-  - Create, attach/detach, update and delete volumes on the cloudscale.ch IaaS service.
+  - Create, attach/detach, update, delete and revert volumes on the cloudscale.ch IaaS service.
 notes:
   - To create a new volume at least the I(name) and I(size_gb) options
     are required.
@@ -66,6 +66,13 @@ options:
     aliases: [ server_uuids, server_uuid ]
     type: list
     elements: str
+  revert:
+    description:
+      - 'UUID of the snapshot to revert the volume to. This must be the most recent
+        snapshot of the volume.
+        For root volumes: the respective server must be shut down.
+        For non-root volumes: the volume to be reverted must be detached'
+    type: str
   tags:
     description:
       - Tags associated with the volume. Set this to C({}) to clear any tags.
@@ -106,6 +113,13 @@ EXAMPLES = '''
   cloudscale_ch.cloud.volume:
     uuid: "{{ my_ssd_volume.uuid }}"
     servers: []
+    api_token: xxxxxx
+
+# Revert a volume to the most recent snapshot
+- name: Revert volume to snapshot
+  cloudscale_ch.cloud.volume:
+    uuid: "{{ my_ssd_volume.uuid }}"
+    revert: "e504dc99-ff01-4e89-ad89-7df080f97b4b"
     api_token: xxxxxx
 
 # Delete a volume
@@ -182,6 +196,7 @@ from ..module_utils.api import (
     AnsibleCloudscaleBase,
     cloudscale_argument_spec,
 )
+from copy import deepcopy
 
 
 class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
@@ -208,6 +223,24 @@ class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
 
         return is_different
 
+    def revert(self):
+        resource = self.query()
+        if len(resource['servers']) > 0:
+            self._module.fail_json(msg='Cannot revert a volume that is attached to server')
+        revert_url = resource['href'] + '/revert'
+        revert_param = {'snapshot': self._module.params['revert']}
+        revert = self._post(revert_url, revert_param)
+        result = self.wait_for_state('current_operation', False)
+        result['changed'] = True
+        result['revert'] = self._module.params['revert']
+        result['diff'] = dict()
+        result['diff']['before'] = deepcopy(resource)
+        result['diff']['after'] = deepcopy(resource)
+        result['diff']['after'].update({
+            'revert': self._module.params['revert'],
+        })
+        return result
+
 
 def main():
     argument_spec = cloudscale_argument_spec()
@@ -219,6 +252,7 @@ def main():
         size_gb=dict(type='int'),
         type=dict(type='str', choices=('ssd', 'bulk')),
         servers=dict(type='list', elements='str', aliases=['server_uuids', 'server_uuid']),
+        revert=dict(type='str'),
         tags=dict(type='dict'),
     ))
 
@@ -256,6 +290,8 @@ def main():
 
     if module.params['state'] == 'absent':
         result = cloudscale_volume.absent()
+    elif module.params['revert']:
+        result = cloudscale_volume.revert()
     else:
         result = cloudscale_volume.present()
     module.exit_json(**result)
