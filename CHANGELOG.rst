@@ -4,6 +4,24 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.5.0
+======
+
+Minor Changes
+-------------
+
+- volume - Add revert parameter.
+
+Bugfixes
+--------
+
+- floating_ip - Fix sanity tests.
+
+New Modules
+-----------
+
+- volume_snapshot - Manage volume snapshots on the cloudscale.ch IaaS service
+
 v2.4.1
 ======
 
