@@ -21,18 +21,18 @@ jobs:
       fail-fast: false
       matrix:
         ansible:
-          - 2.13
-          - 2.14
-          - 2.15
-          - 2.19
+          - 2.13.0
+          - 2.14.0
+          - 2.15.0
+          - 2.19.0b1
         include:
-          - ansible: 2.13
+          - ansible: 2.13.0
             python: 3.8
-          - ansible: 2.14
+          - ansible: 2.14.0
             python: 3.9
-          - ansible: 2.15
+          - ansible: 2.15.0
             python: 3.9
-          - ansible: 2.19
+          - ansible: 2.19.0b1
             python: 3.12
     steps:
       - name: Check out code
@@ -49,7 +49,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # Install the latest ansible-core patchlevel version
-          pip install 'ansible-core~=${{ matrix.ansible }}.0'
+          pip install 'ansible-core~=${{ matrix.ansible }}'
           pip install -r tests/requirements.txt
 
       - name: Build and install collection
