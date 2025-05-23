@@ -33,8 +33,8 @@
       - vol is successful
       - vol is changed
       - vol.size_gb == 50
-      - vol.name == '{{ cloudscale_resource_prefix }}-vol'
-      - vol.zone.slug == '{{ cloudscale_test_zone }}'
+      - vol.name == cloudscale_resource_prefix + '-vol'
+      - vol.zone.slug == cloudscale_test_zone
       - vol.tags.project == 'ansible-test'
       - vol.tags.stage == 'production'
       - vol.tags.sla == '24-7'
@@ -55,8 +55,8 @@
       - vol is successful
       - vol is not changed
       - vol.size_gb == 50
-      - vol.name == '{{ cloudscale_resource_prefix }}-vol'
-      - vol.zone.slug == '{{ cloudscale_test_zone }}'
+      - vol.name == cloudscale_resource_prefix + '-vol'
+      - vol.zone.slug == cloudscale_test_zone
       - vol.tags.project == 'ansible-test'
       - vol.tags.stage == 'production'
       - vol.tags.sla == '24-7'
@@ -185,7 +185,7 @@
       - deleted is changed
       - deleted.state == 'present'
       - deleted.uuid == vol.uuid
-      - deleted.name == '{{ cloudscale_resource_prefix }}-vol'
+      - deleted.name == cloudscale_resource_prefix + '-vol'
 
 - name: Delete attached volume by UUID
   cloudscale_ch.cloud.volume:
@@ -199,7 +199,7 @@
       - deleted is changed
       - deleted.state == 'absent'
       - deleted.uuid == vol.uuid
-      - deleted.name == '{{ cloudscale_resource_prefix }}-vol'
+      - deleted.name == cloudscale_resource_prefix + '-vol'
 
 - name: Delete attached volume by UUID idempotence
   cloudscale_ch.cloud.volume:

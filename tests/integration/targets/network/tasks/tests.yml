@@ -12,7 +12,7 @@
   assert:
     that:
       - net is changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net'
+      - net.name == cloudscale_resource_prefix + '-net'
       - not net.uuid
 
 - name: Create network
@@ -29,9 +29,9 @@
     that:
       - net is changed
       - net.mtu == 9000
-      - net.name == '{{ cloudscale_resource_prefix }}-net'
+      - net.name == cloudscale_resource_prefix + '-net'
       - net.zone.slug == cloudscale_test_zone
-      - net.uuid
+      - net.uuid is defined
       - net.tags.project == 'ansible-test'
       - net.tags.stage == 'production'
       - net.tags.sla == '24-7'
@@ -53,7 +53,7 @@
   assert:
     that:
       - net is not changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net'
+      - net.name == cloudscale_resource_prefix + '-net'
       - net.zone.slug == cloudscale_test_zone
       - net.uuid == network_uuid
       - net.tags.project == 'ansible-test'
@@ -74,7 +74,7 @@
   assert:
     that:
       - net is changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net'
+      - net.name == cloudscale_resource_prefix + '-net'
       - net.uuid == network_uuid
       - net.zone.slug == cloudscale_test_zone
       - net.tags.project == 'ansible-test'
@@ -94,7 +94,7 @@
   assert:
     that:
       - net is changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net2'
+      - net.name == cloudscale_resource_prefix + '-net2'
       - net.uuid == network_uuid
       - net.zone.slug == cloudscale_test_zone
       - net.tags.project == 'ansible-test'
@@ -114,7 +114,7 @@
   assert:
     that:
       - net is not changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net2'
+      - net.name == cloudscale_resource_prefix + '-net2'
       - net.uuid == network_uuid
       - net.zone.slug == cloudscale_test_zone
       - net.tags.project == 'ansible-test'
@@ -131,7 +131,7 @@
   assert:
     that:
       - net is changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net2'
+      - net.name == cloudscale_resource_prefix + '-net2'
       - net.uuid == network_uuid
 
 - name: Delete network
@@ -143,7 +143,7 @@
   assert:
     that:
       - net is changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net2'
+      - net.name == cloudscale_resource_prefix + '-net2'
       - net.uuid == network_uuid
 
 - name: Delete network idempotence
@@ -155,5 +155,5 @@
   assert:
     that:
       - net is not changed
-      - net.name == '{{ cloudscale_resource_prefix }}-net2'
+      - net.name == cloudscale_resource_prefix + '-net2'
       - not net.uuid
