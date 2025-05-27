@@ -175,3 +175,10 @@ releases:
       name: volume_snapshot
       namespace: ''
     release_date: '2025-05-21'
+  2.5.1:
+    changes:
+      minor_changes:
+      - Add ansible-core 2.19+ compatibility
+    fragments:
+    - ansible-2-19-compatibility.yml
+    release_date: '2025-05-27'

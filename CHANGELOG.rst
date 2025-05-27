@@ -4,6 +4,14 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.5.1
+======
+
+Minor Changes
+-------------
+
+- Add ansible-core 2.19+ compatibility
+
 v2.5.0
 ======
 
