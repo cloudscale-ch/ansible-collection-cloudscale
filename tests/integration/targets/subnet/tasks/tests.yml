@@ -34,7 +34,7 @@
     that:
       - snet is changed
       - snet.cidr == cloudscale_subnet_cidr
-      - snet.uuid
+      - snet.uuid is defined
       - snet.tags.project == 'ansible-test'
       - snet.tags.stage == 'production'
       - snet.tags.sla == '24-7'

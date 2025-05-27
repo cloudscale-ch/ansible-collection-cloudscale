@@ -12,7 +12,7 @@
   assert:
     that:
       - obj is changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
+      - obj.display_name == cloudscale_resource_prefix + '-obj'
       - not obj.id
 
 - name: Create objects user
@@ -27,8 +27,8 @@
   assert:
     that:
       - obj is changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
-      - obj.id
+      - obj.display_name == cloudscale_resource_prefix + '-obj'
+      - obj.id is defined
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
       - obj.tags.sla == '24-7'
@@ -49,7 +49,7 @@
   assert:
     that:
       - obj is not changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
+      - obj.display_name == cloudscale_resource_prefix + '-obj'
       - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
@@ -69,7 +69,7 @@
   assert:
     that:
       - obj is changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj'
+      - obj.display_name == cloudscale_resource_prefix + '-obj'
       - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'production'
@@ -88,7 +88,7 @@
   assert:
     that:
       - obj is changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
+      - obj.display_name == cloudscale_resource_prefix + '-obj2'
       - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'staging'
@@ -107,7 +107,7 @@
   assert:
     that:
       - obj is not changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
+      - obj.display_name == cloudscale_resource_prefix + '-obj2'
       - obj.id == objects_user_id
       - obj.tags.project == 'ansible-test'
       - obj.tags.stage == 'staging'
@@ -123,7 +123,7 @@
   assert:
     that:
       - obj is changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
+      - obj.display_name == cloudscale_resource_prefix + '-obj2'
       - obj.id == objects_user_id
 
 - name: Delete objects user
@@ -135,7 +135,7 @@
   assert:
     that:
       - obj is changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
+      - obj.display_name == cloudscale_resource_prefix + '-obj2'
       - obj.id == objects_user_id
 
 - name: Delete objects user idempotence
@@ -147,5 +147,5 @@
   assert:
     that:
       - obj is not changed
-      - obj.display_name == '{{ cloudscale_resource_prefix }}-obj2'
+      - obj.display_name == cloudscale_resource_prefix + '-obj2'
       - not obj.id

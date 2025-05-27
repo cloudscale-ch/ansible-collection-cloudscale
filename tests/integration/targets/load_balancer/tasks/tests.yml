@@ -36,7 +36,7 @@
     that:
       - load_balancer is changed
       - load_balancer.status == 'running'
-      - load_balancer.name == cloudscale_resource_prefix + "-test"
+      - load_balancer.name == cloudscale_resource_prefix + '-test'
       - load_balancer.flavor.slug == cloudscale_test_flavor_lb
       - load_balancer.vip_addresses[0].subnet.uuid == snet.uuid
       - load_balancer.zone.slug == cloudscale_test_zone
@@ -61,7 +61,7 @@
     that:
       - load_balancer is not changed
       - load_balancer.status == 'running'
-      - load_balancer.name == cloudscale_resource_prefix + "-test"
+      - load_balancer.name == cloudscale_resource_prefix + '-test'
       - load_balancer.flavor.slug == cloudscale_test_flavor_lb
       - load_balancer.vip_addresses[0].subnet.uuid == snet.uuid
       - load_balancer.zone.slug == cloudscale_test_zone
@@ -79,7 +79,7 @@
     that:
       - load_balancer_default_flavor is changed
       - load_balancer_default_flavor.status == 'running'
-      - load_balancer_default_flavor.name == cloudscale_resource_prefix + "-test2"
+      - load_balancer_default_flavor.name == cloudscale_resource_prefix + '-test2'
       - load_balancer_default_flavor.flavor.slug == cloudscale_test_flavor_lb
       - load_balancer_default_flavor.zone.slug == cloudscale_test_zone
 
@@ -92,7 +92,7 @@
   assert:
     that:
       - load_balancer is not changed
-      - load_balancer.name == cloudscale_resource_prefix + "-test"
+      - load_balancer.name == cloudscale_resource_prefix + '-test'
 
 # Update running LB
 - name: Test update name and tags of a running load balancer in check mode
@@ -110,7 +110,7 @@
     that:
       - load_balancer is changed
       - load_balancer.status == 'running'
-      - load_balancer.name == cloudscale_resource_prefix + "-test"
+      - load_balancer.name == cloudscale_resource_prefix + '-test'
 
 - name: Test update name and tags of a running load balancer
   cloudscale_ch.cloud.load_balancer:
@@ -126,7 +126,7 @@
     that:
       - load_balancer is changed
       - load_balancer.status == 'running'
-      - load_balancer.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer.name == cloudscale_resource_prefix + '-test-renamed'
       - load_balancer.flavor.slug == cloudscale_test_flavor_lb
       - load_balancer.tags.project == 'ansible-test'
       - load_balancer.tags.stage == 'staging'
@@ -146,7 +146,7 @@
     that:
       - load_balancer is not changed
       - load_balancer.status == 'running'
-      - load_balancer.name == cloudscale_resource_prefix + "-test-renamed"
+      - load_balancer.name == cloudscale_resource_prefix + '-test-renamed'
       - load_balancer.flavor.slug == cloudscale_test_flavor_lb
       - load_balancer.tags.project == 'ansible-test'
       - load_balancer.tags.stage == 'staging'
