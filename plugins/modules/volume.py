@@ -225,8 +225,6 @@ class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):
 
     def revert(self):
         resource = self.query()
-        if len(resource['servers']) > 0:
-            self._module.fail_json(msg='Cannot revert a volume that is attached to server')
         revert_url = resource['href'] + '/revert'
         revert_param = {'snapshot': self._module.params['revert']}
         revert = self._post(revert_url, revert_param)

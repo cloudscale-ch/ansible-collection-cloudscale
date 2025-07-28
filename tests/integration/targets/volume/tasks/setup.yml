@@ -8,3 +8,9 @@
     ssh_keys:
       - '{{ cloudscale_test_ssh_key }}'
   register: server
+
+- name: Create snapshot of root volume
+  cloudscale_ch.cloud.volume_snapshot:
+    name: '{{ cloudscale_resource_prefix }}-test-root-volume-snapshot'
+    source_volume: '{{ server.volumes.0.uuid }}'
+  register: root_volume_snapshot

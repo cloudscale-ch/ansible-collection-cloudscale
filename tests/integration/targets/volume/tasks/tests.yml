@@ -292,3 +292,20 @@
       - bulk is successful
       - bulk is not changed
       - bulk.state == 'absent'
+
+- name: Stop server
+  cloudscale_ch.cloud.server:
+    uuid: '{{ server.uuid }}'
+    state: stopped
+  register: stop_server
+
+- name: Revert root volume stopped
+  cloudscale_ch.cloud.volume:
+    uuid: '{{ server.volumes.0.uuid }}'
+    revert: '{{ root_volume_snapshot.uuid }}'
+  register: revert
+- name: 'VERIFY: Revert volume to snapshot'
+  assert:
+    that:
+      - revert is successful
+      - revert is changed
