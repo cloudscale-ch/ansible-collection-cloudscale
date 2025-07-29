@@ -36,3 +36,14 @@
     that:
       - vol is failed
       - vol.msg.startswith("The resource with UUID 'ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48' was not found")
+
+- name: Fail revert a root volume on a running server
+  cloudscale_ch.cloud.volume:
+    uuid: '{{ server.volumes.0.uuid }}'
+    revert: '{{ root_volume_snapshot.uuid }}'
+  register: revert_root_volume
+  ignore_errors: True
+- name: 'VERIFY: Fail revert a root volume on a running server'
+  assert:
+    that:
+      - revert_root_volume is failed

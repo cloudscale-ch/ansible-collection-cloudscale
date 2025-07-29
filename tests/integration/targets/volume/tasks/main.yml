@@ -7,10 +7,10 @@
   always:
     - import_role:
         name: common
-        tasks_from: cleanup_servers
+        tasks_from: cleanup_volume_snapshots
     - import_role:
         name: common
-        tasks_from: cleanup_volume_snapshots
+        tasks_from: cleanup_servers
     - import_role:
         name: common
         tasks_from: cleanup_volumes
