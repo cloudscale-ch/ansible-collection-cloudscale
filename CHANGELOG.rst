@@ -4,6 +4,14 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.5.2
+======
+
+Minor Changes
+-------------
+
+- Remove the custom error message from snapshots module to fix root volume snapshots/restores on stopped servers
+
 v2.5.1
 ======
 

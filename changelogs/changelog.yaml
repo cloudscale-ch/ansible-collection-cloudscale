@@ -182,3 +182,11 @@ releases:
     fragments:
     - ansible-2-19-compatibility.yml
     release_date: '2025-05-27'
+  2.5.2:
+    changes:
+      minor_changes:
+      - Remove the custom error message from snapshots module to fix root volume snapshots/restores
+        on stopped servers
+    fragments:
+    - snapshot-error-fix.yml
+    release_date: '2025-07-29'
