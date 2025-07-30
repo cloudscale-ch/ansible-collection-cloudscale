@@ -1,5 +1,5 @@
 
-![Collection Integration tests](https://github.com/cloudscale-ch/ansible-collection-cloudscale/workflows/Collection%20Integration%20tests/badge.svg)
+[![Ansible Collection Integration Tests](https://github.com/cloudscale-ch/ansible-collection-cloudscale/actions/workflows/ansible-collection-integration-tests.yml/badge.svg?branch=master)](https://github.com/cloudscale-ch/ansible-collection-cloudscale/actions/workflows/ansible-collection-integration-tests.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/cloudscale-ch/ansible-collection-cloudscale)](https://codecov.io/gh/cloudscale-ch/ansible-collection-cloudscale)
 [![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](LICENSE)
 
