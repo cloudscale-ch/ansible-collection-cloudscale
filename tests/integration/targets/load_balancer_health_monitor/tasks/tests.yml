@@ -167,6 +167,23 @@
       - load_balancer_health_monitor.tags.stage == 'production'
       - load_balancer_health_monitor.tags.sla == '24-7'
 
+- name: Test create a UDP load balancer health monitor (udp-connect)
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ udp_load_balancer_pool.uuid }}'
+    delay_s: '{{ cloudscale_test_udp_delay_lb_monitor }}'
+    timeout_s: '{{ cloudscale_test_udp_timeout_lb_monitor }}'
+    type: 'udp-connect'
+  register: udp_load_balancer_health_monitor
+- name: Verify create a UDP load balancer healtch monitor (udp-connect)
+  assert:
+    that:
+      - udp_load_balancer_health_monitor is changed
+      - udp_load_balancer_health_monitor.state == 'present'
+      - udp_load_balancer_health_monitor.pool.uuid == udp_load_balancer_pool.uuid
+      - udp_load_balancer_health_monitor.delay_s == cloudscale_test_udp_delay_lb_monitor
+      - udp_load_balancer_health_monitor.timeout_s == cloudscale_test_udp_timeout_lb_monitor
+      - udp_load_balancer_health_monitor.type == 'udp-connect'
+
 # Get LB health monitor facts
 - name: Test get facts of a load balancer health monitor by UUID
   cloudscale_ch.cloud.load_balancer_health_monitor:
