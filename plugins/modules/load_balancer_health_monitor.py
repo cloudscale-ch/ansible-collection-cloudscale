@@ -234,6 +234,7 @@ class AnsibleCloudscaleLoadBalancerHealthMonitor(AnsibleCloudscaleBase):
             resource_key_name='pool',
             resource_create_param_keys=[
                 'pool',
+                'delay_s',
                 'timeout_s',
                 'up_threshold',
                 'down_threshold',
