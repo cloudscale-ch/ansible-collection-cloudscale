@@ -75,6 +75,26 @@
       - load_balancer_pool_member.tags.stage == 'production'
       - load_balancer_pool_member.tags.sla == '24-7'
 
+- name: Test create a UDP load balancer pool member
+  cloudscale_ch.cloud.load_balancer_pool_member:
+    name: '{{ cloudscale_resource_prefix }}-test-udp'
+    load_balancer_pool: '{{ udp_load_balancer_pool.uuid }}'
+    enabled: '{{ cloudscale_test_enabled_lb_member }}'
+    protocol_port: '{{ cloudscale_test_protocol_port_lb_member }}'
+    monitor_port: '{{ cloudscale_test_monitor_port_lb_member }}'
+    subnet: '{{ snet.uuid }}'
+    address: '172.16.0.100'
+  register: udp_load_balancer_pool_member
+- name: Verify create a UDP load balancer pool member
+  assert:
+    that:
+      - udp_load_balancer_pool_member is changed
+      - udp_load_balancer_pool_member.name == cloudscale_resource_prefix + '-test-udp'
+      - udp_load_balancer_pool_member.pool.uuid == udp_load_balancer_pool.uuid
+      - udp_load_balancer_pool_member.enabled == cloudscale_test_enabled_lb_member
+      - udp_load_balancer_pool_member.protocol_port == cloudscale_test_protocol_port_lb_member
+      - udp_load_balancer_pool_member.monitor_port == cloudscale_test_monitor_port_lb_member
+
 # Get LB pool member facts
 - name: Test get facts of a load balancer pool member by name
   cloudscale_ch.cloud.load_balancer_pool_member:
