@@ -110,6 +110,25 @@ EXAMPLES = '''
     api_token: xxxxxx
   register: load_balancer_health_monitor
 
+# Craete a udp health monitor for a udp pool
+- name: Create a udp load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: 'udp-pool'
+    load_balancer: '3d41b118-f95c-4897-ad74-2260fea783fc'
+    algorithm: 'round_robin'
+    protocol: 'udp'
+    api_token: xxxxxx
+  register: udp_load_balancer_pool
+
+- name: Create a udp load balancer health monitor (udp-connect)
+  cloudscale_ch.cloud.load_balancer_health_monitor:
+    pool: '{{ udp_load_balancer_pool.uuid }}'
+    type: 'udp-connect'
+    delay_s: 3
+    timeout_s: 2
+    api_token: xxxxxx
+  register: udp_load_balancer_health_monitor
+
 # Get load balancer health monitor facts by UUID
 - name: Get facts of a load balancer health monitor by UUID
   cloudscale_ch.cloud.load_balancer_health_monitor:
