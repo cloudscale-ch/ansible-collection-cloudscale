@@ -92,6 +92,23 @@
       - load_balancer_listener.tags.stage == 'production'
       - load_balancer_listener.tags.sla == '24-7'
 
+# Create UDP LB listener
+- name: Test create a UDP load balancer listener
+  cloudscale_ch.cloud.load_balancer_listener:
+    name: '{{ cloudscale_resource_prefix }}-test-udp'
+    pool: '{{ udp_load_balancer_pool.uuid }}'
+    protocol: 'udp'
+    protocol_port: '{{ cloudscale_test_protocol_port }}'
+  register: udp_load_balancer_listener
+- name: Verify create a UDP load balancer listener
+  assert:
+    that:
+      - udp_load_balancer_listener is changed
+      - udp_load_balancer_listener.name == cloudscale_resource_prefix + '-test-udp'
+      - udp_load_balancer_listener.pool.uuid == udp_load_balancer_pool.uuid
+      - udp_load_balancer_listener.protocol == 'udp'
+      - udp_load_balancer_listener.protocol_port == cloudscale_test_protocol_port
+
 # Get LB listener facts
 - name: Test get facts of a load balancer listener by name
   cloudscale_ch.cloud.load_balancer_listener:

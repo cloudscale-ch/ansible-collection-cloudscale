@@ -41,3 +41,15 @@
       stage: production
       sla: 24-7
   register: load_balancer_pool
+
+- name: Test create a UDP load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-udp'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: 'udp'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: udp_load_balancer_pool

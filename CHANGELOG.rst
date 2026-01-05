@@ -4,6 +4,14 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.5.3
+======
+
+Minor Changes
+---------------
+
+- Added missing param when creating a health monitor
+
 v2.5.2
 ======
 

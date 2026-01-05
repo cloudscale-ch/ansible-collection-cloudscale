@@ -60,6 +60,20 @@
       - load_balancer_pool.tags.stage == 'production'
       - load_balancer_pool.tags.sla == '24-7'
 
+- name: Test create a UDP load balancer pool
+  cloudscale_ch.cloud.load_balancer_pool:
+    name: '{{ cloudscale_resource_prefix }}-test-udp'
+    load_balancer: '{{ load_balancer.uuid }}'
+    algorithm: '{{ cloudscale_test_algorithm_lb_pool }}'
+    protocol: 'udp'
+  register: udp_load_balancer_pool
+- name: Verify create a UDP load balancer pool
+  assert:
+    that:
+      - udp_load_balancer_pool is changed
+      - udp_load_balancer_pool.name == cloudscale_resource_prefix + '-test-udp'
+      - udp_load_balancer_pool.load_balancer.uuid == load_balancer.uuid
+
 # Get LB Pool facts
 - name: Test get facts of a load balancer pool by name
   cloudscale_ch.cloud.load_balancer_pool:
