@@ -190,3 +190,10 @@ releases:
     fragments:
     - snapshot-error-fix.yml
     release_date: '2025-07-29'
+  2.5.3:
+    changes:
+      minor_changes:
+      - Added missing param when creating a health monitor
+    fragments:
+    - 2.5.3.yml
+    release_date: '2026-01-05'
