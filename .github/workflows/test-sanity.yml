@@ -17,7 +17,7 @@ jobs:
         - stable-2.19
         - stable-2.20
         - devel
-    runs-on: debian-trixie
+    runs-on: ubuntu-24.04
     steps:
     - name: Check out code
       uses: actions/checkout@v4

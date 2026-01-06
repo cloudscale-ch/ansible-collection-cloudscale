@@ -13,7 +13,7 @@ jobs:
     name: >-
       Integration test on ansible-core ${{ matrix.ansible }}
       using Python ${{ matrix.python }}
-    runs-on: debian-trixie
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ansible_collections/cloudscale_ch/cloud
