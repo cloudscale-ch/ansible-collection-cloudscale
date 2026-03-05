@@ -11,26 +11,28 @@ jobs:
       run:
         working-directory: ansible_collections/cloudscale_ch/cloud
     strategy:
+      fail-fast: false
       matrix:
-        ansible:
-        - stable-2.15
-        - stable-2.16
-        - stable-2.17
-        - devel
-    runs-on: ubuntu-22.04
+        include: ${{ fromJSON(vars.ANSIBLE_PYTHON_MATRIX) }}
+    runs-on: ${{ vars.RUNNER_OS }}
     steps:
-    - name: Check out code
-      uses: actions/checkout@v6
-      with:
-        path: ansible_collections/cloudscale_ch/cloud
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          path: ansible_collections/cloudscale_ch/cloud
 
-    - name: Set up Python 3
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.11'
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
 
-    - name: Install ansible-base (${{ matrix.ansible }})
-      run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
+      - name: Install ansible
+        run: |
+          if [ "${{ matrix.ansible }}" = "devel" ] ; then
+            pip install https://github.com/ansible/ansible/archive/devel.tar.gz
+          else
+            pip install 'ansible-core~=${{ matrix.ansible }}'
+          fi
 
-    - name: Run sanity tests
-      run: ansible-test sanity --docker -v --color
+      - name: Run sanity tests
+        run: ansible-test sanity --docker -v --color
