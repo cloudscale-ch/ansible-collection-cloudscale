@@ -34,7 +34,7 @@ To use a module from the cloudscale.ch collection, please reference the full nam
   tasks:
     - cloudscale_ch.cloud.server:
         name: web1
-        image: debian-10
+        image: debian-13
         flavor: flex-2
         ssh_keys:
           - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -54,7 +54,7 @@ Or you can add the full namespace and collection name in the `collections` eleme
   tasks:
     - server:
         name: web1
-        image: debian-10
+        image: debian-13
         flavor: flex-2
         ssh_keys:
           - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
