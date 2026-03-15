@@ -143,7 +143,7 @@ EXAMPLES = '''
 - name: Start cloudscale.ch server
   cloudscale_ch.cloud.server:
     name: my-shiny-cloudscale-server
-    image: debian-10
+    image: debian-13
     flavor: flex-4-4
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -169,7 +169,7 @@ EXAMPLES = '''
 - name: Start cloudscale.ch server
   cloudscale_ch.cloud.server:
     name: my-shiny-cloudscale-server
-    image: debian-10
+    image: debian-13
     flavor: flex-8-2
     force: true
     ssh_keys:
@@ -197,7 +197,7 @@ EXAMPLES = '''
 - name: Start server and wait for SSH host keys
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-ssh-key
-    image: debian-10
+    image: debian-13
     flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -215,7 +215,7 @@ EXAMPLES = '''
 - name: Start a server with a public and private network interface
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-two-network-interfaces
-    image: debian-10
+    image: debian-13
     flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -229,7 +229,7 @@ EXAMPLES = '''
 - name: Start a server with a specific IPv4 address from subnet range
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-specific-address
-    image: debian-10
+    image: debian-13
     flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
@@ -247,7 +247,7 @@ EXAMPLES = '''
 - name: Start a server with a private network interface and no IP address
   cloudscale_ch.cloud.server:
     name: my-cloudscale-server-with-specific-address
-    image: debian-10
+    image: debian-13
     flavor: flex-4-2
     ssh_keys:
       - ssh-rsa XXXXXXXXXX...XXXX ansible@cloudscale
