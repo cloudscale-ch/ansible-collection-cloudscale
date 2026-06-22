@@ -24,7 +24,7 @@ jobs:
         include: ${{ fromJSON(vars.ANSIBLE_PYTHON_MATRIX) }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: ansible_collections/cloudscale_ch/cloud
 
