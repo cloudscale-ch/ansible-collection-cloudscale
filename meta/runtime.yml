@@ -5,7 +5,7 @@ action_groups:
   - floating_ip
   - load_balancer
   - load_balancer_health_monitor
-  - loaad_balancer_listener
+  - load_balancer_listener
   - load_balancer_pool
   - load_balancer_pool_member
   - network
@@ -14,6 +14,7 @@ action_groups:
   - server
   - subnet
   - volume
+  - volume_snapshot
 
 plugin_routing:
   inventory:

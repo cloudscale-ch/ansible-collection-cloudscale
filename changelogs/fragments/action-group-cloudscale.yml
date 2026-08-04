@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - cloudscale action group - fix a typo (``loaad_balancer_listener``) that excluded the
+    ``load_balancer_listener`` module from the ``cloudscale_ch.cloud.cloudscale`` action group,
+    and add the missing ``volume_snapshot`` module to the group.
