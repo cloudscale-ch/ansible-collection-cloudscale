@@ -244,10 +244,11 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         return self.pre_transform(self._resource_data)
 
-    def create(self, resource, data=None):
+    def create(self, resource, data=None, recreate=False):
         # Fail if UUID/ID was provided but the resource was not found on state=present.
+        # Skipped when recreating, since recreation deliberately yields a new UUID.
         uuid = self._module.params.get(self.resource_key_uuid)
-        if uuid is not None:
+        if uuid is not None and not recreate:
             self._module.fail_json(msg="The resource with UUID '%s' was not found "
                                    "and we would create a new one with different UUID, "
                                    "this is probably not what you have asked for." % uuid)
@@ -302,6 +303,54 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         if updated and not self._module.check_mode:
             resource = self.query()
         return resource
+
+    def _differing_update_keys(self, resource):
+        # return the subset of resource_update_param_keys whose desired
+        # value differs from the live resource.
+        return [
+            key for key in self.resource_update_param_keys
+            if self._module.params.get(key) is not None
+            and resource and key in resource
+            and self.find_difference(key, resource, self._module.params.get(key))
+        ]
+
+    def delete_resource(self, resource):
+        # delete via href and wait until the resource is gone.
+        href = resource.get('href')
+        if not href:
+            self._module.fail_json(msg='Unable to delete %s, no href found.' % self.resource_name)
+        self._delete(href)
+        self.wait_for_state('state', 'absent')
+
+    def recreate(self, resource):
+        self._result['changed'] = True
+
+        before = deepcopy(resource)
+
+        # delete resource before creating it again
+        if not self._module.check_mode:
+            self.delete_resource(resource)
+
+        # set recreate=True to avoid the uuid check
+        new_resource = self.create(self.init_resource(), recreate=True)
+
+        # create() overwrites diff['before']. restore the
+        # real previous state so the diff reflects the recreation.
+        self._result['diff']['before'] = before
+        return new_resource
+
+    def update_via_recreate(self, resource):
+        # For resources without an update (PATCH) endpoint: destroy and recreate
+        # when a reconciled field drifts. Requires force parameter to be set.
+        diffs = self._differing_update_keys(resource)
+        if not diffs:
+            return resource
+        if not self._module.params.get('force'):
+            self._module.fail_json(msg=(
+                "Field(s) %s changed but the %s API has no update endpoint. "
+                "Set force=true to destroy and recreate the resource."
+                % (', '.join(diffs), self.resource_name)))
+        return self.recreate(resource)
 
     def present(self):
         resource = self.query()
