@@ -10,7 +10,7 @@
 
 - name: Create two networks with the same name
   uri:
-    url: 'https://api.cloudscale.ch/v1/networks'
+    url: '{{ cloudscale_api_url }}/networks'
     method: POST
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'

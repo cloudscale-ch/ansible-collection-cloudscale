@@ -1,7 +1,7 @@
 ---
 - name: List all custom images
   uri:
-    url: 'https://api.cloudscale.ch/v1/custom-images'
+    url: '{{ cloudscale_api_url }}/custom-images'
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'
     status_code: 200

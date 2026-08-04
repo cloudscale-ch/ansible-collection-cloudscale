@@ -1,7 +1,7 @@
 ---
 - name: List all volumes
   uri:
-    url: 'https://api.cloudscale.ch/v1/volumes'
+    url: '{{ cloudscale_api_url }}/volumes'
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'
     status_code: 200

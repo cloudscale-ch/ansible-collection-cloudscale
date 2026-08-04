@@ -18,3 +18,7 @@ cloudscale_test_alt_zone: 'rma1'
 
 # The region to use to request floating IPs
 cloudscale_test_region: 'lpg'
+
+# Base URL of the cloudscale.ch API. Override in
+# integration_config.yml to target a non-production API.
+cloudscale_api_url: 'https://api.cloudscale.ch/v1'
