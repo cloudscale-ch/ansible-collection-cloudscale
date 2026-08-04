@@ -3,6 +3,7 @@ action_groups:
   cloudscale:
   - custom_image
   - floating_ip
+  - interface
   - load_balancer
   - load_balancer_health_monitor
   - load_balancer_listener
@@ -10,6 +11,7 @@ action_groups:
   - load_balancer_pool_member
   - network
   - objects_user
+  - router
   - server_group
   - server
   - subnet

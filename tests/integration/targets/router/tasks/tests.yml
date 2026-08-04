@@ -1,0 +1,137 @@
+---
+- name: Create router in check mode
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-router'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+  register: router
+  check_mode: true
+- name: 'VERIFY: Create router in check mode'
+  assert:
+    that:
+      - router is changed
+      - router.name == cloudscale_resource_prefix + '-router'
+      - not router.uuid
+
+- name: Create router
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-router'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+  register: router
+- name: 'VERIFY: Create router'
+  assert:
+    that:
+      - router is changed
+      - router.name == cloudscale_resource_prefix + '-router'
+      - router.zone.slug == cloudscale_test_zone
+      - router.uuid is defined
+      - router.internet_gateway == false
+      - router.tags.project == 'ansible-test'
+      - router.state == 'present'
+
+- name: Remember uuid
+  set_fact:
+    router_uuid: '{{ router.uuid }}'
+
+- name: Create router idempotence
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-router'
+    zone: '{{ cloudscale_test_zone }}'
+    tags:
+      project: ansible-test
+  register: router
+- name: 'VERIFY: Create router idempotence'
+  assert:
+    that:
+      - router is not changed
+      - router.uuid == router_uuid
+
+- name: Create internet gateway router
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-igw'
+    zone: '{{ cloudscale_test_zone }}'
+    internet_gateway: true
+    tags:
+      project: ansible-test
+  register: igw
+- name: 'VERIFY: Create internet gateway router'
+  assert:
+    that:
+      - igw is changed
+      - igw.name == cloudscale_resource_prefix + '-igw'
+      - igw.internet_gateway == true
+      - igw.uuid is defined
+
+- name: Create internet gateway router idempotence
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-igw'
+    zone: '{{ cloudscale_test_zone }}'
+    internet_gateway: true
+    tags:
+      project: ansible-test
+  register: igw
+- name: 'VERIFY: Create internet gateway router idempotence'
+  assert:
+    that:
+      - igw is not changed
+
+- name: Remember igw uuid
+  set_fact:
+    igw_uuid: '{{ igw.uuid }}'
+
+- name: Change internet_gateway fails
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-igw'
+    zone: '{{ cloudscale_test_zone }}'
+    internet_gateway: false
+    tags:
+      project: ansible-test
+  register: igw
+  ignore_errors: true
+- name: 'VERIFY: Change internet_gateway fails'
+  assert:
+    that:
+      - igw is failed
+      - "'Updating routers is not supported' in igw.msg"
+
+- name: Delete igw
+  cloudscale_ch.cloud.router:
+    uuid: '{{ igw_uuid }}'
+    state: absent
+
+- name: Delete router in check mode
+  cloudscale_ch.cloud.router:
+    uuid: '{{ router_uuid }}'
+    state: absent
+  register: router
+  check_mode: true
+- name: 'VERIFY: Delete router in check mode'
+  assert:
+    that:
+      - router is changed
+      - router.state == 'present'
+
+- name: Delete router
+  cloudscale_ch.cloud.router:
+    uuid: '{{ router_uuid }}'
+    state: absent
+  register: router
+- name: 'VERIFY: Delete router'
+  assert:
+    that:
+      - router is changed
+      - router.state == 'absent'
+
+- name: Delete router idempotence
+  cloudscale_ch.cloud.router:
+    uuid: '{{ router_uuid }}'
+    state: absent
+  register: router
+- name: 'VERIFY: Delete router idempotence'
+  assert:
+    that:
+      - router is not changed
+      - router.state == 'absent'

@@ -350,6 +350,19 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
 
         return is_different
 
+    def has_differences(self, resource):
+        """Check if any create parameters differ from the current resource.
+
+        Iterates resource_create_param_keys and reports the first difference
+        found by delegating to find_difference().
+        """
+        for key in self.resource_create_param_keys:
+            param = self._module.params.get(key)
+            if param is not None and resource and key in resource:
+                if self.find_difference(key, resource, param):
+                    return True
+        return False
+
     def _param_updated(self, key, resource):
         param = self._module.params.get(key)
         if param is None:

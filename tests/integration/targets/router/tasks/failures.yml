@@ -1,0 +1,20 @@
+---
+- name: Fail missing params
+  cloudscale_ch.cloud.router:
+  register: router
+  ignore_errors: true
+- name: 'VERIFY: Fail name and UUID'
+  assert:
+    that:
+      - router is failed
+
+- name: Fail router creation with UUID
+  cloudscale_ch.cloud.router:
+    uuid: ea3b39a3-77a8-4d0b-881d-0bb00a1e7f48
+  register: router
+  ignore_errors: true
+- name: 'VERIFY: Fail router creation with UUID'
+  assert:
+    that:
+      - router is failed
+      - router.msg.startswith("state is present but all of the following are missing")
