@@ -209,7 +209,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
                 resources = self._get('%s' % self.resource_name)
 
             matching = []
-            for resource in resources:
+            for resource in (resources or []):
                 if self.use_tag_for_name:
                     resource[self.resource_key_name] = resource['tags'].get(self.resource_name_tag)
 
