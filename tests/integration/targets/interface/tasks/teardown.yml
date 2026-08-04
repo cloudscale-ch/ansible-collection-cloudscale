@@ -1,0 +1,29 @@
+---
+- name: Delete test interface
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    state: absent
+  when: test_router is defined and test_router.uuid is defined and test_network is defined and test_network.uuid is defined
+  ignore_errors: true
+
+- name: Delete test router
+  cloudscale_ch.cloud.router:
+    uuid: '{{ test_router.uuid }}'
+    state: absent
+  when: test_router is defined and test_router.uuid is defined
+  ignore_errors: true
+
+- name: Delete test subnet
+  cloudscale_ch.cloud.subnet:
+    uuid: '{{ test_subnet.uuid }}'
+    state: absent
+  when: test_subnet is defined and test_subnet.uuid is defined
+  ignore_errors: true
+
+- name: Delete test network
+  cloudscale_ch.cloud.network:
+    uuid: '{{ test_network.uuid }}'
+    state: absent
+  when: test_network is defined and test_network.uuid is defined
+  ignore_errors: true

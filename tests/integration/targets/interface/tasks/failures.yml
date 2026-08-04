@@ -1,0 +1,34 @@
+---
+- name: Fail missing network
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    addresses:
+      - subnet: '{{ test_subnet.uuid }}'
+        address: '172.16.42.10'
+  register: iface
+  ignore_errors: true
+- name: 'VERIFY: Fail missing network'
+  assert:
+    that:
+      - iface is failed
+
+- name: Fail missing router
+  cloudscale_ch.cloud.interface:
+    network: '{{ test_network.uuid }}'
+  register: iface
+  ignore_errors: true
+- name: 'VERIFY: Fail missing router'
+  assert:
+    that:
+      - iface is failed
+
+- name: Fail missing addresses on present
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+  register: iface
+  ignore_errors: true
+- name: 'VERIFY: Fail missing addresses on present'
+  assert:
+    that:
+      - iface is failed

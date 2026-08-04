@@ -1,0 +1,20 @@
+---
+- name: Create test network
+  cloudscale_ch.cloud.network:
+    name: '{{ cloudscale_resource_prefix }}-net'
+    zone: '{{ cloudscale_test_zone }}'
+    auto_create_ipv4_subnet: false
+  register: test_network
+
+- name: Create test subnet
+  cloudscale_ch.cloud.subnet:
+    cidr: '172.16.42.0/24'
+    network:
+      uuid: '{{ test_network.uuid }}'
+  register: test_subnet
+
+- name: Create test router
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-router'
+    zone: '{{ cloudscale_test_zone }}'
+  register: test_router

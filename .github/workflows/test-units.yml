@@ -1,0 +1,58 @@
+name: Unit tests
+on:
+  schedule:
+  - cron: "32 5 * * *"
+  pull_request:
+
+jobs:
+  units:
+    name: Unit tests (${{ matrix.ansible }})
+    defaults:
+      run:
+        working-directory: ansible_collections/cloudscale_ch/cloud
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(vars.ANSIBLE_PYTHON_MATRIX) }}
+    runs-on: ${{ vars.RUNNER_OS }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          path: ansible_collections/cloudscale_ch/cloud
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install ansible
+        run: |
+          if [ "${{ matrix.ansible }}" = "devel" ] ; then
+            pip install https://github.com/ansible/ansible/archive/devel.tar.gz
+          else
+            pip install 'ansible-core~=${{ matrix.ansible }}'
+          fi
+
+      - name: Run unit tests
+        run: >-
+          ansible-test
+          units
+          --docker
+          --python ${{ matrix.python }}
+          -v
+          --color
+          --coverage
+
+      - name: Generate coverage report
+        run: >-
+          ansible-test
+          coverage xml
+          -v
+          --requirements
+          --group-by command
+          --group-by version
+
+      - uses: codecov/codecov-action@v6
+        with:
+          fail_ci_if_error: false
