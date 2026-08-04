@@ -250,7 +250,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         if uuid is not None:
             self._module.fail_json(msg="The resource with UUID '%s' was not found "
                                    "and we would create a new one with different UUID, "
-                                   "this is probably not want you have asked for." % uuid)
+                                   "this is probably not what you have asked for." % uuid)
 
         self._result['changed'] = True
 
