@@ -1,7 +1,7 @@
 ---
 - name: Create two volumes with the same name
   uri:
-    url: 'https://api.cloudscale.ch/v1/volumes'
+    url: '{{ cloudscale_api_url }}/volumes'
     method: POST
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'

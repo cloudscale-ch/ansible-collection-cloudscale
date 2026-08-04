@@ -10,7 +10,7 @@
 
 - name: Create two server groups with the same name
   uri:
-    url: 'https://api.cloudscale.ch/v1/server-groups'
+    url: '{{ cloudscale_api_url }}/server-groups'
     method: POST
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'

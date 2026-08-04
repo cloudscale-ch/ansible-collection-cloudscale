@@ -43,7 +43,7 @@
 
 - name: Create two volume-snapshots with the same name
   uri:
-    url: 'https://api.cloudscale.ch/v1/volume-snapshots'
+    url: '{{ cloudscale_api_url }}/volume-snapshots'
     method: POST
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'

@@ -1,7 +1,7 @@
 ---
 - name: List all objects users
   uri:
-    url: 'https://api.cloudscale.ch/v1/objects-users'
+    url: '{{ cloudscale_api_url }}/objects-users'
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'
     status_code: 200
