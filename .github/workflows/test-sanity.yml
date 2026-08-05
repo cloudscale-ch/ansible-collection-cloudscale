@@ -1,4 +1,7 @@
 name: Sanity tests
+
+permissions: {}
+
 on:
   schedule:
   - cron: "32 5 * * *"
@@ -6,6 +9,8 @@ on:
 
 jobs:
   sanity:
+    permissions:
+      contents: read
     name: Sanity tests (${{ matrix.ansible }})
     defaults:
       run:
@@ -16,13 +21,15 @@ jobs:
         include: ${{ fromJSON(vars.ANSIBLE_PYTHON_MATRIX) }}
     runs-on: ${{ vars.RUNNER_OS }}
     steps:
-      - name: Check out code
-        uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           path: ansible_collections/cloudscale_ch/cloud
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python }}
 
