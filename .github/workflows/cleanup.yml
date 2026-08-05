@@ -1,16 +1,20 @@
 name: Scheduled Cleanup
 
+permissions: {}
+
 on:
   schedule:
   - cron: '0 2 * * *'  # UTC
 
 jobs:
   cleanup:
+    permissions:
+      contents: read
     name: Cleanup possible leftovers
     runs-on: ubuntu-latest
     steps:
     - name: Ensure no other integration test is currently running
-      uses: softprops/turnstyle@v3
+      uses: softprops/turnstyle@afaccda0f3c0136fb7cb4a734b9b96be03599948 # v3.3.2
       timeout-minutes: 60
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -18,7 +22,7 @@ jobs:
         same-branch-only: false
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: '3.8'
 
