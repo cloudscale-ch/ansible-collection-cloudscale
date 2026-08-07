@@ -50,6 +50,16 @@ options:
   server:
     description:
       - UUID of the server assigned to this floating IP.
+      - This can not be used together with 'load_balancer'.
+    type: str
+  load_balancer:
+    description:
+      - UUID of the load_balancer assigned to this floatingIP.
+      - See the [API
+        documentation](https://www.cloudscale.ch/en/api/v1#create-a-floating-ip)
+        for the allowed load balancers.
+      - This can not be used together with 'server'.
+      - You cannot set a prefix_length when adding a load_balancer.
     type: str
   type:
     description:
@@ -68,6 +78,7 @@ options:
       - Only valid if I(ip_version) is 6.
       - Prefix length for the IPv6 network. Currently only a prefix of /56 can be requested. If no I(prefix_length) is present, a
         single address is created.
+      - You cannot set a prefix_length when adding a load_balancer.
     choices: [ 56 ]
     type: int
   reverse_ptr:
@@ -219,6 +230,7 @@ class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
             resource_create_param_keys=[
                 'ip_version',
                 'server',
+                'load_balancer',
                 'prefix_length',
                 'reverse_ptr',
                 'type',
@@ -227,6 +239,7 @@ class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
             ],
             resource_update_param_keys=[
                 'server',
+                'load_balancer',
                 'reverse_ptr',
                 'tags',
             ],
@@ -259,6 +272,7 @@ def main():
         network=dict(aliases=['ip'], type='str'),
         ip_version=dict(choices=(4, 6), type='int'),
         server=dict(type='str'),
+        load_balancer=dict(type='str'),
         type=dict(type='str', choices=('regional', 'global'), default='regional'),
         region=dict(type='str'),
         prefix_length=dict(choices=(56,), type='int'),
@@ -268,6 +282,10 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=(
+            ['load_balancer', 'server'],
+            ['load_balancer', 'prefix_length'],
+        ),
         required_one_of=(('network', 'name'),),
         supports_check_mode=True,
     )
