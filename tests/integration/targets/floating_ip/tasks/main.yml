@@ -21,10 +21,25 @@
         zone: '{{ cloudscale_test_zone }}'
       register: test02
 
+    - name: Create a load_balancer
+      cloudscale_ch.cloud.load_balancer:
+        name: '{{ cloudscale_resource_prefix }}-test01-lb'
+        zone: '{{ cloudscale_test_zone }}'
+      register: test01_lb
+
     - include_tasks: floating_ip.yml
       loop:
         - { 'ip_version': 4, 'reverse_ptr': '{{ cloudscale_resource_prefix }}-4.example.com' }
         - { 'ip_version': 6, 'reverse_ptr': '{{ cloudscale_resource_prefix }}-6.example.com' }
+        - { 'ip_version': 6, 'prefix_length': 56 }
+
+    - include_tasks: floating_ip_load_balancer.yml
+      loop:
+        - { 'ip_version': 4, 'reverse_ptr': '{{ cloudscale_resource_prefix }}-4.example.com' }
+        - { 'ip_version': 6, 'reverse_ptr': '{{ cloudscale_resource_prefix }}-6.example.com' }
+
+    - include_tasks: floating_ip_load_balancer_prefix.yml
+      loop:
         - { 'ip_version': 6, 'prefix_length': 56 }
 
     - import_tasks: unassigned.yml
@@ -33,6 +48,9 @@
     - import_role:
         name: common
         tasks_from: cleanup_servers
+    - import_role:
+        name: common
+        tasks_from: cleanup_load_balancers
     - import_role:
         name: common
         tasks_from: cleanup_floating_ips
