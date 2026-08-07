@@ -1,0 +1,166 @@
+- name: Request regional floating IP for load balancer in check mode
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  check_mode: true
+  register: floating_ip
+- name: Verify request floating IP for load balancer in check mode
+  assert:
+    that:
+      - floating_ip is changed
+      - floating_ip.state == 'absent'
+
+- name: Request regional floating IP for load balancer
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip
+- name: Verify request regional floating IP for load balancer
+  assert:
+    that:
+      - floating_ip is changed
+      - floating_ip.region.slug == cloudscale_test_region
+      - floating_ip.load_balancer == test01_lb.uuid
+      - not floating_ip.server
+
+- name: Request regional floating IP for load balancer idempotence
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_idempotence
+- name: Verify request regional floating IP for load balancer idempotence
+  assert:
+    that:
+      - floating_ip_idempotence is not changed
+      - floating_ip_idempotence.load_balancer == test01_lb.uuid
+      - floating_ip_idempotence.region.slug == cloudscale_test_region
+
+- name: Remove floating IP from load balancer in check mode
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip.ip }}'
+    state: 'absent'
+  register: release_ip
+  check_mode: true
+- name: Verify Remove floating IP from load balancer in check mode
+  assert:
+    that:
+      - release_ip is changed
+      - release_ip.state == 'present'
+
+- name: Remove floating IP from load balancer
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip.ip }}'
+    state: 'absent'
+  register: release_ip
+- name: Verify Remove floating IP from load balancer
+  assert:
+    that:
+      - release_ip is changed
+      - release_ip.state == 'absent'
+
+- name: Remove floating IP from load balancer idempotence
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip.ip }}'
+    state: 'absent'
+  register: release_ip
+- name: Verify Remove floating IP from load balancer idempotence
+  assert:
+    that:
+      - release_ip is not changed
+      - release_ip.state == 'absent'
+
+- name: Request regional floating IP for load balancer and server
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    server: '{{ test01.uuid }}'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip
+  ignore_errors: True
+- name: Verify request regional floating IP for load balancer mutual exclusivity
+  assert:
+    that:
+      - floating_ip is not changed
+      - floating_ip is failed
+
+- name: Request floating IP for server to test reassignment
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip-reassign'
+    server: '{{ test01.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_reassign
+- name: Verify request floating IP for server
+  assert:
+    that:
+      - floating_ip_reassign is changed
+      - floating_ip_reassign.server == test01.uuid
+      - not floating_ip_reassign.load_balancer
+
+- name: Reassign floating IP from server to load balancer
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip-reassign'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_reassign
+- name: Verify reassigned floating IP from server to load balancer
+  assert:
+    that:
+      - floating_ip_reassign is changed
+      - floating_ip_reassign.load_balancer == test01_lb.uuid
+      - not floating_ip_reassign.server
+
+- name: Reassign floating IP from load balancer back to server
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip-reassign'
+    server: '{{ test01.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_reassign
+- name: Verify reassigned floating IP from load balancer back to server
+  assert:
+    that:
+      - floating_ip_reassign is changed
+      - floating_ip_reassign.server == test01.uuid
+      - not floating_ip_reassign.load_balancer
+
+- name: Reassign floating IP from server back to load balancer (round trip)
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip-reassign'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_reassign
+- name: Verify reassigned floating IP from server back to load balancer
+  assert:
+    that:
+      - floating_ip_reassign is changed
+      - floating_ip_reassign.load_balancer == test01_lb.uuid
+      - not floating_ip_reassign.server
+
+- name: Remove reassigned floating IP
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip_reassign.ip }}'
+    state: 'absent'
+  register: release_ip_reassign
+- name: Verify removal of reassigned floating IP
+  assert:
+    that:
+      - release_ip_reassign is changed
+      - release_ip_reassign.state == 'absent'
