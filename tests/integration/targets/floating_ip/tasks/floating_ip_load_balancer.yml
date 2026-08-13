@@ -1,0 +1,117 @@
+- name: Request regional floating IP for load balancer in check mode
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  check_mode: true
+  register: floating_ip
+- name: Verify request floating IP for load balancer in check mode
+  assert:
+    that:
+      - floating_ip is changed
+      - floating_ip.state == 'absent'
+
+- name: Request regional floating IP for load balancer
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: floating_ip
+- name: Verify request regional floating IP for load balancer
+  assert:
+    that:
+      - floating_ip is changed
+      - floating_ip.region.slug == cloudscale_test_region
+      # - (item.ip_version == 4 and floating_ip.ip | ipv4) or (item.ip_version == 6 and floating_ip.ip | ipv6)
+      - floating_ip.load_balancer.uuid == test01_lb.uuid
+      - floating_ip.tags.project == 'ansible-test'
+      - floating_ip.tags.stage == 'production'
+      - floating_ip.tags.sla == '24-7'
+
+- name: Request regional floating IP for load balancer idempotence
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: floating_ip_idempotence
+- name: Verify request regional floating IP for load balancer idempotence
+  assert:
+    that:
+      - floating_ip_idempotence is not changed
+      - floating_ip_idempotence.load_balancer.uuid == test01_lb.uuid
+      - floating_ip.region.slug == cloudscale_test_region
+      - floating_ip.tags.project == 'ansible-test'
+      - floating_ip.tags.stage == 'production'
+      - floating_ip.tags.sla == '24-7'
+
+- name: Remove floating IP from load balancer in check mode
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip.ip }}'
+    state: 'absent'
+  register: release_ip
+  check_mode: true
+- name: Verify Remove floating IP from load balancer in check mode
+  assert:
+    that:
+      - release_ip is changed
+      - release_ip.state == 'present'
+
+- name: Remove floating IP from load balancer
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip.ip }}'
+    state: 'absent'
+  register: release_ip
+- name: Verify Remove floating IP from load balancer
+  assert:
+    that:
+      - release_ip is changed
+      - release_ip.state == 'absent'
+
+- name: Remove floating IP from load balancer idempotence
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip.ip }}'
+    state: 'absent'
+  register: release_ip
+- name: Verify Remove floating IP from load balancer idempotence
+  assert:
+    that:
+      - release_ip is not changed
+      - release_ip.state == 'absent'
+
+- name: Request regional floating IP for load balancer and server
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    server: '{{ test01.uuid }}'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: floating_ip
+  ignore_errors: True
+- name: Verify request regional floating IP for load balancer idempotence
+  assert:
+    that:
+      - floating_ip is not changed
+      - floating_ip.failed

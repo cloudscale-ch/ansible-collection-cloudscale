@@ -1,0 +1,40 @@
+- name: Request regional floating IP for load balancer in check mode
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    prefix_length: '{{ item.prefix_length }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  check_mode: true
+  register: floating_ip
+  ignore_errors: True
+- name: Verify request floating IP for load balancer in check mode
+  assert:
+    that:
+      - floating_ip is not changed
+      - floating_ip.failed
+
+- name: Request regional floating IP for load balancer
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    prefix_length: '{{ item.prefix_length }}'
+    region: '{{ cloudscale_test_region }}'
+    tags:
+      project: ansible-test
+      stage: production
+      sla: 24-7
+  register: floating_ip
+  ignore_errors: True
+- name: Verify request regional floating IP for load balancer
+  assert:
+    that:
+      - floating_ip is not changed
+      - floating_ip.failed
