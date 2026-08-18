@@ -4,11 +4,25 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.6.0
+======
+
+Bugfixes
+--------
+
+- cloudscale action group - fix a typo (``loaad_balancer_listener``) that excluded the ``load_balancer_listener`` module from the ``cloudscale_ch.cloud.cloudscale`` action group, and add the missing ``volume_snapshot`` module to the group.
+
+New Modules
+-----------
+
+- interface - Manages network interfaces on the cloudscale.ch IaaS service
+- router - Manages routers on the cloudscale.ch IaaS service
+
 v2.5.3
 ======
 
 Minor Changes
----------------
+-------------
 
 - Added missing param when creating a health monitor
 
