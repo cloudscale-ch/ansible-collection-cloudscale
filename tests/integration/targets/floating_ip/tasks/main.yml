@@ -50,4 +50,7 @@
         tasks_from: cleanup_servers
     - import_role:
         name: common
+        tasks_from: cleanup_load_balancers
+    - import_role:
+        name: common
         tasks_from: cleanup_floating_ips

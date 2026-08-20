@@ -50,16 +50,17 @@ options:
   server:
     description:
       - UUID of the server assigned to this floating IP.
-      - This can not be used together with 'load_balancer'.
+      - This can not be used together with I(load_balancer).
     type: str
   load_balancer:
     description:
-      - UUID of the load_balancer assigned to this floatingIP.
-      - See the [API
-        documentation](https://www.cloudscale.ch/en/api/v1#create-a-floating-ip)
+      - UUID of the load_balancer assigned to this floating IP.
+      - See the L(API
+        documentation, https://www.cloudscale.ch/en/api/v1#create-a-floating-ip)
         for the allowed load balancers.
-      - This can not be used together with 'server'.
-      - You cannot set a prefix_length when adding a load_balancer.
+      - This cannot be used together with I(server).
+      - You cannot set a I(prefix_length) when adding a I(load_balancer).
+    version_added: 2.7.0
     type: str
   type:
     description:
@@ -78,7 +79,7 @@ options:
       - Only valid if I(ip_version) is 6.
       - Prefix length for the IPv6 network. Currently only a prefix of /56 can be requested. If no I(prefix_length) is present, a
         single address is created.
-      - You cannot set a prefix_length when adding a load_balancer.
+      - You cannot set a I(prefix_length) when adding a I(load_balancer).
     choices: [ 56 ]
     type: int
   reverse_ptr:
@@ -211,6 +212,12 @@ tags:
   type: dict
   sample: { 'project': 'my project' }
   version_added: 1.1.0
+load_balancer:
+  description: Load balancer assigned to this floating IP.
+  returned: success when state == present
+  type: dict
+  sample: { 'uuid': 'e4a5...', 'name': 'my-lb', 'href': 'https://api.cloudscale.ch/v1/load-balancers/e4a5...' }
+  version_added: 2.7.0
 '''
 
 from ansible.module_utils.basic import AnsibleModule

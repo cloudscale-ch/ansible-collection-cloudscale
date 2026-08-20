@@ -17,7 +17,7 @@
   assert:
     that:
       - floating_ip is not changed
-      - floating_ip.failed
+      - floating_ip is failed
 
 - name: Request regional floating IP for load balancer
   cloudscale_ch.cloud.floating_ip:
@@ -37,4 +37,4 @@
   assert:
     that:
       - floating_ip is not changed
-      - floating_ip.failed
+      - floating_ip is failed
