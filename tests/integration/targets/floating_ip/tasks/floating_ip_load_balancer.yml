@@ -35,7 +35,7 @@
       - floating_ip is changed
       - floating_ip.region.slug == cloudscale_test_region
       - floating_ip.load_balancer == test01_lb.uuid
-      - floating_ip.server is undefined
+      - not floating_ip.server
       - floating_ip.tags.project == 'ansible-test'
       - floating_ip.tags.stage == 'production'
       - floating_ip.tags.sla == '24-7'
@@ -122,7 +122,7 @@
     that:
       - floating_ip_reassign is changed
       - floating_ip_reassign.server == test01.uuid
-      - floating_ip_reassign.load_balancer is undefined
+      - not floating_ip_reassign.load_balancer
 
 - name: Reassign floating IP from server to load balancer
   cloudscale_ch.cloud.floating_ip:
@@ -137,7 +137,7 @@
     that:
       - floating_ip_reassign is changed
       - floating_ip_reassign.load_balancer == test01_lb.uuid
-      - floating_ip_reassign.server is undefined
+      - not floating_ip_reassign.server
 
 - name: Remove reassigned floating IP
   cloudscale_ch.cloud.floating_ip:
