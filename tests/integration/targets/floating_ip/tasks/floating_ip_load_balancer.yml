@@ -34,7 +34,7 @@
     that:
       - floating_ip is changed
       - floating_ip.region.slug == cloudscale_test_region
-      - floating_ip.load_balancer.uuid == test01_lb.uuid
+      - floating_ip.load_balancer == test01_lb.uuid
       - floating_ip.server is undefined
       - floating_ip.tags.project == 'ansible-test'
       - floating_ip.tags.stage == 'production'
@@ -52,7 +52,7 @@
   assert:
     that:
       - floating_ip_idempotence is not changed
-      - floating_ip_idempotence.load_balancer.uuid == test01_lb.uuid
+      - floating_ip_idempotence.load_balancer == test01_lb.uuid
       - floating_ip.region.slug == cloudscale_test_region
 
 - name: Remove floating IP from load balancer in check mode
@@ -108,3 +108,44 @@
     that:
       - floating_ip is not changed
       - floating_ip is failed
+
+- name: Request floating IP for server to test reassignment
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip-reassign'
+    server: '{{ test01.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_reassign
+- name: Verify request floating IP for server
+  assert:
+    that:
+      - floating_ip_reassign is changed
+      - floating_ip_reassign.server == test01.uuid
+      - floating_ip_reassign.load_balancer is undefined
+
+- name: Reassign floating IP from server to load balancer
+  cloudscale_ch.cloud.floating_ip:
+    name: '{{ cloudscale_resource_prefix }}-floating-ip-reassign'
+    load_balancer: '{{ test01_lb.uuid }}'
+    ip_version: '{{ item.ip_version }}'
+    reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
+    region: '{{ cloudscale_test_region }}'
+  register: floating_ip_reassign
+- name: Verify reassigned floating IP from server to load balancer
+  assert:
+    that:
+      - floating_ip_reassign is changed
+      - floating_ip_reassign.load_balancer == test01_lb.uuid
+      - floating_ip_reassign.server is undefined
+
+- name: Remove reassigned floating IP
+  cloudscale_ch.cloud.floating_ip:
+    ip: '{{ floating_ip_reassign.ip }}'
+    state: 'absent'
+  register: release_ip_reassign
+- name: Verify removal of reassigned floating IP
+  assert:
+    that:
+      - release_ip_reassign is changed
+      - release_ip_reassign.state == 'absent'

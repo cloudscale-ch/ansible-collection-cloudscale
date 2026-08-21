@@ -1,4 +1,4 @@
-- name: Request regional floating IP for load balancer in check mode
+- name: Request regional floating IP for load balancer with prefix length in check mode
   cloudscale_ch.cloud.floating_ip:
     name: '{{ cloudscale_resource_prefix }}-floating-ip'
     load_balancer: '{{ test01_lb.uuid }}'
@@ -13,13 +13,13 @@
   check_mode: true
   register: floating_ip
   ignore_errors: True
-- name: Verify request floating IP for load balancer in check mode
+- name: Verify request floating IP for load balancer with prefix length in check mode
   assert:
     that:
       - floating_ip is not changed
       - floating_ip is failed
 
-- name: Request regional floating IP for load balancer
+- name: Request regional floating IP for load balancer with prefix length
   cloudscale_ch.cloud.floating_ip:
     name: '{{ cloudscale_resource_prefix }}-floating-ip'
     load_balancer: '{{ test01_lb.uuid }}'
@@ -33,7 +33,7 @@
       sla: 24-7
   register: floating_ip
   ignore_errors: True
-- name: Verify request regional floating IP for load balancer
+- name: Verify request regional floating IP for load balancer with prefix length
   assert:
     that:
       - floating_ip is not changed

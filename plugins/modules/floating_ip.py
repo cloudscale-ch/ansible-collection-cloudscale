@@ -15,7 +15,7 @@ short_description: Manages floating IPs on the cloudscale.ch IaaS service
 description:
   - Create, assign and delete floating IPs on the cloudscale.ch IaaS service.
 notes:
-  - Once a floating_ip is created, all parameters except C(server), C(reverse_ptr) and C(tags) are read-only.
+  - Once a floating_ip is created, all parameters except C(server), C(load_balancer), C(reverse_ptr) and C(tags) are read-only.
 author:
   - Gaudenz Steinlin (@gaudenz)
   - Denis Krienbühl (@href)
@@ -50,11 +50,11 @@ options:
   server:
     description:
       - UUID of the server assigned to this floating IP.
-      - This can not be used together with I(load_balancer).
+      - This cannot be used together with I(load_balancer).
     type: str
   load_balancer:
     description:
-      - UUID of the load_balancer assigned to this floating IP.
+      - UUID of the load balancer assigned to this floating IP.
       - See the L(API
         documentation, https://www.cloudscale.ch/en/api/v1#create-a-floating-ip)
         for the allowed load balancers.
@@ -215,8 +215,8 @@ tags:
 load_balancer:
   description: Load balancer assigned to this floating IP.
   returned: success when state == present
-  type: dict
-  sample: { 'uuid': 'e4a5...', 'name': 'my-lb', 'href': 'https://api.cloudscale.ch/v1/load-balancers/e4a5...' }
+  type: str
+  sample: 47cec963-fcd2-482f-bdb6-24461b2d47b1
   version_added: 2.7.0
 '''
 
@@ -255,8 +255,9 @@ class AnsibleCloudscaleFloatingIp(AnsibleCloudscaleBase):
         self.query_constraint_keys = ['ip_version']
 
     def pre_transform(self, resource):
-        if 'server' in resource and isinstance(resource['server'], dict):
-            resource['server'] = resource['server']['uuid']
+        for key in ('server', 'load_balancer'):
+            if key in resource and isinstance(resource[key], dict):
+                resource[key] = resource[key]['uuid']
         return resource
 
     def create(self, resource):
