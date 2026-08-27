@@ -250,7 +250,7 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
         if uuid is not None:
             self._module.fail_json(msg="The resource with UUID '%s' was not found "
                                    "and we would create a new one with different UUID, "
-                                   "this is probably not want you have asked for." % uuid)
+                                   "this is probably not what you have asked for." % uuid)
 
         self._result['changed'] = True
 
@@ -349,6 +349,19 @@ class AnsibleCloudscaleBase(AnsibleCloudscaleApi):
             is_different = True
 
         return is_different
+
+    def has_differences(self, resource):
+        """Check if any create parameters differ from the current resource.
+
+        Iterates resource_create_param_keys and reports the first difference
+        found by delegating to find_difference().
+        """
+        for key in self.resource_create_param_keys:
+            param = self._module.params.get(key)
+            if param is not None and resource and key in resource:
+                if self.find_difference(key, resource, param):
+                    return True
+        return False
 
     def _param_updated(self, key, resource):
         param = self._module.params.get(key)

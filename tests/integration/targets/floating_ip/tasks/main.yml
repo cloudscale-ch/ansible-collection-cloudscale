@@ -44,6 +44,9 @@
 
     - import_tasks: unassigned.yml
 
+  module_defaults:
+    group/cloudscale_ch.cloud.cloudscale:
+      api_url: "{{ cloudscale_api_url }}"
   always:
     - import_role:
         name: common

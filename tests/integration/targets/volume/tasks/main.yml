@@ -4,6 +4,9 @@
     - import_tasks: failures.yml
     - import_tasks: tests.yml
     - import_tasks: deprecation_warning.yml
+  module_defaults:
+    group/cloudscale_ch.cloud.cloudscale:
+      api_url: "{{ cloudscale_api_url }}"
   always:
     - import_role:
         name: common

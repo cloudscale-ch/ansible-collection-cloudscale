@@ -10,7 +10,7 @@
 
 - name: Create two objects user with the same display_name
   uri:
-    url: 'https://api.cloudscale.ch/v1/objects-users'
+    url: '{{ cloudscale_api_url }}/objects-users'
     method: POST
     headers:
       Authorization: 'Bearer {{ cloudscale_api_token }}'

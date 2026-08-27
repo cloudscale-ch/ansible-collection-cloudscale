@@ -1,0 +1,8 @@
+---
+# Copy this file to `integration_config.yml` to override integration test settings.
+# ansible-test loads `integration_config.yml` automatically as extra vars for every
+# target and preserves it through delegation (e.g. --docker).
+#
+# Override the cloudscale.ch API base URL used by all modules and cleanup tasks.
+# When unset, tests default to production (https://api.cloudscale.ch/v1).
+#cloudscale_api_url: "https://api.cloudscale.ch/v1"

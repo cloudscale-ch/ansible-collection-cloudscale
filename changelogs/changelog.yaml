@@ -197,3 +197,19 @@ releases:
     fragments:
     - 2.5.3.yml
     release_date: '2026-01-05'
+  2.6.0:
+    changes:
+      bugfixes:
+      - cloudscale action group - fix a typo (``loaad_balancer_listener``) that excluded
+        the ``load_balancer_listener`` module from the ``cloudscale_ch.cloud.cloudscale``
+        action group, and add the missing ``volume_snapshot`` module to the group.
+    fragments:
+    - action-group-cloudscale.yml
+    modules:
+    - description: Manages network interfaces on the cloudscale.ch IaaS service
+      name: interface
+      namespace: ''
+    - description: Manages routers on the cloudscale.ch IaaS service
+      name: router
+      namespace: ''
+    release_date: '2026-08-18'

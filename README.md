@@ -82,7 +82,7 @@ There are many ways in which you can participate in the project, for example:
 - Submit bugs and feature requests, and help us verify them as they are checked in
 - Review source code changes
 - Review the documentation and make pull requests for anything from typos to new content
-- If you are interested in fixing issues and contributing directly to the code base, please see the [CONTRIBUTING](CONTRIBUTING.md) document.
+- If you are interested in fixing issues and contributing directly to the code base, please see the [CONTRIBUTING](CONTRIBUTING.md) document, which also covers running the tests and building the documentation locally.
 
 ## Releasing
 

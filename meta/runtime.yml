@@ -3,17 +3,20 @@ action_groups:
   cloudscale:
   - custom_image
   - floating_ip
+  - interface
   - load_balancer
   - load_balancer_health_monitor
-  - loaad_balancer_listener
+  - load_balancer_listener
   - load_balancer_pool
   - load_balancer_pool_member
   - network
   - objects_user
+  - router
   - server_group
   - server
   - subnet
   - volume
+  - volume_snapshot
 
 plugin_routing:
   inventory:

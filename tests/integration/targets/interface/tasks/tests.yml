@@ -1,0 +1,101 @@
+---
+- name: Attach interface in check mode
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    addresses:
+      - subnet: '{{ test_subnet.uuid }}'
+        address: '172.16.42.10'
+  register: iface
+  check_mode: true
+- name: 'VERIFY: Attach interface in check mode'
+  assert:
+    that:
+      - iface is changed
+      - not iface.uuid
+
+- name: Attach interface
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    addresses:
+      - subnet: '{{ test_subnet.uuid }}'
+        address: '172.16.42.10'
+  register: iface
+- name: 'VERIFY: Attach interface'
+  assert:
+    that:
+      - iface is changed
+      - iface.uuid is defined
+      - iface.network.uuid == test_network.uuid
+      - iface.state == 'present'
+
+- name: Remember interface uuid
+  set_fact:
+    interface_uuid: '{{ iface.uuid }}'
+
+- name: Attach interface idempotence (by network)
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    addresses:
+      - subnet: '{{ test_subnet.uuid }}'
+        address: '172.16.42.10'
+  register: iface
+- name: 'VERIFY: Attach interface idempotence'
+  assert:
+    that:
+      - iface is not changed
+      - iface.uuid == interface_uuid
+
+- name: Change addresses fails
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    addresses:
+      - subnet: '{{ test_subnet.uuid }}'
+        address: '172.16.42.20'
+  register: iface
+  ignore_errors: true
+- name: 'VERIFY: Change addresses fails'
+  assert:
+    that:
+      - iface is failed
+      - "'Updating interfaces is not supported' in iface.msg"
+
+- name: Detach interface in check mode
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    state: absent
+  register: iface
+  check_mode: true
+- name: 'VERIFY: Detach interface in check mode'
+  assert:
+    that:
+      - iface is changed
+      - iface.state == 'present'
+
+- name: Detach interface by network
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    state: absent
+  register: iface
+- name: 'VERIFY: Detach interface'
+  assert:
+    that:
+      - iface is changed
+      - iface.state == 'absent'
+
+- name: Detach interface idempotence
+  cloudscale_ch.cloud.interface:
+    router: '{{ test_router.uuid }}'
+    network: '{{ test_network.uuid }}'
+    state: absent
+  register: iface
+- name: 'VERIFY: Detach interface idempotence'
+  assert:
+    that:
+      - iface is not changed
+      - iface.state == 'absent'

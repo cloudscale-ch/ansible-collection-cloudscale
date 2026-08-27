@@ -1,0 +1,65 @@
+name: Unit tests
+
+permissions: {}
+
+on:
+  schedule:
+  - cron: "32 5 * * *"
+  pull_request:
+
+jobs:
+  units:
+    permissions:
+      contents: read
+    name: Unit tests (${{ matrix.ansible }})
+    defaults:
+      run:
+        working-directory: ansible_collections/cloudscale_ch/cloud
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(vars.ANSIBLE_PYTHON_MATRIX) }}
+    runs-on: ${{ vars.RUNNER_OS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          path: ansible_collections/cloudscale_ch/cloud
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install ansible
+        run: |
+          if [ "${{ matrix.ansible }}" = "devel" ] ; then
+            pip install https://github.com/ansible/ansible/archive/devel.tar.gz
+          else
+            pip install 'ansible-core~=${{ matrix.ansible }}'
+          fi
+
+      - name: Run unit tests
+        run: >-
+          ansible-test
+          units
+          --docker
+          --python ${{ matrix.python }}
+          -v
+          --color
+          --coverage
+
+      - name: Generate coverage report
+        run: >-
+          ansible-test
+          coverage xml
+          -v
+          --requirements
+          --group-by command
+          --group-by version
+
+      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          fail_ci_if_error: false
