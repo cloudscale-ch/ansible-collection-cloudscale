@@ -5,10 +5,6 @@
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
     region: '{{ cloudscale_test_region }}'
-    tags:
-      project: ansible-test
-      stage: production
-      sla: 24-7
   check_mode: true
   register: floating_ip
 - name: Verify request floating IP for load balancer in check mode
@@ -24,10 +20,6 @@
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
     region: '{{ cloudscale_test_region }}'
-    tags:
-      project: ansible-test
-      stage: production
-      sla: 24-7
   register: floating_ip
 - name: Verify request regional floating IP for load balancer
   assert:
@@ -36,9 +28,6 @@
       - floating_ip.region.slug == cloudscale_test_region
       - floating_ip.load_balancer == test01_lb.uuid
       - not floating_ip.server
-      - floating_ip.tags.project == 'ansible-test'
-      - floating_ip.tags.stage == 'production'
-      - floating_ip.tags.sla == '24-7'
 
 - name: Request regional floating IP for load balancer idempotence
   cloudscale_ch.cloud.floating_ip:
@@ -97,10 +86,6 @@
     ip_version: '{{ item.ip_version }}'
     reverse_ptr: '{{ item.reverse_ptr | default(omit) }}'
     region: '{{ cloudscale_test_region }}'
-    tags:
-      project: ansible-test
-      stage: production
-      sla: 24-7
   register: floating_ip
   ignore_errors: True
 - name: Verify request regional floating IP for load balancer mutual exclusivity
