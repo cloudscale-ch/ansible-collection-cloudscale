@@ -213,3 +213,10 @@ releases:
       name: router
       namespace: ''
     release_date: '2026-08-18'
+  2.7.0:
+    changes:
+      minor_changes:
+      - Add missing load_balancer parameter to the floating IP module.
+    fragments:
+    - add-loadbalancer-parameter-to-floating-ip.yml
+    release_date: '2026-09-03'

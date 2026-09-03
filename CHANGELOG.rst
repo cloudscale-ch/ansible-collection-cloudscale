@@ -4,6 +4,14 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
+v2.7.0
+======
+
+Minor Changes
+-------------
+
+- Add missing load_balancer parameter to the floating IP module.
+
 v2.6.0
 ======
 

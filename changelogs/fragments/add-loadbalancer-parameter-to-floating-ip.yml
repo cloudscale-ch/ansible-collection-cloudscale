@@ -1,2 +1,0 @@
-minor_changes:
-    - Add missing load_balancer parameter to the floating IP module.
