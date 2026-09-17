@@ -73,6 +73,13 @@ cp tests/integration/integration_config.yml.template tests/integration/integrati
 When left unset the tests use production. See the comments in the template for
 details.
 
+Use the following API URL to run the tests against a local instance of the API.
+Using `localhost` will not work since the integration tests are run in a docker container.
+
+```yaml
+cloudscale_api_url: "http://host.docker.internal:8000/api/v1"
+```
+
 ## Generating documentation
 
 To preview the module documentation locally, use `antsibull-docs`:
