@@ -82,7 +82,7 @@
   set_fact:
     igw_uuid: '{{ igw.uuid }}'
 
-- name: Change internet_gateway fails
+- name: Update router internet_gateway in check mode
   cloudscale_ch.cloud.router:
     name: '{{ cloudscale_resource_prefix }}-igw'
     zone: '{{ cloudscale_test_zone }}'
@@ -90,12 +90,46 @@
     tags:
       project: ansible-test
   register: igw
-  ignore_errors: true
-- name: 'VERIFY: Change internet_gateway fails'
+  check_mode: true
+- name: 'VERIFY: Update router internet_gateway in check mode'
   assert:
     that:
-      - igw is failed
-      - "'Updating routers is not supported' in igw.msg"
+      - igw is changed
+      - igw.uuid == igw_uuid
+      - igw.internet_gateway == true
+      - igw.zone.slug == cloudscale_test_zone
+
+- name: Update router internet_gateway
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-igw'
+    zone: '{{ cloudscale_test_zone }}'
+    internet_gateway: false
+    tags:
+      project: ansible-test
+  register: igw
+- name: 'VERIFY: Update router internet_gateway'
+  assert:
+    that:
+      - igw is changed
+      - igw.uuid == igw_uuid
+      - igw.internet_gateway == false
+      - igw.zone.slug == cloudscale_test_zone
+
+- name: Update router internet_gateway idempotence
+  cloudscale_ch.cloud.router:
+    name: '{{ cloudscale_resource_prefix }}-igw'
+    zone: '{{ cloudscale_test_zone }}'
+    internet_gateway: false
+    tags:
+      project: ansible-test
+  register: igw
+- name: 'VERIFY: Update router internet_gateway idempotence'
+  assert:
+    that:
+      - igw is not changed
+      - igw.uuid == igw_uuid
+      - igw.internet_gateway == false
+      - igw.zone.slug == cloudscale_test_zone
 
 - name: Delete igw
   cloudscale_ch.cloud.router:

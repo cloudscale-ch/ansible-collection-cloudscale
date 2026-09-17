@@ -17,8 +17,6 @@ description:
 author:
   - Michael Weibel (@mweibel)
 version_added: "2.6.0"
-notes:
-  - B(Updates are not supported.) Changing any parameter requires deleting and recreating the router.
 options:
   name:
     description:
@@ -37,7 +35,7 @@ options:
   internet_gateway:
     description:
       - Whether this router acts as an internet gateway.
-    default: false
+      - When creating a router defaults to C(false) if not specified.
     type: bool
   tags:
     description:
@@ -251,21 +249,7 @@ from ..module_utils.api import (
 
 
 class AnsibleCloudscaleRouter(AnsibleCloudscaleBase):
-
-    def update(self, resource):
-        # The router API has no update endpoint.
-        # Any change to a create parameter requires delete+recreate.
-        if self.has_differences(resource):
-            self._module.fail_json(
-                msg="Updating routers is not supported. "
-                    "Use state=absent followed by state=present to recreate.",
-            )
-        return resource
-
-    def find_difference(self, key, resource, param):
-        if key == 'zone':
-            return resource.get('zone', {}).get('slug') != param
-        return super().find_difference(key, resource, param)
+    pass
 
 
 def main():
@@ -274,7 +258,7 @@ def main():
         name=dict(type='str'),
         uuid=dict(type='str'),
         zone=dict(type='str'),
-        internet_gateway=dict(type='bool', default=False),
+        internet_gateway=dict(type='bool'),
         tags=dict(type='dict'),
         state=dict(default='present', choices=['absent', 'present']),
     ))
