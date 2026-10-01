@@ -220,3 +220,10 @@ releases:
     fragments:
     - add-loadbalancer-parameter-to-floating-ip.yml
     release_date: '2026-09-03'
+  2.8.0:
+    changes:
+      minor_changes:
+      - Add update support for routers.
+    fragments:
+    - add-update-support-for-routers.yml
+    release_date: '2026-10-01'
