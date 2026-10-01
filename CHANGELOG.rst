@@ -4,14 +4,6 @@ Ansible Collection cloudscale.ch Release Notes
 
 .. contents:: Topics
 
-v2.8.0
-======
-
-Minor Changes
--------------
-
-- Add update support for routers.
-
 v2.7.0
 ======
 
